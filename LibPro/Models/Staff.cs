@@ -52,7 +52,17 @@ namespace LibPro.Models
         [RegularExpression("[1-9][0-9]{2}|[1-9][0-9]{5}")]
         public string? ZipCode { get; set; }
 
+        public string UserID { get; set; } = null!;
 
+        public byte CityID { get; set; }
+
+        public string DeptID { get; set; } = null!;
+
+        public virtual UserAccounts? UserAccounts { get; set; }
+
+        public virtual Cities? Cities { get; set; }
+
+        public virtual Departments? Department { get; set; }
 
 
 

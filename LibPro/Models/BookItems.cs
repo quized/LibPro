@@ -17,5 +17,7 @@ namespace LibPro.Models
         [StringLength(200, ErrorMessage = "備註最多接受200個字元")]
         [DataType(DataType.MultilineText)]
         public string? Remarks { get; set; }
+
+        public byte ItmStatus { get; set; }
     }
 }

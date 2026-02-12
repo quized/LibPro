@@ -11,5 +11,7 @@ namespace LibPro.Models
         [Required(ErrorMessage = "必填欄位")]
         [StringLength(20)]
         public string StatusName { get; set; } = null!;
+
+        public List<Reserves>? Reserves { get; set; }
     }
 }

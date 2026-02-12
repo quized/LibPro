@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -9,9 +10,9 @@ namespace LibPro.Models
         [RegularExpression("A[0-9]{11}")]
         public string AnnID { get; set; } = null!;
 
-        [Display(Name ="標題")]
+        [Display(Name = "標題")]
         [Required(ErrorMessage = "必填欄位")]
-        [StringLength(100,MinimumLength =2, ErrorMessage ="標題限2~100個字元")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "標題限2~100個字元")]
         public string Title { get; set; } = null!;
 
         [Display(Name = "內容")]
@@ -24,6 +25,11 @@ namespace LibPro.Models
         [DataType(DataType.DateTime)]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm:ss}")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+        public string Creator { get; set; } = null!;
+
+        [ForeignKey("Creator")]
+        public virtual Staff? Staff { get; set; }
 
     }
 }

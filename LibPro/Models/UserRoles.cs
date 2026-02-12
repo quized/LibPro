@@ -13,5 +13,8 @@ namespace LibPro.Models
         [Required(ErrorMessage = "必填欄位")]
         [StringLength(20)]
         public string RoleName { get; set; } = null!;
+
+        public List<UserAccounts>? UserAccounts { get; set; } 
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -8,7 +9,7 @@ namespace LibPro.Models
         [RegularExpression("P[0-9]{7}[1-9]")]
         public string PatronID { get; set; } = null!;
 
-        
+
         [StringLength(40, MinimumLength = 2, ErrorMessage = ("姓名需2~40個字元"))]
         [Display(Name = "姓名")]
         [Required(ErrorMessage = "必填欄位")]
@@ -48,7 +49,7 @@ namespace LibPro.Models
 
         [Required(ErrorMessage = "必填欄位")]
         [Display(Name = "行政區")]
-        [StringLength(10,MinimumLength =2, ErrorMessage ="行政區需填2~10個字元")]
+        [StringLength(10, MinimumLength = 2, ErrorMessage = "行政區需填2~10個字元")]
         public string District { get; set; } = null!;
 
         [Required(ErrorMessage = "必填欄位")]
@@ -62,9 +63,21 @@ namespace LibPro.Models
         public string? ZipCode { get; set; }
 
         [Display(Name = "備註")]
-        [StringLength(100,ErrorMessage = "備註最多接受100個字元")]
+        [StringLength(100, ErrorMessage = "備註最多接受100個字元")]
         [DataType(DataType.MultilineText)]
         public string? Memo { get; set; }
 
+        public string UserID { get; set; } = null!;
+
+        public byte CityID { get; set; }
+
+        public byte PtrStatus { get; set; }
+
+        public virtual UserAccounts? UserAccount { get; set; }
+
+        public virtual Cities? City { get; set; }
+
+        [ForeignKey("PtrStatus")]
+        public virtual PatronsStatus? PatronsStatus { get; set; }
     }
 }

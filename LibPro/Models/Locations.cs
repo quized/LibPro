@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -17,5 +18,14 @@ namespace LibPro.Models
 
         [Display(Name = "排列序號")]
         public int SortOrder { get; set; }
+
+        
+        public byte? ParentID { get; set; }
+
+        [ForeignKey(nameof(ParentID))]
+        public virtual Locations? ParentLocation { get; set; }
+
+
+
     }
 }

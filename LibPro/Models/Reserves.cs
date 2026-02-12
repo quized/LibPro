@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -23,5 +24,18 @@ namespace LibPro.Models
         [StringLength(200, ErrorMessage = "備註最多接受200個字元")]
         [DataType(DataType.MultilineText)]
         public string? Notes { get; set; }
+
+        public byte ResStatus { get; set; }
+
+        public string PatronID { get; set; } = null!;
+
+        public string ItemID { get; set; } = null!;
+
+        [ForeignKey("ResStatus")]
+        public virtual ReserveStatus? ReserveStatus { get; set; }
+
+        public virtual Patrons? Patron { get; set; }
+
+        public virtual BookItems? BookItem { get; set; }
     }
 }

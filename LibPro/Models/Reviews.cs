@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
     public class Reviews
     {
-        [Key]        
+        [Key]
         public long ReviewID { get; set; }
 
         [Required(ErrorMessage = "必填欄位")]
@@ -27,6 +28,16 @@ namespace LibPro.Models
         [Required(ErrorMessage = "必填欄位")]
         public byte Rating { get; set; }
 
+        public byte RevStatus { get; set; }
+
+        public string PatronID { get; set; } = null!;
+
+        public long BibID { get; set; }
+
+        [ForeignKey("RevStatus")]
+        public virtual SystemStatus? SystemStatus { get; set; }
+
+        public virtual Patrons? Patron { get; set; }
 
     }
 }

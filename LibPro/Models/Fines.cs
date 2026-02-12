@@ -17,6 +17,16 @@ namespace LibPro.Models
 
         public bool IsPaid { get; set; } = false;
 
-        
+        public string PatronID { get; set; } = null!;
+
+        public byte FTID { get; set; }
+
+        public string LoanID { get; set; } = null!;
+
+        public virtual Patrons? Patron { get; set; }
+
+        public virtual FineTypes? FineTypes { get; set; }
+
+        public virtual Loans? Loan { get; set; }
     }
 }

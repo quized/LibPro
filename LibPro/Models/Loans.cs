@@ -33,5 +33,12 @@ namespace LibPro.Models
         [DataType(DataType.MultilineText)]
         public string? Notes { get; set; } 
 
+        public string PatronID { get; set; } = null!;
+
+        public string ItemID { get; set; } = null!;
+
+        public virtual Patrons? Patron { get; set; }
+
+        public virtual BookItems? BookItem { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -33,5 +34,10 @@ namespace LibPro.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         
+        public byte UserType { get; set; }
+
+        [ForeignKey("UserType")]
+        public virtual UserRoles? UserRole { get; set; }
+
     }
 }

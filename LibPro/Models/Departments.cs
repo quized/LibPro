@@ -12,5 +12,7 @@ namespace LibPro.Models
         [StringLength(20,MinimumLength =3,ErrorMessage =("部門名稱需3~20個字元"))]
         [Required(ErrorMessage = "必填欄位")]
         public string DeptName { get; set; } = null!;
+
+        public List<Staff>? Staffs { get; set; }
     }
 }
