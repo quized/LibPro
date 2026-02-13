@@ -79,5 +79,13 @@ namespace LibPro.Models
 
         [ForeignKey("PtrStatus")]
         public virtual PatronsStatus? PatronsStatus { get; set; }
+
+        public virtual List<Fines>? Fines { get; set; }
+
+        public virtual List<Loans>? Loans { get; set; }
+
+        public virtual List<Reserves>? Reserves { get; set; }
+
+        public virtual List<Reviews>? Reviews { get; set; }
     }
 }

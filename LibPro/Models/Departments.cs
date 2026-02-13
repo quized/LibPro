@@ -14,5 +14,7 @@ namespace LibPro.Models
         public string DeptName { get; set; } = null!;
 
         public List<Staff>? Staffs { get; set; }
+
+        
     }
 }

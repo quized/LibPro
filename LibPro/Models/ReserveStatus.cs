@@ -12,6 +12,6 @@ namespace LibPro.Models
         [StringLength(20)]
         public string StatusName { get; set; } = null!;
 
-        public List<Reserves>? Reserves { get; set; }
+        public virtual List<Reserves>? Reserves { get; set; }
     }
 }

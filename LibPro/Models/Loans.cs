@@ -40,5 +40,7 @@ namespace LibPro.Models
         public virtual Patrons? Patron { get; set; }
 
         public virtual BookItems? BookItem { get; set; }
+
+        public virtual List<Fines>? Fines { get; set; }
     }
 }

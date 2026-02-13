@@ -39,5 +39,8 @@ namespace LibPro.Models
         [ForeignKey("UserType")]
         public virtual UserRoles? UserRole { get; set; }
 
+        public virtual List<Staff>? Staffs { get; set; }
+
+        public virtual List<Patrons>? Patrons { get; set; }
     }
 }

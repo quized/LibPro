@@ -11,5 +11,7 @@ namespace LibPro.Models
         [Required(ErrorMessage = "必填欄位")]
         [StringLength(10)]
         public string StatusName { get; set; } = null!;
+        
+        public virtual List<BookItems>? BookItems { get; set; }
     }
 }

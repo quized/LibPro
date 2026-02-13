@@ -14,8 +14,8 @@ namespace LibPro.Models
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm:ss}")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-
-        public bool IsPaid { get; set; } = false;
+        [Display(Name = "付款與否")]
+        public bool ISPaid { get; set; } = false;
 
         public string PatronID { get; set; } = null!;
 
@@ -25,7 +25,7 @@ namespace LibPro.Models
 
         public virtual Patrons? Patron { get; set; }
 
-        public virtual FineTypes? FineTypes { get; set; }
+        public virtual FineTypes? FineType { get; set; }
 
         public virtual Loans? Loan { get; set; }
     }

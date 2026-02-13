@@ -58,13 +58,13 @@ namespace LibPro.Models
 
         public string DeptID { get; set; } = null!;
 
-        public virtual UserAccounts? UserAccounts { get; set; }
+        public virtual UserAccounts? UserAccount { get; set; }
 
-        public virtual Cities? Cities { get; set; }
+        public virtual Cities? City { get; set; }
 
         public virtual Departments? Department { get; set; }
 
-
+        public virtual List<Announcements>? Announcements { get; set; }
 
     }
 }

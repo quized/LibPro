@@ -22,8 +22,12 @@ namespace LibPro.Models
         
         public byte? ParentID { get; set; }
 
-        [ForeignKey(nameof(ParentID))]
+        [ForeignKey("ParentID")]
         public virtual Locations? ParentLocation { get; set; }
+
+        public virtual List<Locations>? SubLocations { get; set; }
+
+        public virtual List<BookItems>? BookItems { get; set; }
 
 
 

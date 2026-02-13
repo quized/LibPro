@@ -11,5 +11,7 @@ namespace LibPro.Models
         [Display(Name ="類別名稱")]
         [StringLength(20,ErrorMessage ="類別名稱最多20個字元")]
         public string CatName { get; set; } = null!;
+
+        public virtual List<Biblios>? Biblios { get; set; }
     }
 }

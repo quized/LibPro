@@ -22,5 +22,10 @@ namespace LibPro.Models
         [RegularExpression("0[2-9][0-9]{7,8}")]
         public string? Pubtel { get; set; }
 
+        public byte CityID { get; set; }
+
+        public virtual Cities? City { get; set; }
+
+        public virtual List<Biblios>? Biblios { get; set; }
     }
 }

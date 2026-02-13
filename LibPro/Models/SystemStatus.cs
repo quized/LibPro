@@ -12,6 +12,6 @@ namespace LibPro.Models
         [StringLength(20)]
         public string StatusName { get; set; } = null!;
 
-        public List<Reviews>? Review{ get; set; }
+        public virtual List<Reviews>? Reviews{ get; set; }
     }
 }

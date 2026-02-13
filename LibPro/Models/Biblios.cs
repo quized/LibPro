@@ -34,7 +34,17 @@ namespace LibPro.Models
         [StringLength(50, ErrorMessage = "圖片最多接受50字元")]
         public string? ImgPath { get; set; }
 
+        public int CatID { get; set; }
 
+        public long? PubID { get; set; }
+
+        public virtual Categories? Category { get; set; }
+
+        public virtual Publishers? Publisher { get; set; }
+
+        public virtual List<Reviews>? Reviews { get; set; }
+
+        public virtual List<BookItems>? BookItems { get; set; }
 
     }
 }

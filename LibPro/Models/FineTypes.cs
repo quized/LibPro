@@ -15,5 +15,7 @@ namespace LibPro.Models
         [Display(Name ="金額")]
         [Required(ErrorMessage = "必填欄位")]
         public decimal UnitPrice { get; set; } 
+
+        public virtual List<Fines>? Fines { get; set; }
     }
 }

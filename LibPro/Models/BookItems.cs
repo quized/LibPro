@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -19,5 +20,20 @@ namespace LibPro.Models
         public string? Remarks { get; set; }
 
         public byte ItmStatus { get; set; }
+
+        public long BibID { get; set; }
+
+        public byte LocID { get; set; }
+
+        public virtual ItemStatus? ItemStatus { get; set; }
+
+        public virtual Biblios? Biblio { get; set; }
+
+        [ForeignKey("LocID")]
+        public virtual Locations? Location { get; set; }
+
+        public virtual List<Loans>? Loans { get; set; }
+         
+        public virtual List<Reserves>? Reserves { get; set; }
     }
 }
