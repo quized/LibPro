@@ -6,7 +6,8 @@ namespace LibPro.Models
     public class Locations
     {
         [Key]
-        public byte LocationID { get; set; }
+        
+        public int LocationID { get; set; }
 
         [Required(ErrorMessage = "必填欄位")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = ("名稱需2~50個字元"))]
@@ -20,7 +21,7 @@ namespace LibPro.Models
         public int SortOrder { get; set; }
 
         
-        public byte? ParentID { get; set; }
+        public int? ParentID { get; set; }
 
         [ForeignKey("ParentID")]
         public virtual Locations? ParentLocation { get; set; }

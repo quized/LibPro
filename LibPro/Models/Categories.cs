@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
     public class Categories
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int CatID { get; set; }
 
         [Required(ErrorMessage = "必填欄位")]

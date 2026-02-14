@@ -23,7 +23,7 @@ namespace LibPro.Models
 
         public long BibID { get; set; }
 
-        public byte LocID { get; set; }
+        public int LocID { get; set; }
 
         public virtual ItemStatus? ItemStatus { get; set; }
 

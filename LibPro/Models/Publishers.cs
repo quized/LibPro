@@ -21,7 +21,7 @@ namespace LibPro.Models
         [DataType(DataType.PhoneNumber)]
         [RegularExpression("0[2-9][0-9]{7,8}")]
         public string? Pubtel { get; set; }
-
+        [Display(Name = "城市")]
         public byte CityID { get; set; }
 
         public virtual Cities? City { get; set; }

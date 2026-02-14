@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
     public class UserRoles
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [HiddenInput]
         public byte RoleID { get; set; }
 

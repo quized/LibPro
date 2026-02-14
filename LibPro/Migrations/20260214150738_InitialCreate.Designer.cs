@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibPro.Migrations
 {
     [DbContext(typeof(LibproContext))]
-    [Migration("20260214133422_InitialCreate")]
+    [Migration("20260214150738_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -122,8 +122,8 @@ namespace LibPro.Migrations
                     b.Property<byte>("ItmStatus")
                         .HasColumnType("tinyint");
 
-                    b.Property<byte>("LocID")
-                        .HasColumnType("tinyint");
+                    b.Property<int>("LocID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("PurDate")
                         .HasColumnType("datetime2");
@@ -146,10 +146,7 @@ namespace LibPro.Migrations
             modelBuilder.Entity("LibPro.Models.Categories", b =>
                 {
                     b.Property<int>("CatID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CatID"));
 
                     b.Property<string>("CatName")
                         .IsRequired()
@@ -164,7 +161,10 @@ namespace LibPro.Migrations
             modelBuilder.Entity("LibPro.Models.Cities", b =>
                 {
                     b.Property<byte>("CityID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("CityID"));
 
                     b.Property<string>("CityName")
                         .IsRequired()
@@ -193,7 +193,10 @@ namespace LibPro.Migrations
             modelBuilder.Entity("LibPro.Models.FineTypes", b =>
                 {
                     b.Property<byte>("FTID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("FTID"));
 
                     b.Property<string>("FTName")
                         .IsRequired()
@@ -201,7 +204,8 @@ namespace LibPro.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(8)
+                        .HasColumnType("decimal(8,0)");
 
                     b.HasKey("FTID");
 
@@ -241,7 +245,10 @@ namespace LibPro.Migrations
             modelBuilder.Entity("LibPro.Models.ItemStatus", b =>
                 {
                     b.Property<byte>("StatusCode")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("StatusCode"));
 
                     b.Property<string>("StatusName")
                         .IsRequired()
@@ -296,8 +303,11 @@ namespace LibPro.Migrations
 
             modelBuilder.Entity("LibPro.Models.Locations", b =>
                 {
-                    b.Property<byte>("LocationID")
-                        .HasColumnType("tinyint");
+                    b.Property<int>("LocationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocationID"));
 
                     b.Property<byte>("Depth")
                         .HasColumnType("tinyint");
@@ -307,8 +317,8 @@ namespace LibPro.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<byte?>("ParentID")
-                        .HasColumnType("tinyint");
+                    b.Property<int?>("ParentID")
+                        .HasColumnType("int");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
@@ -398,7 +408,10 @@ namespace LibPro.Migrations
             modelBuilder.Entity("LibPro.Models.PatronsStatus", b =>
                 {
                     b.Property<byte>("StatusCode")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("StatusCode"));
 
                     b.Property<string>("StatusName")
                         .IsRequired()
@@ -444,7 +457,10 @@ namespace LibPro.Migrations
             modelBuilder.Entity("LibPro.Models.ReserveStatus", b =>
                 {
                     b.Property<byte>("StatusCode")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("StatusCode"));
 
                     b.Property<string>("StatusName")
                         .IsRequired()
@@ -612,7 +628,10 @@ namespace LibPro.Migrations
             modelBuilder.Entity("LibPro.Models.SystemStatus", b =>
                 {
                     b.Property<byte>("StatusCode")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("StatusCode"));
 
                     b.Property<string>("StatusName")
                         .IsRequired()
@@ -658,7 +677,10 @@ namespace LibPro.Migrations
             modelBuilder.Entity("LibPro.Models.UserRoles", b =>
                 {
                     b.Property<byte>("RoleID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("RoleID"));
 
                     b.Property<string>("RoleName")
                         .IsRequired()

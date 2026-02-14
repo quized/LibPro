@@ -15,8 +15,7 @@ namespace LibPro.Migrations
                 name: "Categories",
                 columns: table => new
                 {
-                    CatID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CatID = table.Column<int>(type: "int", nullable: false),
                     CatName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
@@ -28,7 +27,8 @@ namespace LibPro.Migrations
                 name: "Cities",
                 columns: table => new
                 {
-                    CityID = table.Column<byte>(type: "tinyint", nullable: false),
+                    CityID = table.Column<byte>(type: "tinyint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CityName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -52,9 +52,10 @@ namespace LibPro.Migrations
                 name: "FineTypes",
                 columns: table => new
                 {
-                    FTID = table.Column<byte>(type: "tinyint", nullable: false),
+                    FTID = table.Column<byte>(type: "tinyint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     FTName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    UnitPrice = table.Column<decimal>(type: "decimal(8,0)", precision: 8, scale: 0, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,7 +66,8 @@ namespace LibPro.Migrations
                 name: "ItemStatus",
                 columns: table => new
                 {
-                    StatusCode = table.Column<byte>(type: "tinyint", nullable: false),
+                    StatusCode = table.Column<byte>(type: "tinyint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     StatusName = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
                 },
                 constraints: table =>
@@ -77,11 +79,12 @@ namespace LibPro.Migrations
                 name: "Locations",
                 columns: table => new
                 {
-                    LocationID = table.Column<byte>(type: "tinyint", nullable: false),
+                    LocationID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     LocationName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Depth = table.Column<byte>(type: "tinyint", nullable: false),
                     SortOrder = table.Column<int>(type: "int", nullable: false),
-                    ParentID = table.Column<byte>(type: "tinyint", nullable: true)
+                    ParentID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -97,7 +100,8 @@ namespace LibPro.Migrations
                 name: "PatronsStatus",
                 columns: table => new
                 {
-                    StatusCode = table.Column<byte>(type: "tinyint", nullable: false),
+                    StatusCode = table.Column<byte>(type: "tinyint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     StatusName = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
                 },
                 constraints: table =>
@@ -109,7 +113,8 @@ namespace LibPro.Migrations
                 name: "ReserveStatus",
                 columns: table => new
                 {
-                    StatusCode = table.Column<byte>(type: "tinyint", nullable: false),
+                    StatusCode = table.Column<byte>(type: "tinyint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     StatusName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
@@ -121,7 +126,8 @@ namespace LibPro.Migrations
                 name: "SystemStatus",
                 columns: table => new
                 {
-                    StatusCode = table.Column<byte>(type: "tinyint", nullable: false),
+                    StatusCode = table.Column<byte>(type: "tinyint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     StatusName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
@@ -133,7 +139,8 @@ namespace LibPro.Migrations
                 name: "UserRoles",
                 columns: table => new
                 {
-                    RoleID = table.Column<byte>(type: "tinyint", nullable: false),
+                    RoleID = table.Column<byte>(type: "tinyint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     RoleName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
@@ -309,7 +316,7 @@ namespace LibPro.Migrations
                     Remarks = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     ItmStatus = table.Column<byte>(type: "tinyint", nullable: false),
                     BibID = table.Column<long>(type: "bigint", nullable: false),
-                    LocID = table.Column<byte>(type: "tinyint", nullable: false),
+                    LocID = table.Column<int>(type: "int", nullable: false),
                     ItemStatusStatusCode = table.Column<byte>(type: "tinyint", nullable: true),
                     BiblioBibID = table.Column<long>(type: "bigint", nullable: true)
                 },
