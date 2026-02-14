@@ -15,15 +15,11 @@ namespace LibPro.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         [Display(Name = "付款與否")]
-        public bool ISPaid { get; set; } = false;
-
-        public string PatronID { get; set; } = null!;
+        public bool ISPaid { get; set; } = false;     
 
         public byte FTID { get; set; }
 
-        public string LoanID { get; set; } = null!;
-
-        public virtual Patrons? Patron { get; set; }
+        public string LoanID { get; set; } = null!;     
 
         public virtual FineTypes? FineType { get; set; }
 

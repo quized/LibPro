@@ -78,9 +78,7 @@ namespace LibPro.Models
         public virtual Cities? City { get; set; }
 
         [ForeignKey("PtrStatus")]
-        public virtual PatronsStatus? PatronsStatus { get; set; }
-
-        public virtual List<Fines>? Fines { get; set; }
+        public virtual PatronsStatus? PatronsStatus { get; set; }      
 
         public virtual List<Loans>? Loans { get; set; }
 
