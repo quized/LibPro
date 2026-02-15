@@ -9,7 +9,7 @@ namespace LibPro.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public byte CityID { get; set; }
 
-        [Display(Name = "縣市名稱")]
+        [Display(Name = "縣市")]
         public string CityName { get; set; } = null!;
 
         public virtual List<Staff>? Staffs { get; set; }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static LibPro.ValidationAttributes.UniqueAttribute;
 
 namespace LibPro.Models
 {
@@ -10,6 +11,7 @@ namespace LibPro.Models
         [Display(Name = "出版社")]
         [Required(ErrorMessage = "必填欄位")]
         [StringLength(50, ErrorMessage = "出版社名稱最多50個字元")]
+        [PubNameCheck]
         public string PubName { get; set; } = null!;
 
         [Display(Name = "地址")]
@@ -21,9 +23,11 @@ namespace LibPro.Models
         [DataType(DataType.PhoneNumber)]
         [RegularExpression("0[2-9][0-9]{7,8}")]
         public string? Pubtel { get; set; }
-        [Display(Name = "城市")]
+
+        [Display(Name = "縣市")]
         public byte CityID { get; set; }
 
+        [Display(Name = "縣市")]
         public virtual Cities? City { get; set; }
 
         public virtual List<Biblios>? Biblios { get; set; }

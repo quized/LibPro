@@ -1,0 +1,134 @@
+﻿@model IEnumerable<LibPro.Models.Publishers>
+
+@{
+    ViewData["Title"] = "出版社列表";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" data-bs-toggle="modal" data-bs-target="#PubcreateModal" class="btn btn-success text-light">新增出版社</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PubName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.City)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pubtel)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PubName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.City.CityName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pubtel)
+                </td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.PubID" data-id="@item.PubID" data-bs-toggle="modal"
+                       data-bs-target="#PubEditModal" class="btn btn-primary text-light ">修改</a>
+                    <a asp-action="Delete" asp-route-id="@item.PubID" class="btn btn-danger">刪除</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- CreateModal -->
+<div class="modal fade " id="PubcreateModal" tabindex="-1" aria-labelledby="CreateModalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content ">
+            <div class="modal-header bg-secondary-subtle">
+                <h1 class="modal-title fs-2 w-100 text-center" id="CreateModalLabel">新增出版社</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-info-subtle">
+                <div id="PubCreate">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EditModal -->
+<div class="modal fade " id="PubEditModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content ">
+            <div class="modal-header bg-secondary-subtle">
+                <h1 class="modal-title fs-2 w-100 text-center" id="editModalLabel">出版社修改</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-info-subtle">
+                <div id="PubEdit">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+
+    <script>
+            // 當 Modal 開啟時載入 Create Partial View
+            $('#PubcreateModal').on('show.bs.modal', function () {
+                $('#PubCreate').load('/Publishers/Create', function () {
+                    $.validator.unobtrusive.parse($('#PubCreate'));
+                });
+
+            // 每次關閉時清空內容
+            $('#PubcreateModal').on('hidden.bs.modal', function () {
+                $('#PubCreate').html('');
+            });
+        });
+
+
+           $('#PubEditModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // 取得觸發 modal 的按鈕
+            var pubId = button.data('id');
+            $('#PubEdit').html(''); // 先清空
+            if (pubId) {
+                $('#PubEdit').load('/Publishers/Edit/' + pubId, function () {
+                    $.validator.unobtrusive.parse($('#PubEdit'));
+                });
+            }
+        });
+
+        $('#PubEditModal').on('hidden.bs.modal', function () {
+            $('#PubEdit').html('');
+        });
+
+
+
+
+    </script>
+
+}

@@ -1,0 +1,46 @@
+﻿@model LibPro.Models.Publishers
+
+@{
+    ViewData["Title"] = "出版社修改";
+}
+
+
+
+
+<div class="row">
+    <div class="col">
+        <form asp-action="Edit" >
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="PubID" />
+            <div class="form-group mb-2">
+                <label asp-for="PubName" class="control-label mb-2"></label>
+                <input asp-for="PubName" class="form-control" />
+                <span asp-validation-for="PubName" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="CityID" class="control-label mb-2"></label>
+                <select asp-for="CityID" class="form-control" asp-items="ViewBag.CityID"></select>
+                <span asp-validation-for="CityID" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="Address" class="control-label mb-2"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="Pubtel" class="control-label mb-2"></label>
+                <input asp-for="Pubtel" class="form-control" />
+                <span asp-validation-for="Pubtel" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group  mt-3  text-end">
+                <input type="submit" value="送出" class="btn btn-primary  w-25 fs-5" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
