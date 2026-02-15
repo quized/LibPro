@@ -48,7 +48,10 @@
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.PubID" data-id="@item.PubID" data-bs-toggle="modal"
                        data-bs-target="#PubEditModal" class="btn btn-primary text-light ">修改</a>
-                    <a asp-action="Delete" asp-route-id="@item.PubID" class="btn btn-danger">刪除</a>
+                    <form asp-action="Delete" asp-route-id="@item.PubID" class="d-inline">
+                        <input type="submit" class="btn btn-danger" value="刪除" onclick="return confirm('確定要刪除《@item.PubName》這筆資料嗎？')" />
+                       </form>
+                    
                 </td>
             </tr>
         }

@@ -103,29 +103,12 @@ namespace LibPro.Controllers
             return View(publishers);
         }
 
-        // GET: Publishers/Delete/5
-        public async Task<IActionResult> Delete(long? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var publishers = await _context.Publishers
-                .Include(p => p.City)
-                .FirstOrDefaultAsync(m => m.PubID == id);
-            if (publishers == null)
-            {
-                return NotFound();
-            }
-
-            return View(publishers);
-        }
+        
 
         // POST: Publishers/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        public async Task<IActionResult> Delete(long id)
         {
             var publishers = await _context.Publishers.FindAsync(id);
             if (publishers != null)
