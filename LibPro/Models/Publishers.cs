@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using static LibPro.ValidationAttributes.UniqueAttribute;
 
 namespace LibPro.Models
@@ -28,6 +29,7 @@ namespace LibPro.Models
         public byte CityID { get; set; }
 
         [Display(Name = "縣市")]
+        [ForeignKey("CityID")]
         public virtual Cities? City { get; set; }
 
         public virtual List<Biblios>? Biblios { get; set; }

@@ -73,8 +73,10 @@ namespace LibPro.Models
 
         public byte PtrStatus { get; set; }
 
+        [ForeignKey("UserID")]
         public virtual UserAccounts? UserAccount { get; set; }
 
+        [ForeignKey("CityID")]
         public virtual Cities? City { get; set; }
 
         [ForeignKey("PtrStatus")]

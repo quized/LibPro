@@ -26,6 +26,7 @@ namespace LibPro.Models
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm:ss}")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
+
         public string Creator { get; set; } = null!;
 
         [ForeignKey("Creator")]

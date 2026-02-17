@@ -1,0 +1,102 @@
+﻿@model IEnumerable<LibPro.Models.Biblios>
+
+@{
+    ViewData["Title"] = "書目表";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+<div class="col">
+    <a asp-action="Create" class="btn btn-success">新增書目</a>    
+</div>
+<div class=" col mb-3 text-end">
+    <div class="btn-group" role="group">
+        <a asp-action="Index" asp-route-isDeleted="0" class="btn btn-outline-primary" data-status="0">
+            現有書目
+        </a>
+
+        <a asp-action="Index" asp-route-isDeleted="1" class="btn btn-outline-danger" data-status="1">
+            已註銷書目
+        </a>
+    </div>
+
+</div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.BTitle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ISBN)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Author)
+            </th>
+
+             <th>
+                @Html.DisplayNameFor(model => model.Category.CatName)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="align-middle">
+           
+                <td>
+                    @Html.DisplayFor(modelItem => item.BTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ISBN)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.CatName)
+                </td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.BibID" class="btn btn-outline-info">修改</a> 
+                    <a asp-action="Details" asp-route-id="@item.BibID" class="btn btn-outline-warning">詳細</a> 
+                    <form asp-action="Delete" asp-route-id="@item.BibID" class="d-inline">
+                        <input type="submit" id="LogoutBtn" class="btn btn-outline-danger" value="註銷" onclick="return confirm('確定要註銷《@item.BTitle》這筆資料嗎？')" />
+                    </form>
+                    <button type="button" id="restoreBtn" class="btn btn-outline-success" style="display:none;">復原</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            
+            const urlParams = new URLSearchParams(window.location.search);
+                       
+            const currentStatus = urlParams.get('isDeleted') || '0';
+
+           
+
+
+            if (currentStatus === '0') {               
+                $('a[data-status="0"]').removeClass('btn-outline-primary').addClass('btn-primary');
+                $('#restoreBtn').hide();
+                $('#LogoutBtn').show();        
+            }
+            else{                
+                $('a[data-status="1"]').removeClass('btn-outline-danger').addClass('btn-danger');
+                $('#restoreBtn').show();
+                $('#LogoutBtn').hide();
+            }
+        });
+    </script>
+}

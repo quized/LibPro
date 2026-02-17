@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -52,16 +53,22 @@ namespace LibPro.Models
         [RegularExpression("[1-9][0-9]{2}|[1-9][0-9]{5}")]
         public string? ZipCode { get; set; }
 
+        
         public string UserID { get; set; } = null!;
 
+       
         public byte CityID { get; set; }
 
+       
         public string DeptID { get; set; } = null!;
 
+        [ForeignKey("UserID")]
         public virtual UserAccounts? UserAccount { get; set; }
 
+        [ForeignKey("CityID")]
         public virtual Cities? City { get; set; }
 
+        [ForeignKey("DeptID")]
         public virtual Departments? Department { get; set; }
 
         public virtual List<Announcements>? Announcements { get; set; }

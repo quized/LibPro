@@ -1,0 +1,104 @@
+﻿@model LibPro.Models.Biblios
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Biblios</h4>
+<hr />
+<div class="row">
+    <div class="col-7">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="BibID" />
+            <div class="form-group">
+                <label asp-for="BTitle" class="control-label"></label>
+                <input asp-for="BTitle" class="form-control" />
+                <span asp-validation-for="BTitle" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ISBN" class="control-label"></label>
+                <input asp-for="ISBN" class="form-control" />
+                <span asp-validation-for="ISBN" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Author" class="control-label"></label>
+                <input asp-for="Author" class="form-control" />
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Summary" class="control-label"></label>
+                <textarea asp-for="Summary" class="form-control"></textarea>
+                <span asp-validation-for="Summary" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PubDate" class="control-label"></label>
+                <input asp-for="PubDate" class="form-control" />
+                <span asp-validation-for="PubDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">                
+                <input type="file" name="newimg" id="newimg" class="form-control" />
+                <span asp-validation-for="ImgPath" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CatID" class="control-label"></label>
+                <select asp-for="CatID" class="form-control" asp-items="ViewBag.CatID"></select>
+                <span asp-validation-for="CatID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PubID" class="control-label"></label>
+                <select asp-for="PubID" class="form-control" asp-items="ViewBag.PubID"></select>
+                <span asp-validation-for="PubID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+    <div class="col-5">
+        <img id="ImagePreview" class="img-fluid" />
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+
+        $('#newimg').on('change', function(){
+              let file = this.files[0];
+
+              if(file == null){
+
+                  return;
+              }
+
+          //圖片格式確認
+          if(file.type != "image/jpeg" && file.type !="image/png")
+          {
+              alert("錯誤的照片檔案");
+              $('#newimg').val('');
+              $('#ImagePreview').attr('src', '');
+              return;
+          }
+
+
+              let reader = new FileReader();
+
+              reader.onload=function(e){
+
+                  $('#ImagePreview').attr('src', e.target.result);
+              }
+
+              reader.readAsDataURL(file);
+          });
+    </script>
+
+
+}

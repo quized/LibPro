@@ -110,6 +110,13 @@ namespace LibPro.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(long id)
         {
+            bool hasBiblios = _context.Biblios.Any(b => b.PubID == id);
+            if (hasBiblios)
+            {
+                return BadRequest("該出版社下有書籍，無法刪除。");
+            }
+
+
             var publishers = await _context.Publishers.FindAsync(id);
             if (publishers != null)
             {

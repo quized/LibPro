@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -13,7 +15,7 @@ namespace LibPro.Models
         public string BTitle { get; set; } = null!;
 
         [Display(Name = "國際標準書號(ISBN)")]     
-        [RegularExpression("97[89][0-9]{10} | [0-9]{9}[0-9xX]")]
+        [RegularExpression("97[89][0-9]{10}|[0-9]{9}[0-9xX]")]
         public string? ISBN { get; set; }
 
         [Display(Name ="作者")]
@@ -31,15 +33,24 @@ namespace LibPro.Models
         public DateTime? PubDate { get; set; }
 
         [Display(Name = "圖片")]
-        [StringLength(50, ErrorMessage = "圖片最多接受50字元")]
+        [StringLength(40, ErrorMessage = "圖片最多接受40字元")]
         public string? ImgPath { get; set; }
 
+        [HiddenInput]
+        public byte isDeleted { get; set; } = 0;
+
+        [Display(Name = "書類")]
+        [ForeignKey("CatID")]
         public int CatID { get; set; }
 
+        [Display(Name = "出版社")]      
+        [ForeignKey("PubID")]
         public long? PubID { get; set; }
 
+        [Display(Name = "書類")]
         public virtual Categories? Category { get; set; }
 
+        [Display(Name = "出版社")]
         public virtual Publishers? Publisher { get; set; }
 
         public virtual List<Reviews>? Reviews { get; set; }

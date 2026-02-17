@@ -25,8 +25,10 @@ namespace LibPro.Models
 
         public int LocID { get; set; }
 
+        [ForeignKey("ItmStatus")]
         public virtual ItemStatus? ItemStatus { get; set; }
 
+        [ForeignKey("BibID")]
         public virtual Biblios? Biblio { get; set; }
 
         [ForeignKey("LocID")]

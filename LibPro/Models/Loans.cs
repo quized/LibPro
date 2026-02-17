@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -37,8 +38,10 @@ namespace LibPro.Models
 
         public string ItemID { get; set; } = null!;
 
+        [ForeignKey("PatronID")]
         public virtual Patrons? Patron { get; set; }
 
+        [ForeignKey("ItemID")]
         public virtual BookItems? BookItem { get; set; }
 
         public virtual List<Fines>? Fines { get; set; }

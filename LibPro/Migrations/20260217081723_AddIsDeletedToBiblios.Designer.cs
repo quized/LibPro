@@ -4,6 +4,7 @@ using LibPro.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibPro.Migrations
 {
     [DbContext(typeof(LibproContext))]
-    partial class LibproContextModelSnapshot : ModelSnapshot
+    [Migration("20260217081723_AddIsDeletedToBiblios")]
+    partial class AddIsDeletedToBiblios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,6 +116,12 @@ namespace LibPro.Migrations
                     b.Property<long>("BibID")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("BiblioBibID")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte?>("ItemStatusStatusCode")
+                        .HasColumnType("tinyint");
+
                     b.Property<byte>("ItmStatus")
                         .HasColumnType("tinyint");
 
@@ -128,9 +137,9 @@ namespace LibPro.Migrations
 
                     b.HasKey("ItemID");
 
-                    b.HasIndex("BibID");
+                    b.HasIndex("BiblioBibID");
 
-                    b.HasIndex("ItmStatus");
+                    b.HasIndex("ItemStatusStatusCode");
 
                     b.HasIndex("LocID");
 
@@ -217,6 +226,9 @@ namespace LibPro.Migrations
                     b.Property<byte>("FTID")
                         .HasColumnType("tinyint");
 
+                    b.Property<byte?>("FineTypeFTID")
+                        .HasColumnType("tinyint");
+
                     b.Property<bool>("ISPaid")
                         .HasColumnType("bit");
 
@@ -226,7 +238,7 @@ namespace LibPro.Migrations
 
                     b.HasKey("FineID");
 
-                    b.HasIndex("FTID");
+                    b.HasIndex("FineTypeFTID");
 
                     b.HasIndex("LoanID");
 
@@ -256,12 +268,15 @@ namespace LibPro.Migrations
                     b.Property<string>("LoanID")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("BookItemItemID")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ItemID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LoanDate")
                         .HasColumnType("datetime2");
@@ -282,7 +297,7 @@ namespace LibPro.Migrations
 
                     b.HasKey("LoanID");
 
-                    b.HasIndex("ItemID");
+                    b.HasIndex("BookItemItemID");
 
                     b.HasIndex("PatronID");
 
@@ -371,9 +386,12 @@ namespace LibPro.Migrations
                     b.Property<byte>("PtrStatus")
                         .HasColumnType("tinyint");
 
+                    b.Property<string>("UserAccountUserID")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ZipCode")
                         .HasMaxLength(6)
@@ -385,7 +403,7 @@ namespace LibPro.Migrations
 
                     b.HasIndex("PtrStatus");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserAccountUserID");
 
                     b.ToTable("Patrons");
                 });
@@ -462,12 +480,15 @@ namespace LibPro.Migrations
                     b.Property<string>("ResID")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("BookItemItemID")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ItemID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(200)
@@ -485,7 +506,7 @@ namespace LibPro.Migrations
 
                     b.HasKey("ResID");
 
-                    b.HasIndex("ItemID");
+                    b.HasIndex("BookItemItemID");
 
                     b.HasIndex("PatronID");
 
@@ -503,6 +524,9 @@ namespace LibPro.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ReviewID"));
 
                     b.Property<long>("BibID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("BibliosBibID")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Content")
@@ -529,7 +553,7 @@ namespace LibPro.Migrations
 
                     b.HasKey("ReviewID");
 
-                    b.HasIndex("BibID");
+                    b.HasIndex("BibliosBibID");
 
                     b.HasIndex("PatronID");
 
@@ -554,9 +578,12 @@ namespace LibPro.Migrations
                     b.Property<byte>("CityID")
                         .HasColumnType("tinyint");
 
+                    b.Property<string>("DepartmentDeptID")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("DeptID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Education")
                         .IsRequired()
@@ -579,9 +606,12 @@ namespace LibPro.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserAccountUserID")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ZipCode")
                         .HasMaxLength(6)
@@ -591,9 +621,9 @@ namespace LibPro.Migrations
 
                     b.HasIndex("CityID");
 
-                    b.HasIndex("DeptID");
+                    b.HasIndex("DepartmentDeptID");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserAccountUserID");
 
                     b.ToTable("Staffs");
                 });
@@ -695,15 +725,11 @@ namespace LibPro.Migrations
                 {
                     b.HasOne("LibPro.Models.Biblios", "Biblio")
                         .WithMany("BookItems")
-                        .HasForeignKey("BibID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BiblioBibID");
 
                     b.HasOne("LibPro.Models.ItemStatus", "ItemStatus")
                         .WithMany("BookItems")
-                        .HasForeignKey("ItmStatus")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ItemStatusStatusCode");
 
                     b.HasOne("LibPro.Models.Locations", "Location")
                         .WithMany("BookItems")
@@ -722,9 +748,7 @@ namespace LibPro.Migrations
                 {
                     b.HasOne("LibPro.Models.FineTypes", "FineType")
                         .WithMany("Fines")
-                        .HasForeignKey("FTID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FineTypeFTID");
 
                     b.HasOne("LibPro.Models.Loans", "Loan")
                         .WithMany("Fines")
@@ -741,9 +765,7 @@ namespace LibPro.Migrations
                 {
                     b.HasOne("LibPro.Models.BookItems", "BookItem")
                         .WithMany("Loans")
-                        .HasForeignKey("ItemID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BookItemItemID");
 
                     b.HasOne("LibPro.Models.Patrons", "Patron")
                         .WithMany("Loans")
@@ -781,9 +803,7 @@ namespace LibPro.Migrations
 
                     b.HasOne("LibPro.Models.UserAccounts", "UserAccount")
                         .WithMany("Patrons")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserAccountUserID");
 
                     b.Navigation("City");
 
@@ -807,9 +827,7 @@ namespace LibPro.Migrations
                 {
                     b.HasOne("LibPro.Models.BookItems", "BookItem")
                         .WithMany("Reserves")
-                        .HasForeignKey("ItemID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BookItemItemID");
 
                     b.HasOne("LibPro.Models.Patrons", "Patron")
                         .WithMany("Reserves")
@@ -832,11 +850,9 @@ namespace LibPro.Migrations
 
             modelBuilder.Entity("LibPro.Models.Reviews", b =>
                 {
-                    b.HasOne("LibPro.Models.Biblios", "Biblio")
+                    b.HasOne("LibPro.Models.Biblios", null)
                         .WithMany("Reviews")
-                        .HasForeignKey("BibID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BibliosBibID");
 
                     b.HasOne("LibPro.Models.Patrons", "Patron")
                         .WithMany("Reviews")
@@ -849,8 +865,6 @@ namespace LibPro.Migrations
                         .HasForeignKey("RevStatus")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Biblio");
 
                     b.Navigation("Patron");
 
@@ -867,15 +881,11 @@ namespace LibPro.Migrations
 
                     b.HasOne("LibPro.Models.Departments", "Department")
                         .WithMany("Staffs")
-                        .HasForeignKey("DeptID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DepartmentDeptID");
 
                     b.HasOne("LibPro.Models.UserAccounts", "UserAccount")
                         .WithMany("Staffs")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserAccountUserID");
 
                     b.Navigation("City");
 

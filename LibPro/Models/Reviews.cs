@@ -37,7 +37,11 @@ namespace LibPro.Models
         [ForeignKey("RevStatus")]
         public virtual SystemStatus? SystemStatus { get; set; }
 
+        [ForeignKey("PatronID")]
         public virtual Patrons? Patron { get; set; }
+
+        [ForeignKey("BibID")]
+        public virtual Biblios? Biblio { get; set; }
 
     }
 }

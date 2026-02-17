@@ -203,7 +203,7 @@ namespace LibPro.Migrations
                     Author = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Summary = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     PubDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ImgPath = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    ImgPath = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
                     CatID = table.Column<int>(type: "int", nullable: false),
                     PubID = table.Column<long>(type: "bigint", nullable: true),
                     CategoryCatID = table.Column<int>(type: "int", nullable: true),

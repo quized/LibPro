@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibPro.Models
 {
@@ -19,10 +20,12 @@ namespace LibPro.Models
 
         public byte FTID { get; set; }
 
-        public string LoanID { get; set; } = null!;     
+        public string LoanID { get; set; } = null!;
 
+        [ForeignKey("FTID")]
         public virtual FineTypes? FineType { get; set; }
 
+        [ForeignKey("LoanID")]
         public virtual Loans? Loan { get; set; }
     }
 }
