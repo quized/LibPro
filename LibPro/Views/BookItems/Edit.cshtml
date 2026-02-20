@@ -1,0 +1,84 @@
+﻿@model LibPro.Models.BookItems
+
+@{
+       ViewData["Title"] = "編輯館藏：" + Model.ItemID;
+}
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm border-0 rounded-3 mx-auto" style="max-width: 800px;">
+
+        <div class="card-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-pencil-square text-warning"></i> 編輯館藏書籍 
+            </h5>
+            <span class="badge bg-warning text-dark fs-6">館藏編號：@Model.ItemID</span>
+        </div>
+
+        <div class="card-body p-4">
+            <form asp-action="Edit" asp-route-returnUrl="@ViewBag.ReturnUrl">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="ItemID" />
+
+                <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">所屬資訊</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="BibID" class="form-label fw-bold text-muted mb-1"></label>
+                        <select asp-for="BibID" class="form-select border-warning" asp-items="ViewBag.BibID"></select>
+                        <span asp-validation-for="BibID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="LocID" class="form-label fw-bold text-muted mb-1"></label>
+                        <select asp-for="LocID" class="form-select" asp-items="ViewBag.LocID"></select>
+                        <span asp-validation-for="LocID" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">狀態與採購紀錄</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="ItmStatus" class="form-label fw-bold text-muted mb-1"></label>
+                        <select asp-for="ItmStatus" class="form-select" asp-items="ViewBag.ItmStatus"></select>
+                        <span asp-validation-for="ItmStatus" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PurDate" class="form-label fw-bold text-muted mb-1"></label>
+                        <input asp-for="PurDate" class="form-control" type="date" />
+                        <span asp-validation-for="PurDate" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Remarks" class="form-label fw-bold text-muted mb-1"></label>
+                    <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="請輸入館藏備註（例如：附光碟、封面破損...）"></textarea>
+                    <span asp-validation-for="Remarks" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                    {
+                        <a href="@ViewBag.ReturnUrl" class="btn btn-outline-secondary px-4 fw-bold shadow-sm">
+                            <i class="bi bi-arrow-left"></i> 原路返回
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 fw-bold shadow-sm">
+                            <i class="bi bi-arrow-left"></i> 返回館藏
+                        </a>
+                    }
+                    <button type="submit" class="btn btn-warning px-5 fw-bold text-dark shadow-sm">
+                        <i class="bi bi-save"></i> 儲存變更
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

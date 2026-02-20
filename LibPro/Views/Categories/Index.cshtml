@@ -1,0 +1,94 @@
+﻿@model IEnumerable<LibPro.Models.Categories>
+
+@{
+    ViewData["Title"] = "書目分類管理";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold mb-0">@ViewData["Title"]</h3>
+
+        <button type="button" class="btn btn-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+            <i class="bi bi-plus-lg"></i> 新增分類
+        </button>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="d-flex bg-light p-3 border-bottom rounded-top text-muted fw-bold">
+            <div style="width: 30%;" class="ps-3">分類編號</div>
+            <div style="width: 45%;">分類名稱</div>
+            <div style="width: 25%;" class="text-end pe-3">管理操作</div>
+        </div>
+
+        <div class="list-group list-group-flush rounded-bottom">
+            @foreach (var item in Model)
+            {
+                <div class="list-group-item d-flex align-items-center p-3 border-bottom">
+                    <div style="width: 30%;" class="ps-3 text-secondary">@item.CatID</div>
+                    <div style="width: 45%;" class="fw-bold text-dark">@item.CatName</div>
+                    <div style="width: 25%;" class="text-end pe-3">
+                        <button type="button" class="btn btn-sm btn-outline-warning text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#editModal-@item.CatID">
+                            <i class="bi bi-pencil-square"></i> 修改
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="editModal-@item.CatID" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form asp-action="Edit" method="post">
+                                <div class="modal-header bg-light">
+                                    <h5 class="modal-title fw-bold">修改分類</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label fw-bold text-muted">分類編號</label>
+                                        <input name="CatID" value="@item.CatID" class="form-control bg-light" readonly />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label fw-bold text-muted">分類名稱</label>
+                                        <input name="CatName" value="@item.CatName" class="form-control border-secondary" required />
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="submit" class="btn btn-warning fw-bold">儲存修改</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="Create" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-plus-lg"></i> 新增書目分類</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-bold text-muted">分類編號</label>
+                        <input name="CATID" class="form-control border-primary" placeholder="請輸入自訂分類編號..." required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label fw-bold text-muted">分類名稱</label>
+                        <input name="CATNAME" class="form-control border-primary" placeholder="例如：自然科學、輕小說..." required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary fw-bold">確認新增</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

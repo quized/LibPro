@@ -4,104 +4,118 @@
     ViewData["Title"] = "新增書目";
 }
 
-<h1 class="text-center">@ViewData["Title"]</h1>
+<div class="container mt-4 mb-5">
+    <div class="card shadow border-0 rounded-3">
+        <div class="card-header bg-primary text-white p-3">
+            <h3 class="mb-0 text-center" ><i class="bi bi-book"></i> @ViewData["Title"]</h3>
+        </div>
 
-<hr />
-<div class="row">
-    <div class="col-7">
-        <form asp-action="Create" enctype="multipart/form-data" >
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group mb-2">
-                <label asp-for="BTitle" class="control-label mb-1"></label>
-                <input asp-for="BTitle" class="form-control" />
-                <span asp-validation-for="BTitle" class="text-danger"></span>
-            </div>
-            <div class="form-group  mb-2">
-                <label asp-for="ISBN" class="control-label mb-1"></label>
-                <input asp-for="ISBN" class="form-control" placeholder="請直接輸入數字(橫槓不用輸入)" />
-                <span asp-validation-for="ISBN" class="text-danger"></span>
-            </div>
-            <div class="form-group  mb-2">
-                <label asp-for="Author" class="control-label mb-1"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
-            <div class="form-group  mb-2">
-                <label asp-for="Summary" class="control-label mb-1"></label>
-                <textarea asp-for="Summary" class="form-control"></textarea>
-                <span asp-validation-for="Summary" class="text-danger"></span>
-            </div>
-            <div class="form-group  mb-2">
-                <label asp-for="PubDate" class="control-label mb-1"></label>
-                <input asp-for="PubDate" class="form-control" type="date" />
-                <span asp-validation-for="PubDate" class="text-danger"></span>
-            </div>
-         
-            <div class="form-group  mb-2">
-                <label asp-for="CatID" class="control-label mb-1"></label>
-                <select asp-for="CatID" class="form-control" asp-items="ViewBag.CatID"></select>
-                <span asp-validation-for="CatID" class="text-danger"></span>
-            </div>
-            <div class="form-group  mb-2">
-                <label asp-for="PubID" class="control-label mb-1"></label>
-                <select asp-for="PubID" class="form-control" asp-items="ViewBag.PubID"></select>
-                <span asp-validation-for="PubID" class="text-danger"></span>
-            </div>
-            <div class="form-group  mb-2">
+        <div class="card-body p-4">
+            <form asp-action="Create" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                <input type="file" name="newimg" id="newimg" class="form-control"/>
-                <span asp-validation-for="ImgPath" class="text-danger"></span>
-            </div>
-            <div class="form-group  mb-2">
-                <input type="submit" value="送出" class="btn btn-primary" />
-            </div>
-        </form>
+                <div class="row">
+                    <div class="col-md-8 border-end pe-4">
+                        <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">基本資訊</h6>
+
+                        <div class="mb-3">
+                            <label asp-for="BTitle" class="form-label fw-bold"></label>
+                            <input asp-for="BTitle" class="form-control form-control-lg border-primary" placeholder="請輸入書名" />
+                            <span asp-validation-for="BTitle" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="ISBN" class="form-label fw-bold"></label>
+                                <input asp-for="ISBN" class="form-control" placeholder="請直接輸入數字(橫槓不用輸入)" />
+                                <span asp-validation-for="ISBN" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Author" class="form-label fw-bold"></label>
+                                <input asp-for="Author" class="form-control" placeholder="請輸入作者名稱" />
+                                <span asp-validation-for="Author" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CatID" class="form-label fw-bold"></label>
+                                <select asp-for="CatID" class="form-select" asp-items="ViewBag.CatID"></select>
+                                <span asp-validation-for="CatID" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="PubID" class="form-label fw-bold"></label>
+                                <select asp-for="PubID" class="form-select" asp-items="ViewBag.PubID"></select>
+                                <span asp-validation-for="PubID" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PubDate" class="form-label fw-bold"></label>
+                                <input asp-for="PubDate" class="form-control" type="date" />
+                                <span asp-validation-for="PubDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <h6 class="text-muted fw-bold mt-4 mb-3 border-bottom pb-2">內容簡介</h6>
+                        <div class="mb-3">
+                            <textarea asp-for="Summary" class="form-control" rows="4" placeholder="請輸入書籍摘要..."></textarea>
+                            <span asp-validation-for="Summary" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 ps-4">
+                        <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">書封圖片</h6>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-primary">上傳檔案</label>
+                            <input type="file" name="newimg" id="newimg" class="form-control" accept="image/jpeg, image/png" />
+                            <span asp-validation-for="ImgPath" class="text-danger small"></span>
+                            <div class="form-text mt-2">※ 僅支援 JPG、PNG 格式。</div>
+                        </div>
+
+                        <div class="mt-4 p-3 border rounded-3 bg-light text-center d-flex flex-column justify-content-center align-items-center" style="min-height: 280px;">
+                            <span class="text-muted small mb-2"><i class="bi bi-image"></i> 圖片預覽區</span>
+                            <img id="ImagePreview" class="img-fluid rounded shadow-sm" style="max-height: 250px; object-fit: contain;" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-4 border-top mt-3">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">返回列表</a>
+                    <button type="submit" class="btn btn-primary px-5 fw-bold"> 送出表單</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="col-5">
-        <img id="ImagePreview" class="img-fluid" />
-    </div>    
-
-</div>
-
-<div>
-    <a asp-action="Index" class=" btn btn-secondary">上一頁</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
     <script>
-
         $('#newimg').on('change', function(){
-              let file = this.files[0];
+            let file = this.files[0];
 
-              if(file == null){
+            if(file == null){
+                return;
+            }
 
-                  return;
-              }
+            //圖片格式確認
+            if(file.type != "image/jpeg" && file.type !="image/png")
+            {
+                alert("錯誤的照片檔案");
+                $('#newimg').val('');
+                $('#ImagePreview').attr('src', '');
+                return;
+            }
 
-          //圖片格式確認
-          if(file.type != "image/jpeg" && file.type !="image/png")
-          {
-              alert("錯誤的照片檔案");
-              $('#newimg').val('');
-              $('#ImagePreview').attr('src', '');
-              return;
-          }
+            let reader = new FileReader();
 
+            reader.onload=function(e){
+                $('#ImagePreview').attr('src', e.target.result);
+            }
 
-              let reader = new FileReader();
-
-              reader.onload=function(e){
-
-                  $('#ImagePreview').attr('src', e.target.result);
-              }
-
-              reader.readAsDataURL(file);
-          });
+            reader.readAsDataURL(file);
+        });
     </script>
-
-
-
-
 }

@@ -1,0 +1,21 @@
+﻿@model IEnumerable<LibPro.Models.BookItems>
+
+<div class="container">
+    <div class="row fw-bold border-bottom py-2">
+        <div class="col-3">館藏代碼</div>
+        <div class="col-4">館藏位置</div>
+        <div class="col-4">目前狀態</div>
+       
+    </div>
+    @foreach (var item in Model)
+    {
+        <div class="row align-items-center border-bottom py-2">
+            <div class="col-3">@item.ItemID</div>
+            <div class="col-4">@item.Location.LocationName</div>
+            <div class="col-4">@item.ItemStatus.StatusName</div>
+            <div class="col-1 text-end">
+                <a asp-controller="BookItems" asp-action="Edit" asp-route-id="@item.ItemID" asp-route-returnUrl="@Context.Request.Path" class="btn btn-primary ">修改</a>
+            </div>
+        </div>
+    }
+</div>

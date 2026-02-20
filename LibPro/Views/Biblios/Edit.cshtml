@@ -1,73 +1,120 @@
 ﻿@model LibPro.Models.Biblios
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "編輯書目：" + Model.BTitle;
 }
 
-<h1>Edit</h1>
-
-<h4>Biblios</h4>
-<hr />
-<div class="row">
-    <div class="col-7">
-        <form asp-action="Edit" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="BibID" />
-            <div class="form-group">
-                <label asp-for="BTitle" class="control-label"></label>
-                <input asp-for="BTitle" class="form-control" />
-                <span asp-validation-for="BTitle" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ISBN" class="control-label"></label>
-                <input asp-for="ISBN" class="form-control" />
-                <span asp-validation-for="ISBN" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Author" class="control-label"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Summary" class="control-label"></label>
-                <textarea asp-for="Summary" class="form-control"></textarea>
-                <span asp-validation-for="Summary" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PubDate" class="control-label"></label>
-                <input asp-for="PubDate" class="form-control" />
-                <span asp-validation-for="PubDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">                
-                <input type="file" name="newimg" id="newimg" class="form-control" />
-                <span asp-validation-for="ImgPath" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CatID" class="control-label"></label>
-                <select asp-for="CatID" class="form-control" asp-items="ViewBag.CatID"></select>
-                <span asp-validation-for="CatID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PubID" class="control-label"></label>
-                <select asp-for="PubID" class="form-control" asp-items="ViewBag.PubID"></select>
-                <span asp-validation-for="PubID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container-fluid mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark m-0 ">
+            <i class="bi bi-pencil-square text-warning"></i> @ViewData["Title"]
+        </h3>
+        <a asp-action="Index" class="btn btn-outline-secondary px-4 fw-bold">
+            <i class="bi bi-arrow-left"></i> 返回列表
+        </a>
     </div>
-    <div class="col-5">
-        <img id="ImagePreview" class="img-fluid" />
-    </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <form asp-action="Edit" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <input type="hidden" asp-for="BibID" />
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="m-0 fw-bold text-primary">基本與出版資訊</h6>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <div class="mb-4">
+                            <label asp-for="BTitle" class="fw-bold text-primary"></label>
+                            <input asp-for="BTitle" class="form-control border-primary" placeholder="書名" />
+                            <span asp-validation-for="BTitle" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="ISBN" class="fw-bold text-muted"></label>
+                                <input asp-for="ISBN" class="form-control" placeholder="ISBN" />
+                                <span asp-validation-for="ISBN" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Author" class="fw-bold text-muted"></label>
+                                <input asp-for="Author" class="form-control" placeholder="作者" />
+                                <span asp-validation-for="Author" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CatID" class="form-label fw-bold text-muted small mb-1"></label>
+                                <select asp-for="CatID" class="form-select form-select-lg" asp-items="ViewBag.CatID"></select>
+                                <span asp-validation-for="CatID" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="PubID" class="form-label fw-bold text-muted small mb-1"></label>
+                                <select asp-for="PubID" class="form-select form-select-lg" asp-items="ViewBag.PubID"></select>
+                                <span asp-validation-for="PubID" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">                              
+                                <label asp-for="PubDate" class="fw-bold text-muted"></label>
+                                    <input asp-for="PubDate" class="form-control" type="date" placeholder="出版日期" />                                   
+                                
+                                <span asp-validation-for="PubDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class=" mb-3">
+                                                        <label asp-for="Summary" class="fw-bold text-muted"></label>
+                            <textarea asp-for="Summary" class="form-control" placeholder="摘要" style="height: 150px"></textarea>
+                            <span asp-validation-for="Summary" class="text-danger small"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 h-100 d-flex flex-column">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="m-0 fw-bold text-success">書封圖片設定</h6>
+                    </div>
+                    <div class="card-body p-4 text-center d-flex flex-column">
+
+                        <div class="mb-4 bg-light rounded-3 p-2 border border-dashed d-flex align-items-center justify-content-center" style="min-height: 250px;">
+                            @if (!string.IsNullOrEmpty(Model.ImgPath))
+                            {
+                                <img id="ImagePreview" src="~/ImgPath/@Model.ImgPath" class="img-fluid rounded shadow-sm" style="max-height: 230px; object-fit: contain;" alt="目前書封" />
+                            }
+                            else
+                            {
+                                <img id="ImagePreview" src="~/ImgPath/bookcover.jpg" class="img-fluid rounded shadow-sm" style="max-height: 230px; object-fit: contain;" alt="預設書封" />
+                            }
+                        </div>
+
+                        <div class="text-start mb-4">
+                            <label class="form-label fw-bold text-muted small">更換新圖片 (可不填)</label>
+                            <input type="file" name="newimg" id="newimg" class="form-control" accept="image/jpeg, image/png" />
+                            <span asp-validation-for="ImgPath" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 pt-3 border-top mt-auto">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold text-dark shadow-sm">
+                                <i class="bi bi-save"></i> 儲存修改內容
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
     <script>
 

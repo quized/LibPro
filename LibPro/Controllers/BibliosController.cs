@@ -37,11 +37,19 @@ namespace LibPro.Controllers
             }
 
             var biblios = await _context.Biblios
-                .FirstOrDefaultAsync(m => m.BibID == id);
+            .Include(b => b.Category)
+            .Include(b => b.Publisher)
+            .Include(b => b.BookItems)
+                .ThenInclude(bi => bi.Location)
+            .Include(b => b.BookItems)
+                .ThenInclude(bi => bi.ItemStatus)
+            .FirstOrDefaultAsync(m => m.BibID == id);
             if (biblios == null)
             {
                 return NotFound();
             }
+            var bookItems = await _context.BookItems.Where(b => b.BibID == id).ToListAsync();
+            ViewBag.BookItems = bookItems;
 
             return View(biblios);
         }
@@ -122,7 +130,7 @@ namespace LibPro.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id,  Biblios biblios, IFormFile? newimg)
+        public async Task<IActionResult> Edit(long id, Biblios biblios, IFormFile? newimg)
         {
             if (id != biblios.BibID)
             {
@@ -146,9 +154,6 @@ namespace LibPro.Controllers
 
 
 
-                  
-
-
                     if (oldImg != null)
                     {
                         string oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ImgPath", oldImg);
@@ -159,7 +164,7 @@ namespace LibPro.Controllers
 
                     }
 
-                  
+
 
                     string FileName = Guid.NewGuid().ToString() + Path.GetExtension(newimg.FileName);
                     string uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ImgPath", FileName);
@@ -174,7 +179,7 @@ namespace LibPro.Controllers
 
                 }
 
-                if(newimg == null && oldImg != null)
+                if (newimg == null && oldImg != null)
                 {
                     biblios.ImgPath = oldImg;
                 }
@@ -201,22 +206,30 @@ namespace LibPro.Controllers
             return View(biblios);
         }
 
-      
-      
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(long id)
         {
+            bool hasBookItems = await _context.BookItems.AnyAsync(b => b.BibID == id && b.ItmStatus != 6);
+
+            if(hasBookItems)
+            {
+                TempData["ErrorMessage"] = "該書目仍有書籍未註銷，請註銷後再刪除";
+                return RedirectToAction(nameof(Index));
+            }
+
             var biblios = await _context.Biblios.FindAsync(id);
             if (biblios != null)
             {
                 biblios.isDeleted = 1;
                 _context.Biblios.Update(biblios);
-                await _context.SaveChangesAsync();            
-            
+                await _context.SaveChangesAsync();
+
             }
 
-         
+
             return RedirectToAction(nameof(Index));
         }
 

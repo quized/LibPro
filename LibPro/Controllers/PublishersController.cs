@@ -40,14 +40,18 @@ namespace LibPro.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Publishers publishers)
         {
+
+          
+
+
             if (ModelState.IsValid)
             {
                 _context.Add(publishers);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityID", publishers.CityID);
-            return View(publishers);
+            TempData["ErrorCreate"] = "出版社名稱已存在";
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Publishers/Edit/5

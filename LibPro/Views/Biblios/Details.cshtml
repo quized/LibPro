@@ -1,66 +1,55 @@
 ﻿@model LibPro.Models.Biblios
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.BTitle + " - 詳細資料";
 }
 
-<h1>Details</h1>
+<h1 class="text-center fw-bold">@ViewData["Title"]</h1>
 
-<div>
-    <h4>Biblios</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BTitle)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BTitle)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ISBN)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ISBN)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Author)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Author)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Summary)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Summary)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PubDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PubDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImgPath)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImgPath)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CatID)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CatID)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PubID)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PubID)
-        </dd>
-    </dl>
+<hr />
+
+<div class="card mb-3">
+    <div class="row g-0">
+        <div class="col-md-4 d-flex align-items-center">
+            @if (Model.ImgPath == null)
+            {
+                <img src="~/ImgPath/bookcover.jpg" class="img-fluid rounded-start" alt="Default Book Cover">
+            }
+            else
+            {
+                <img src="~/ImgPath/@Model.ImgPath" class="img-fluid rounded-start" alt="Book Cover">
+            }
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h2 class="card-title">@Model.BTitle</h2>
+                <p class="text-muted small">ISBN: @Model.ISBN</p>
+                <hr>
+                <p>類別：@Model.Category.CatName</p>
+                <div class="row">                    
+                    <p class="card-text col-12 col-mb-4 col-lg-6"><strong>作者：</strong> @Model.Author</p>
+                    <p class="card-text col-12 col-mb-8 col-lg-6 text-end pe-4"><strong>出版社：</strong> @Model.Publisher.PubName</p>
+                </div>
+
+                <p class="card-text"><strong>摘要：</strong> @Model.Summary</p>
+                <p class="card-text">出版日期： @Html.DisplayFor(model => model.PubDate) </p>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.BibID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<h2 class="text-center fw-bold bg-primary-subtle">館藏資料</h2>
+
+<div >
+    @await Html.PartialAsync("_BookItemsIndex", Model.BookItems)
+</div>
+
+<hr />
+
+
+
+
+<div class="text-end">    
+    <a asp-action="Edit" asp-route-id="@Model?.BibID" class="btn btn-success">書目修改</a>
+    <a asp-action="Index" class="btn btn-secondary">返回列表</a>
 </div>

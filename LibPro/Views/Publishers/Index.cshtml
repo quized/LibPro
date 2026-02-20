@@ -6,6 +6,13 @@
 
 <h1 class="text-center">@ViewData["Title"]</h1>
 
+@if (TempData["ErrorCreate"] != null)
+{
+    <div class="alert alert-danger text-center fs-4">
+        @TempData["ErrorCreate"]
+    </div>
+}
+
 <p>
     <a asp-action="Create" data-bs-toggle="modal" data-bs-target="#PubcreateModal" class="btn btn-success text-light">新增出版社</a>
 </p>

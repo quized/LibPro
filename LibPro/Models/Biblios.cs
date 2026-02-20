@@ -23,7 +23,7 @@ namespace LibPro.Models
         public string? Author { get; set; }
 
         [Display(Name = "內容簡介")]
-        [StringLength(500, ErrorMessage = "內容簡介最多接受100字元")]
+        [StringLength(500, ErrorMessage = "內容簡介最多接受500字元")]
         [DataType(DataType.MultilineText)]
         public string? Summary { get; set; }
 
@@ -40,17 +40,17 @@ namespace LibPro.Models
         public byte isDeleted { get; set; } = 0;
 
         [Display(Name = "書類")]
-        [ForeignKey("CatID")]
         public int CatID { get; set; }
 
-        [Display(Name = "出版社")]      
-        [ForeignKey("PubID")]
+        [Display(Name = "出版社")]
         public long? PubID { get; set; }
 
         [Display(Name = "書類")]
+        [ForeignKey("CatID")]
         public virtual Categories? Category { get; set; }
 
         [Display(Name = "出版社")]
+        [ForeignKey("PubID")]
         public virtual Publishers? Publisher { get; set; }
 
         public virtual List<Reviews>? Reviews { get; set; }

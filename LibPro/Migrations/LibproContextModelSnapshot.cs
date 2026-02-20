@@ -70,9 +70,6 @@ namespace LibPro.Migrations
                     b.Property<int>("CatID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CategoryCatID")
-                        .HasColumnType("int");
-
                     b.Property<string>("ISBN")
                         .HasColumnType("nvarchar(max)");
 
@@ -86,9 +83,6 @@ namespace LibPro.Migrations
                     b.Property<long?>("PubID")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("PublisherPubID")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Summary")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -98,9 +92,9 @@ namespace LibPro.Migrations
 
                     b.HasKey("BibID");
 
-                    b.HasIndex("CategoryCatID");
+                    b.HasIndex("CatID");
 
-                    b.HasIndex("PublisherPubID");
+                    b.HasIndex("PubID");
 
                     b.ToTable("Biblios");
                 });
@@ -680,11 +674,13 @@ namespace LibPro.Migrations
                 {
                     b.HasOne("LibPro.Models.Categories", "Category")
                         .WithMany("Biblios")
-                        .HasForeignKey("CategoryCatID");
+                        .HasForeignKey("CatID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("LibPro.Models.Publishers", "Publisher")
                         .WithMany("Biblios")
-                        .HasForeignKey("PublisherPubID");
+                        .HasForeignKey("PubID");
 
                     b.Navigation("Category");
 

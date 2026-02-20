@@ -142,8 +142,8 @@ namespace LibPro.Models
                     context.ItemStatus.AddRange(
                        new ItemStatus
                         {
-                           StatusName = "報廢"
-                        },
+                           StatusName = "註銷"
+                       },
                         new ItemStatus
                         {
                             StatusName = "整理"

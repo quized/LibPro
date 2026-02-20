@@ -1,0 +1,100 @@
+﻿@model LibPro.Models.BookItems
+
+@{
+    ViewData["Title"] = "館藏詳細資訊";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm border-0 rounded-3 mx-auto" style="max-width: 850px;">
+
+        <div class="card-header bg-warning-subtle  border-bottom p-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 fw-bold">
+                <i class="bi bi-info-circle me-2"></i>@ViewData["Title"]
+            </h6>
+            <span class="badge bg-secondary-subtle text-dark border fs-6 font-monospace px-3 py-2 shadow-sm">
+                <i class="bi bi-upc-scan"></i> @Model.ItemID
+            </span>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row g-4 mb-4">
+
+                <div class="col-md-4 text-center d-flex align-items-center justify-content-center">
+                    <div class="p-2 border border-light rounded-3 bg-light shadow-sm w-100" style="min-height: 250px;">
+                        @if (!string.IsNullOrEmpty(Model.Biblio.ImgPath))
+                        {
+                            <img src="~/ImgPath/@Model.Biblio.ImgPath" class="img-fluid rounded" style="max-height: 230px; object-fit: contain;" alt="書封" />
+                        }
+                        else
+                        {
+                            <img src="~/ImgPath/bookcover.jpg" class="img-fluid rounded opacity-50" style="max-height: 230px; object-fit: contain;" alt="預設書封" />
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <h3 class="fw-bold text-dark mb-2">
+                        @Html.DisplayFor(model => model.Biblio.BTitle)
+                    </h3>
+
+                    <div class="mb-4">
+                        <span class="badge bg-primary px-3 py-2 fs-6 shadow-sm me-2">
+                            <i class="bi bi-tag-fill"></i> @Html.DisplayFor(model => model.ItemStatus.StatusName)
+                        </span>
+                        <span class="text-muted small fw-bold">
+                            館藏代碼：<span class="text-dark">@Model.ItemID</span>
+                        </span>
+                    </div>
+
+                    <div class="row g-4 mt-2 border-top pt-3">
+                        <div class="col-sm-6">
+                            <p class="text-muted small fw-bold mb-1">
+                                @Html.DisplayNameFor(model => model.Location)
+                            </p>
+                            <p class="fs-5 text-dark mb-0 fw-bold">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                @Html.DisplayFor(model => model.Location.LocationName)
+                            </p>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <p class="text-muted small fw-bold mb-1">
+                                @Html.DisplayNameFor(model => model.PurDate)
+                            </p>
+                            <p class="fs-5 text-dark mb-0 fw-bold">
+                                <i class="bi bi-calendar-check text-success me-1"></i>
+                                @Html.DisplayFor(model => model.PurDate)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mt-4 bg-light p-4 rounded-3 border border-light">
+                <p class="text-muted small fw-bold mb-2">
+                    <i class="bi bi-card-text me-1"></i> @Html.DisplayNameFor(model => model.Remarks)
+                </p>
+                <div class="text-dark" style="min-height: 60px;">
+                    @if (string.IsNullOrEmpty(Model.Remarks))
+                    {
+                        <span class="text-muted fst-italic">無備註紀錄</span>
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(model => model.Remarks)
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer bg-white border-top p-3 d-flex justify-content-end gap-2 rounded-bottom">
+            <a asp-action="Index" class="btn btn-outline-secondary px-4 fw-bold shadow-sm">
+                <i class="bi bi-arrow-left"></i> 返回列表
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.ItemID" asp-route-returnUrl="@Context.Request.Path" class="btn btn-warning px-4 fw-bold text-dark shadow-sm">
+                <i class="bi bi-pencil-square"></i> 編輯此館藏
+            </a>
+        </div>
+    </div>
+</div>

@@ -204,22 +204,22 @@ namespace LibPro.Migrations
                     Summary = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     PubDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ImgPath = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
+                    isDeleted = table.Column<byte>(type: "tinyint", nullable: false),
                     CatID = table.Column<int>(type: "int", nullable: false),
-                    PubID = table.Column<long>(type: "bigint", nullable: true),
-                    CategoryCatID = table.Column<int>(type: "int", nullable: true),
-                    PublisherPubID = table.Column<long>(type: "bigint", nullable: true)
+                    PubID = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Biblios", x => x.BibID);
                     table.ForeignKey(
-                        name: "FK_Biblios_Categories_CategoryCatID",
-                        column: x => x.CategoryCatID,
+                        name: "FK_Biblios_Categories_CatID",
+                        column: x => x.CatID,
                         principalTable: "Categories",
-                        principalColumn: "CatID");
+                        principalColumn: "CatID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Biblios_Publishers_PublisherPubID",
-                        column: x => x.PublisherPubID,
+                        name: "FK_Biblios_Publishers_PubID",
+                        column: x => x.PubID,
                         principalTable: "Publishers",
                         principalColumn: "PubID");
                 });
@@ -240,10 +240,9 @@ namespace LibPro.Migrations
                     Address = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ZipCode = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true),
                     Memo = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    UserID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CityID = table.Column<byte>(type: "tinyint", nullable: false),
-                    PtrStatus = table.Column<byte>(type: "tinyint", nullable: false),
-                    UserAccountUserID = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    PtrStatus = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -261,10 +260,11 @@ namespace LibPro.Migrations
                         principalColumn: "StatusCode",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Patrons_UserAccounts_UserAccountUserID",
-                        column: x => x.UserAccountUserID,
+                        name: "FK_Patrons_UserAccounts_UserID",
+                        column: x => x.UserID,
                         principalTable: "UserAccounts",
-                        principalColumn: "UserID");
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -280,11 +280,9 @@ namespace LibPro.Migrations
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ZipCode = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true),
-                    UserID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CityID = table.Column<byte>(type: "tinyint", nullable: false),
-                    DeptID = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserAccountUserID = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    DepartmentDeptID = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    DeptID = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -296,15 +294,17 @@ namespace LibPro.Migrations
                         principalColumn: "CityID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Staffs_Departments_DepartmentDeptID",
-                        column: x => x.DepartmentDeptID,
+                        name: "FK_Staffs_Departments_DeptID",
+                        column: x => x.DeptID,
                         principalTable: "Departments",
-                        principalColumn: "DeptID");
+                        principalColumn: "DeptID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Staffs_UserAccounts_UserAccountUserID",
-                        column: x => x.UserAccountUserID,
+                        name: "FK_Staffs_UserAccounts_UserID",
+                        column: x => x.UserID,
                         principalTable: "UserAccounts",
-                        principalColumn: "UserID");
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -316,23 +316,23 @@ namespace LibPro.Migrations
                     Remarks = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     ItmStatus = table.Column<byte>(type: "tinyint", nullable: false),
                     BibID = table.Column<long>(type: "bigint", nullable: false),
-                    LocID = table.Column<int>(type: "int", nullable: false),
-                    ItemStatusStatusCode = table.Column<byte>(type: "tinyint", nullable: true),
-                    BiblioBibID = table.Column<long>(type: "bigint", nullable: true)
+                    LocID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BookItems", x => x.ItemID);
                     table.ForeignKey(
-                        name: "FK_BookItems_Biblios_BiblioBibID",
-                        column: x => x.BiblioBibID,
+                        name: "FK_BookItems_Biblios_BibID",
+                        column: x => x.BibID,
                         principalTable: "Biblios",
-                        principalColumn: "BibID");
+                        principalColumn: "BibID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BookItems_ItemStatus_ItemStatusStatusCode",
-                        column: x => x.ItemStatusStatusCode,
+                        name: "FK_BookItems_ItemStatus_ItmStatus",
+                        column: x => x.ItmStatus,
                         principalTable: "ItemStatus",
-                        principalColumn: "StatusCode");
+                        principalColumn: "StatusCode",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BookItems_Locations_LocID",
                         column: x => x.LocID,
@@ -353,17 +353,17 @@ namespace LibPro.Migrations
                     Rating = table.Column<byte>(type: "tinyint", nullable: false),
                     RevStatus = table.Column<byte>(type: "tinyint", nullable: false),
                     PatronID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BibID = table.Column<long>(type: "bigint", nullable: false),
-                    BibliosBibID = table.Column<long>(type: "bigint", nullable: true)
+                    BibID = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reviews", x => x.ReviewID);
                     table.ForeignKey(
-                        name: "FK_Reviews_Biblios_BibliosBibID",
-                        column: x => x.BibliosBibID,
+                        name: "FK_Reviews_Biblios_BibID",
+                        column: x => x.BibID,
                         principalTable: "Biblios",
-                        principalColumn: "BibID");
+                        principalColumn: "BibID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reviews_Patrons_PatronID",
                         column: x => x.PatronID,
@@ -410,17 +410,17 @@ namespace LibPro.Migrations
                     RenewalCount = table.Column<byte>(type: "tinyint", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     PatronID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ItemID = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BookItemItemID = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ItemID = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Loans", x => x.LoanID);
                     table.ForeignKey(
-                        name: "FK_Loans_BookItems_BookItemItemID",
-                        column: x => x.BookItemItemID,
+                        name: "FK_Loans_BookItems_ItemID",
+                        column: x => x.ItemID,
                         principalTable: "BookItems",
-                        principalColumn: "ItemID");
+                        principalColumn: "ItemID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Loans_Patrons_PatronID",
                         column: x => x.PatronID,
@@ -439,17 +439,17 @@ namespace LibPro.Migrations
                     Notes = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     ResStatus = table.Column<byte>(type: "tinyint", nullable: false),
                     PatronID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ItemID = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BookItemItemID = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ItemID = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reserves", x => x.ResID);
                     table.ForeignKey(
-                        name: "FK_Reserves_BookItems_BookItemItemID",
-                        column: x => x.BookItemItemID,
+                        name: "FK_Reserves_BookItems_ItemID",
+                        column: x => x.ItemID,
                         principalTable: "BookItems",
-                        principalColumn: "ItemID");
+                        principalColumn: "ItemID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reserves_Patrons_PatronID",
                         column: x => x.PatronID,
@@ -472,17 +472,17 @@ namespace LibPro.Migrations
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ISPaid = table.Column<bool>(type: "bit", nullable: false),
                     FTID = table.Column<byte>(type: "tinyint", nullable: false),
-                    LoanID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FineTypeFTID = table.Column<byte>(type: "tinyint", nullable: true)
+                    LoanID = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Fines", x => x.FineID);
                     table.ForeignKey(
-                        name: "FK_Fines_FineTypes_FineTypeFTID",
-                        column: x => x.FineTypeFTID,
+                        name: "FK_Fines_FineTypes_FTID",
+                        column: x => x.FTID,
                         principalTable: "FineTypes",
-                        principalColumn: "FTID");
+                        principalColumn: "FTID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Fines_Loans_LoanID",
                         column: x => x.LoanID,
@@ -497,24 +497,24 @@ namespace LibPro.Migrations
                 column: "Creator");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Biblios_CategoryCatID",
+                name: "IX_Biblios_CatID",
                 table: "Biblios",
-                column: "CategoryCatID");
+                column: "CatID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Biblios_PublisherPubID",
+                name: "IX_Biblios_PubID",
                 table: "Biblios",
-                column: "PublisherPubID");
+                column: "PubID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookItems_BiblioBibID",
+                name: "IX_BookItems_BibID",
                 table: "BookItems",
-                column: "BiblioBibID");
+                column: "BibID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookItems_ItemStatusStatusCode",
+                name: "IX_BookItems_ItmStatus",
                 table: "BookItems",
-                column: "ItemStatusStatusCode");
+                column: "ItmStatus");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookItems_LocID",
@@ -522,9 +522,9 @@ namespace LibPro.Migrations
                 column: "LocID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Fines_FineTypeFTID",
+                name: "IX_Fines_FTID",
                 table: "Fines",
-                column: "FineTypeFTID");
+                column: "FTID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Fines_LoanID",
@@ -532,9 +532,9 @@ namespace LibPro.Migrations
                 column: "LoanID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Loans_BookItemItemID",
+                name: "IX_Loans_ItemID",
                 table: "Loans",
-                column: "BookItemItemID");
+                column: "ItemID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Loans_PatronID",
@@ -557,9 +557,9 @@ namespace LibPro.Migrations
                 column: "PtrStatus");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Patrons_UserAccountUserID",
+                name: "IX_Patrons_UserID",
                 table: "Patrons",
-                column: "UserAccountUserID");
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Publishers_CityID",
@@ -567,9 +567,9 @@ namespace LibPro.Migrations
                 column: "CityID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reserves_BookItemItemID",
+                name: "IX_Reserves_ItemID",
                 table: "Reserves",
-                column: "BookItemItemID");
+                column: "ItemID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reserves_PatronID",
@@ -582,9 +582,9 @@ namespace LibPro.Migrations
                 column: "ResStatus");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reviews_BibliosBibID",
+                name: "IX_Reviews_BibID",
                 table: "Reviews",
-                column: "BibliosBibID");
+                column: "BibID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_PatronID",
@@ -602,14 +602,14 @@ namespace LibPro.Migrations
                 column: "CityID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Staffs_DepartmentDeptID",
+                name: "IX_Staffs_DeptID",
                 table: "Staffs",
-                column: "DepartmentDeptID");
+                column: "DeptID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Staffs_UserAccountUserID",
+                name: "IX_Staffs_UserID",
                 table: "Staffs",
-                column: "UserAccountUserID");
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserAccounts_UserType",

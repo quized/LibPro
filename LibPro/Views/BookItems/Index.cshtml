@@ -1,0 +1,100 @@
+﻿@model IEnumerable<LibPro.Models.BookItems>
+
+@{
+    ViewData["Title"] = "館藏目錄";
+}
+
+<h1 class="text-center fw-bold">@ViewData["Title"]</h1>
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+        <a asp-action="Create" class="btn btn-primary fw-bold shadow-sm">
+            <i class="bi bi-plus-lg"></i> 新增館藏
+        </a>
+    </div>
+
+    <div>
+        <form asp-action="Index" method="get" class="d-flex align-items-center gap-2 shadow-sm p-2 bg-light rounded border" >
+
+            <select name="statusFilter" class="form-select border-secondary" style="width: auto;" onchange="this.form.submit()">
+                <option value="">顯示全部狀態</option>
+                <option value="1" selected="@(Context.Request.Query["statusFilter"] == "1")"> 在架</option>
+                <option value="2" selected="@(Context.Request.Query["statusFilter"] == "2")"> 借出</option>
+                <option value="3" selected="@(Context.Request.Query["statusFilter"] == "3")"> 預約保留</option>
+                <option value="4" selected="@(Context.Request.Query["statusFilter"] == "4")"> 遺失</option>
+                <option value="5" selected="@(Context.Request.Query["statusFilter"] == "5")"> 整理</option>
+                <option value="6" selected="@(Context.Request.Query["statusFilter"] == "6")"> 已註銷</option>
+            </select>
+
+            <div class="input-group" style="width: 300px;">
+                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control border-secondary" placeholder="輸入館藏編號或書名...">
+
+                <button class="btn btn-outline-warning text-dark fw-bold border border-dark" type="submit" title="搜尋">
+                    <i class="bi bi-search"></i> 搜尋
+                </button>
+
+                <a asp-action="Index" class="btn btn-outline-danger" title="清除條件">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PurDate)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.ItemStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Biblio)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Location)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr> 
+            <td>
+                    @Html.DisplayFor(modelItem => item.ItemID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PurDate)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemStatus.StatusName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Biblio.BTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Location.LocationName)
+            </td>
+            <td class="text-end">
+                <a asp-action="Edit" asp-route-id="@item.ItemID" class="btn btn-warning ">修改</a>
+                <a asp-action="Details" asp-route-id="@item.ItemID" class="btn btn-info ">詳細</a>
+                    <form asp-action="Delete" asp-route-id="@item.ItemID" class="d-inline">
+                        <input type="submit" class="btn btn-danger" value="註銷" onclick="return confirm('確定要註銷這筆資料嗎？')" />
+                    </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

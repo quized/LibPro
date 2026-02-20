@@ -1,0 +1,68 @@
+﻿@model LibPro.Models.BookItems
+
+@{
+    ViewData["Title"] = "新增館藏";
+}
+
+
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-success text-white p-3">
+            <h3 class="mb-0 text-center"><i class="bi bi-journal-plus"></i> 新增實體館藏</h3>
+        </div>
+
+        <div class="card-body p-4 ">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3  "></div>
+
+                <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">基本屬性</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="BibID" class="form-label fw-bold"></label>
+                        <select asp-for="BibID" class="form-select form-select-lg border-primary" asp-items="ViewBag.BibID"></select>
+                        <span asp-validation-for="BibID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="LocID" class="form-label fw-bold"></label>
+                        <select asp-for="LocID" class="form-select form-select-lg" asp-items="ViewBag.LocID"></select>
+                        <span asp-validation-for="LocID" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">狀態與採購資訊</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="ItmStatus" class="form-label fw-bold"></label>
+                        <select asp-for="ItmStatus" class="form-select" asp-items="ViewBag.ItmStatus"></select>
+                        <span asp-validation-for="ItmStatus" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PurDate" class="form-label fw-bold"></label>
+                        <input asp-for="PurDate" class="form-control" type="date" />
+                        <span asp-validation-for="PurDate" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Remarks" class="form-label fw-bold"></label>
+                    <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="請輸入館藏備註（例如：附光碟、封面破損...）"></textarea>
+                    <span asp-validation-for="Remarks" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">取消返回</a>
+                    <button type="submit" class="btn btn-primary px-5 fw-bold"> 確認新增</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
