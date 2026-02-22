@@ -1,0 +1,117 @@
+﻿@model LibPro.Models.Staff
+
+@{
+    ViewData["Title"] = "館員詳細資料";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="fw-bold mb-0"><i class="bi bi-person-vcard me-2"></i>@ViewData["Title"]</h3>              
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-return-left"></i> 返回列表
+                </a>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-3">
+
+                <div class="card-header bg-info text-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-person-circle me-2"></i> @Html.DisplayFor(m => m.Name)
+
+                        <span class="fs-6 fw-normal ms-3 text-black ">
+                          (@(Model.IsResigned ? "離職" : "在職"))
+                        </span>
+                    </h5>
+                </div>
+                    </h5>                               
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <h6 class="text-info fw-bold border-bottom pb-2 mb-3">基本與職務資料</h6>
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="text-muted" style="width: 120px;">館員編號</th>
+                                        <td class="fw-bold text-dark">@Html.DisplayFor(m => m.StaffID)</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">@Html.DisplayNameFor(m => m.Department)</th>
+                                        <td><span class="badge bg-secondary">@Html.DisplayFor(m => m.Department.DeptName)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">@Html.DisplayNameFor(m => m.Gender)</th>
+                                        <td>@Html.DisplayFor(m => m.Gender)</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">@Html.DisplayNameFor(m => m.Birthday)</th>
+                                        <td>@Html.DisplayFor(m => m.Birthday)</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">@Html.DisplayNameFor(m => m.Education)</th>
+                                        <td>@Html.DisplayFor(m => m.Education)</td>
+                                    </tr>
+                                   
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-info fw-bold border-bottom pb-2 mb-3">聯絡與系統資訊</h6>
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="text-muted" style="width: 120px;">登入帳號</th>
+                                        <td>
+                                            <span >
+                                                @Model.UserID
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">@Html.DisplayNameFor(m => m.Phone)</th>
+                                        <td>@Html.DisplayFor(m => m.Phone)</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">@Html.DisplayNameFor(m => m.Email)</th>
+                                        <td>@Html.DisplayFor(m => m.Email)</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">縣市</th>
+                                        <td>@(Model.City.CityName)</td>
+                                    </tr>
+                                  
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-12 mt-2">
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="text-muted" style="width: 120px;">@Html.DisplayNameFor(m => m.Address)</th>
+                                        <td>@Html.DisplayFor(m => m.ZipCode) @Html.DisplayFor(m => m.Address)</td>
+                                    </tr>
+
+                                 
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light text-end py-3 border-top-0 rounded-bottom-3">
+                    <a asp-action="Edit" asp-route-id="@Model.StaffID" class="btn btn-primary fw-bold px-4">
+                        <i class="bi bi-pencil-square"></i> 編輯此館員
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

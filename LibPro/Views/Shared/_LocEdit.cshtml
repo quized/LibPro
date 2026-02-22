@@ -1,0 +1,59 @@
+﻿@model LibPro.Models.Locations
+
+@{
+   
+    Layout = null;
+}
+
+<form asp-action="Edit">
+    <div class="p-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <input type="hidden" asp-for="LocationID" />
+
+        <div class="form-group mb-3">
+            <label asp-for="LocationName" class="form-label fw-bold text-muted"></label>
+            <input asp-for="LocationName" class="form-control border-secondary" />
+            <span asp-validation-for="LocationName" class="text-danger small"></span>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-6 form-group">
+                <label asp-for="Depth" class="form-label fw-bold text-muted"></label>
+                <input asp-for="Depth" class="form-control border-secondary" />
+                <div class="form-text small text-secondary">
+                    數字越小層級越高。<br>
+                    0:建築 〉1:樓層 〉2:區塊 〉3:書架
+                </div>
+                <span asp-validation-for="Depth" class="text-danger small"></span>
+            </div>
+            <div class="col-6 form-group">
+                <label asp-for="SortOrder" class="form-label fw-bold text-muted"></label>
+                <input asp-for="SortOrder" class="form-control border-secondary" />               
+                <div class="form-text small text-secondary">
+                    決定選單中的上下順序。<br>
+                    建議以 <strong>10, 20, 30...</strong> 遞增填寫。
+                </div>
+                <span asp-validation-for="SortOrder" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="form-group mb-2">
+            <label asp-for="ParentID" class="form-label fw-bold text-muted"></label>
+            <select asp-for="ParentID" class="form-select border-secondary" asp-items="ViewBag.ParentID">
+                <option value="">-- 無 (設為最上層) --</option>
+            </select>
+            <span asp-validation-for="ParentID" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-warning fw-bold text-dark">儲存修改</button>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

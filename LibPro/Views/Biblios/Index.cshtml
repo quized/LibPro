@@ -96,24 +96,25 @@
 </table>
 
 
+
 @section Scripts {
     <script>
         $(document).ready(function () {
-            
+
             const urlParams = new URLSearchParams(window.location.search);
-                       
-            const currentStatus = urlParams.get('isDeleted') || '0';
 
-           
+            const currentStatus = urlParams.get('isDeleted') || '';
 
 
-            if (currentStatus === '0') {               
+
+
+            if (currentStatus === '0') {
                 $('a[data-status="0"]').removeClass('btn-outline-primary').addClass('btn-primary');
-                     
+
             }
-            else{                
+            else{
                 $('a[data-status="1"]').removeClass('btn-outline-danger').addClass('btn-danger');
-               
+
             }
         });
     </script>

@@ -1,0 +1,120 @@
+﻿@model LibPro.Models.Staff
+
+@{
+    ViewData["Title"] = "新增館員資料";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-person-badge me-2"></i>@ViewData["Title"]</h3>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-return-left"></i> 返回列表</a>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-primary text-white py-3">
+                    <h6 class="mb-0 fw-bold">請填寫基本資料與聯絡方式</h6>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <input type="hidden" asp-for="IsResigned" value="false" />
+
+                        <h5 class="text-primary fw-bold mb-3 border-bottom pb-2">個人基本資料</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Name" class="form-label fw-bold text-muted"></label>
+                                <input asp-for="Name" class="form-control" placeholder="請輸入全名" />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Gender" class="form-label fw-bold text-muted"></label>
+                                <select asp-for="Gender" class="form-select">
+                                    <option value="">-- 請選擇性別 --</option>
+                                    <option value="1">男</option>
+                                    <option value="2">女</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Birthday" class="form-label fw-bold text-muted"></label>
+                                <input asp-for="Birthday" type="date" class="form-control" />
+                                <span asp-validation-for="Birthday" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Education" class="form-label fw-bold text-muted"></label>
+                                <select asp-for="Education" class="form-select">
+                                    <option value="">-- 請選擇最高學歷 --</option>                                   
+                                    <option value="高中/職">高中/職</option>
+                                    <option value="專科">專科</option>
+                                    <option value="學士">學士</option>
+                                    <option value="碩士">碩士</option>
+                                    <option value="博士">博士</option>
+                                </select>
+                                <span asp-validation-for="Education" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="text-primary fw-bold mb-3 border-bottom pb-2">聯絡與職務資訊</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Phone" class="form-label fw-bold text-muted"></label>
+                                <input asp-for="Phone" class="form-control" placeholder="例如：0912345678" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Email" class="form-label fw-bold text-muted"></label>
+                                <input asp-for="Email" class="form-control" placeholder="example@libpro.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-8 form-group mb-3">
+                                <label asp-for="CityID" class="form-label fw-bold text-muted"></label>
+                                <select asp-for="CityID" class="form-select" asp-items="ViewBag.CityID">
+                                    <option value="">-- 請選擇縣市 --</option>
+                                </select>
+                                <span asp-validation-for="CityID" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4 form-group mb-3">
+                                <label asp-for="ZipCode" class="form-label fw-bold text-muted"></label>
+                                <input asp-for="ZipCode" class="form-control" placeholder="6碼郵遞區號" />
+                                <span asp-validation-for="ZipCode" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12 form-group mb-3">
+                                <label asp-for="Address" class="form-label fw-bold text-muted"></label>
+                                <input asp-for="Address" class="form-control" placeholder="請輸入詳細地址" />
+                                <span asp-validation-for="Address" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12 form-group mb-3">
+                                <label asp-for="DeptID" class="form-label fw-bold text-muted"></label>
+                                <select asp-for="DeptID" class="form-select" asp-items="ViewBag.DeptID">
+                                    <option value="">-- 請選擇所屬部門 --</option>
+                                </select>
+                                <span asp-validation-for="DeptID" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-light border me-2">取消</a>
+                            <button type="submit" class="btn btn-primary fw-bold px-4">確認新增</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

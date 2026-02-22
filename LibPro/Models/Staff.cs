@@ -28,10 +28,10 @@ namespace LibPro.Models
 
         [Required(ErrorMessage = "必填欄位")]
         [Display(Name = "性別")]
+        [UIHint("GenderFormat")]
         public byte Gender { get; set; }
 
         [Display(Name = "電子郵件")]
-        [DataType(DataType.EmailAddress)]
         [EmailAddress(ErrorMessage = "請輸入正確的電子郵件格式")]
         [StringLength(100, ErrorMessage = ("電子郵件最多只接受100個字元"))]
         public string? Email { get; set; }
@@ -39,7 +39,6 @@ namespace LibPro.Models
         [Display(Name = "電話")]
         [RegularExpression("0[2-9][0-9]{7,8}")]
         [Phone]
-        [DataType(DataType.PhoneNumber)]
         [Required(ErrorMessage = "必填欄位")]
         public string Phone { get; set; } = null!;
 
@@ -49,26 +48,32 @@ namespace LibPro.Models
         public string Address { get; set; } = null!;
 
         [Display(Name = "郵遞區號")]
-        [StringLength(6,MinimumLength =3,ErrorMessage = "需填3碼或6碼郵遞區號")]
-        [RegularExpression("[1-9][0-9]{2}|[1-9][0-9]{5}")]
+        [StringLength(6,ErrorMessage = "需填6碼郵遞區號")]
+        [RegularExpression("[1-9][0-9]{5}")]
         public string? ZipCode { get; set; }
 
-        
-        public string UserID { get; set; } = null!;
+        [Display(Name = "是否離職")]
+        public bool IsResigned { get; set; } = false;
 
-       
+        [Display(Name = "登入ID")]
+        public string? UserID { get; set; }
+
+        [Display(Name = "縣市")]
         public byte CityID { get; set; }
 
-       
+        [Display(Name = "部門")]
         public string DeptID { get; set; } = null!;
 
         [ForeignKey("UserID")]
+        [Display(Name = "登入ID")]
         public virtual UserAccounts? UserAccount { get; set; }
 
         [ForeignKey("CityID")]
+        [Display(Name = "縣市")]
         public virtual Cities? City { get; set; }
 
         [ForeignKey("DeptID")]
+        [Display(Name = "部門")]
         public virtual Departments? Department { get; set; }
 
         public virtual List<Announcements>? Announcements { get; set; }

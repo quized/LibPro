@@ -28,10 +28,10 @@ namespace LibPro.Models
 
         [Required(ErrorMessage = "必填欄位")]
         [Display(Name = "性別")]
+        [UIHint("GenderFormat")]
         public byte Gender { get; set; }
 
         [Display(Name = "電子郵件")]
-        [DataType(DataType.EmailAddress)]
         [EmailAddress(ErrorMessage = "請輸入正確的電子郵件格式")]
         [StringLength(100, ErrorMessage = ("電子郵件最多只接受100個字元"))]
         public string? Email { get; set; }
@@ -39,7 +39,6 @@ namespace LibPro.Models
         [Display(Name = "電話")]
         [RegularExpression("0[2-9][0-9]{7,8}")]
         [Phone]
-        [DataType(DataType.PhoneNumber)]
         [Required(ErrorMessage = "必填欄位")]
         public string Phone { get; set; } = null!;
 
@@ -67,7 +66,7 @@ namespace LibPro.Models
         [DataType(DataType.MultilineText)]
         public string? Memo { get; set; }
 
-        public string UserID { get; set; } = null!;
+        public string? UserID { get; set; } 
 
         public byte CityID { get; set; }
 

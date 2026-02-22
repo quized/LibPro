@@ -20,10 +20,11 @@ namespace LibPro.Models
         [Display(Name = "排列序號")]
         public int SortOrder { get; set; }
 
-        
+        [Display(Name = "隸屬")]
         public int? ParentID { get; set; }
 
         [ForeignKey("ParentID")]
+        [Display(Name = "隸屬")]
         public virtual Locations? ParentLocation { get; set; }
 
         public virtual List<Locations>? SubLocations { get; set; }

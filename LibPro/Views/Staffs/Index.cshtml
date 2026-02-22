@@ -1,0 +1,112 @@
+﻿@model IEnumerable<LibPro.Models.Staff>
+
+@{
+    ViewData["Title"] = "館員列表";
+}
+
+<h1 class="text-center fw-bold">@ViewData["Title"]</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-action="Create" class="btn btn-primary">新增館員</a>
+
+    <div class="btn-group shadow-sm" role="group">
+        <a asp-action="Index" asp-route-isresignde="false"
+           class="btn btn-outline-success fw-bold" data-status="false">
+            在職館員
+        </a>
+        <a asp-action="Index" asp-route-isresignde="true"
+           class="btn btn-outline-secondary fw-bold" data-status="true">
+            已離職館員
+        </a>
+    </div>
+</div>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.Gender)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Phone)
+            </th>
+          
+            <th>
+                @Html.DisplayNameFor(model => model.City)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Department)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+        
+            <td>
+                @Html.DisplayFor(modelItem => item.Gender)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Phone)
+            </td>
+            
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.City.CityName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Department.DeptName)
+            </td>
+            <td class=" text-end">
+                    <a asp-action="Edit" asp-route-id="@item.StaffID" class="btn btn-outline-primary">編輯</a>
+                    <a asp-action="Details" asp-route-id="@item.StaffID" class="btn btn-outline-info">詳細</a>
+                    <form asp-action="Delete" asp-route-id="@item.StaffID" class="d-inline ">
+                        <input type="submit" class="btn btn-outline-danger resign " value="離職" onclick="return confirm('確定要將@(item.Name)設為離職嗎？')" />
+                    </form>
+                    <a asp-action="Restore" asp-route-id="@item.StaffID" class="btn btn-outline-success restore">復職</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            const urlParams = new URLSearchParams(window.location.search);
+
+            const currentStatus = urlParams.get('isresignde') || 'false';
+
+
+
+
+            if (currentStatus === 'false') {
+                $('a[data-status="false"]').removeClass('btn-outline-success').addClass('btn-success');
+                $('.resign').show
+                $('.restore').hide()
+            }
+            else{
+                $('a[data-status="true"]').removeClass('btn-outline-secondary').addClass('btn-secondary');
+                $('.resign').hide()
+                $('.restore').show()
+            }
+        });
+    </script>
+}

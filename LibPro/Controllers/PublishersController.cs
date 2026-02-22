@@ -103,7 +103,7 @@ namespace LibPro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityID", publishers.CityID);
+            ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", publishers.CityID);
             return View(publishers);
         }
 
