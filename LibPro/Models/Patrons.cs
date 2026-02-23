@@ -57,8 +57,8 @@ namespace LibPro.Models
         public string Address { get; set; } = null!;
 
         [Display(Name = "郵遞區號")]
-        [StringLength(6, MinimumLength = 3, ErrorMessage = "需填3碼或6碼郵遞區號")]
-        [RegularExpression("[1-9][0-9]{2}|[1-9][0-9]{5}")]
+        [StringLength(6, ErrorMessage = "需填6碼郵遞區號")]
+        [RegularExpression("[1-9][0-9]{5}")]
         public string? ZipCode { get; set; }
 
         [Display(Name = "備註")]
@@ -66,19 +66,25 @@ namespace LibPro.Models
         [DataType(DataType.MultilineText)]
         public string? Memo { get; set; }
 
-        public string? UserID { get; set; } 
+        [Display(Name = "登入ID")]
+        public string? UserID { get; set; }
 
+        [Display(Name = "縣市")]
         public byte CityID { get; set; }
 
+        [Display(Name = "狀態")]
         public byte PtrStatus { get; set; }
 
         [ForeignKey("UserID")]
+        [Display(Name = "登入ID")]
         public virtual UserAccounts? UserAccount { get; set; }
 
         [ForeignKey("CityID")]
+        [Display(Name = "縣市")]
         public virtual Cities? City { get; set; }
 
         [ForeignKey("PtrStatus")]
+        [Display(Name = "狀態")]
         public virtual PatronsStatus? PatronsStatus { get; set; }      
 
         public virtual List<Loans>? Loans { get; set; }

@@ -75,10 +75,13 @@
             <td class=" text-end">
                     <a asp-action="Edit" asp-route-id="@item.StaffID" class="btn btn-outline-primary">編輯</a>
                     <a asp-action="Details" asp-route-id="@item.StaffID" class="btn btn-outline-info">詳細</a>
-                    <form asp-action="Delete" asp-route-id="@item.StaffID" class="d-inline ">
+                    <form asp-action="ToggleResignStatus" asp-route-id="@item.StaffID" class="d-inline ">
                         <input type="submit" class="btn btn-outline-danger resign " value="離職" onclick="return confirm('確定要將@(item.Name)設為離職嗎？')" />
                     </form>
-                    <a asp-action="Restore" asp-route-id="@item.StaffID" class="btn btn-outline-success restore">復職</a>
+                    <form asp-action="ToggleResignStatus" asp-route-id="@item.StaffID" class="d-inline ">
+                        <input type="submit" class="btn btn-outline-success restore" value="復職" onclick="return confirm('確定要讓館員 【@(item.Name)】 復職嗎？')" />
+                    </form>
+                   
             </td>
         </tr>
 }

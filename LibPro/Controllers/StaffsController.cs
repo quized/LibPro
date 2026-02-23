@@ -149,30 +149,21 @@ namespace LibPro.Controllers
         // POST: Staffs/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult>ToggleResignStatus(string id)
         {
             var staff = await _context.Staffs.FindAsync(id);
             if (staff != null)
             {
-                staff.IsResigned = true;
+                staff.IsResigned = !staff.IsResigned; 
                 _context.Staffs.Update(staff);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
+            
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Restore(string id)
-        {
-            var staff = await _context.Staffs.FindAsync(id);
-            if (staff != null)
-            {
-                staff.IsResigned = false;
-                _context.Staffs.Update(staff);
-            }
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+       
 
         private bool StaffExists(string id)
         {
