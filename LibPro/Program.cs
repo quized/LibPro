@@ -9,6 +9,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<LibproContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LibProContext")));
 
+builder.Services.AddAuthentication("ManagerLogin").AddCookie("ManagerLogin", options =>
+{
+    options.LoginPath = "/Login/Login";
+    options.LogoutPath = "/Login/Logout";
+    options.AccessDeniedPath = "/Home/Index";
+});
+
+
 var app = builder.Build();
 
 

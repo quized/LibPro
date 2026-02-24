@@ -17,7 +17,7 @@ namespace LibPro.Models
 
         [Required(ErrorMessage = "必填欄位")]
         [Display(Name ="密碼")]
-        [StringLength(50,MinimumLength =8,ErrorMessage ="密碼需8~50個字元")]
+        [StringLength(100,MinimumLength =8,ErrorMessage ="密碼至少8個字")]
         [DataType(DataType.Password)]
         public string Password { get; set; } = null!;
 

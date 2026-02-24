@@ -72,12 +72,55 @@ namespace LibPro.Controllers
 
             if (ModelState.IsValid)
             {
-                var StaffID = await _context.Database.SqlQuery<string>($"exec GetStaffID").ToListAsync();
-                staff.StaffID = StaffID.FirstOrDefault();
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    var StaffID = await _context.Database.SqlQuery<string>($"exec GetStaffID").ToListAsync();
 
-                _context.Add(staff);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    string newStaffID = StaffID.FirstOrDefault();
+
+                    if (string.IsNullOrEmpty(newStaffID))
+                    {
+                        ModelState.AddModelError("", "產生 PatronID 失敗，請聯絡管理員。");
+                        ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
+                        ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
+                        ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", staff.UserID);
+                        return View(staff);
+                    }
+                    string newUserID = "L" + newStaffID;
+
+                    string loginAccount = staff.Phone;
+
+                    string loginPassword = staff.Birthday.ToString("yyyyMMdd");
+
+                    string hashedPassword = BCrypt.Net.BCrypt.HashPassword(loginPassword);
+
+
+                    var newUserAccount = new UserAccounts
+                    {
+                        UserID = newUserID,
+                        Account = loginAccount,
+                        Password = hashedPassword,
+                        CreatedDate = DateTime.Now,
+                        UserType = 2
+                    };
+
+                    _context.UserAccounts.Add(newUserAccount);
+
+                    staff.StaffID = newStaffID;
+
+                    staff.UserID = newUserID;
+
+                    _context.Add(staff);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    ModelState.AddModelError("", "新增員工失敗: " + ex.Message);
+                }
             }
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
             ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
@@ -149,21 +192,21 @@ namespace LibPro.Controllers
         // POST: Staffs/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>ToggleResignStatus(string id)
+        public async Task<IActionResult> ToggleResignStatus(string id)
         {
             var staff = await _context.Staffs.FindAsync(id);
             if (staff != null)
             {
-                staff.IsResigned = !staff.IsResigned; 
+                staff.IsResigned = !staff.IsResigned;
                 _context.Staffs.Update(staff);
                 await _context.SaveChangesAsync();
             }
 
-            
+
             return RedirectToAction(nameof(Index));
         }
 
-       
+
 
         private bool StaffExists(string id)
         {
