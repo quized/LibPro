@@ -73,62 +73,58 @@ namespace LibPro.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Patrons patrons)
         {
-
             ModelState.Remove("PatronID");
 
             if (ModelState.IsValid)
             {
-                using var transaction = await _context.Database.BeginTransactionAsync();
+              
+                var patronIDResult = await _context.Database.SqlQuery<string>($"exec GetPatronsID").ToListAsync();
+                string newPatronID = patronIDResult.FirstOrDefault();
 
+                if (string.IsNullOrWhiteSpace(newPatronID))
+                {
+                    ModelState.AddModelError("", "產生 借閱人ID 失敗，請聯絡管理員。");
+                    ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", patrons.CityID);
+                    ViewData["PtrStatus"] = new SelectList(_context.PatronsStatus, "StatusCode", "StatusName", patrons.PtrStatus);
+                    ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", patrons.UserID);
+                    return View(patrons);
+                }
+
+               
+                string newUserID = "L" + newPatronID;
+                string loginAccount = patrons.Phone;
+                string loginPassword = patrons.Birthday.ToString("yyyyMMdd"); // 預設密碼為生日
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(loginPassword);
+
+                var newUserAccount = new UserAccounts
+                {
+                    UserID = newUserID,
+                    Account = loginAccount,
+                    Password = hashedPassword,
+                    CreatedDate = DateTime.Now,
+                    UserType = 3 // 3 代表借閱人
+                };
+
+                _context.UserAccounts.Add(newUserAccount);
+
+                patrons.PatronID = newPatronID;
+                patrons.UserID = newUserID;
+                _context.Add(patrons);
+
+             
                 try
                 {
-                    var patronID = await _context.Database.SqlQuery<string>($"exec GetPatronsID").ToListAsync();
-                    string newPatronID = patronID.FirstOrDefault();
-
-                    if (string.IsNullOrWhiteSpace(newPatronID))
-                    {
-                        ModelState.AddModelError("", "產生 PatronID 失敗，請聯絡管理員。");
-                        ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", patrons.CityID);
-                        ViewData["PtrStatus"] = new SelectList(_context.PatronsStatus, "StatusCode", "StatusName", patrons.PtrStatus);
-                        ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", patrons.UserID);
-                        return View(patrons);
-                    }
-
-                    string newUserID = "L" + newPatronID;
-
-                    string loginAccount = patrons.Phone;
-
-
-
-                    string loginPassword = patrons.Birthday.ToString("yyyyMMdd");
-
-                    string hashedPassword = BCrypt.Net.BCrypt.HashPassword(loginPassword);
-
-                    var newUserAccount = new UserAccounts
-                    {
-                        UserID = newUserID,
-                        Account = loginAccount,
-                        Password = hashedPassword,
-                        CreatedDate = DateTime.Now,
-                        UserType = 3
-                    };
-                    _context.UserAccounts.Add(newUserAccount);
-
-                    patrons.PatronID = newPatronID;
-                    patrons.UserID = newUserID;
-                    _context.Add(patrons);
+                 
                     await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    await transaction.RollbackAsync();
+                   
                     ModelState.AddModelError("", "新增失敗，系統發生錯誤：" + ex.Message);
                 }
-
-
             }
+
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", patrons.CityID);
             ViewData["PtrStatus"] = new SelectList(_context.PatronsStatus, "StatusCode", "StatusName", patrons.PtrStatus);
             ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", patrons.UserID);

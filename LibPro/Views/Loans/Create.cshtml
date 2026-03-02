@@ -1,84 +1,69 @@
 ﻿@model LibPro.Models.Loans
 
 @{
-    ViewData["Title"] = "借書作業 (Check-Out)";
+    ViewData["Title"] = "借書作業";
 }
 
 <div class="container-fluid mt-4">
-    <div class="row mb-3">
-        <div class="col-12">
-            <h2><i class="bi bi-book"></i> 櫃台借書作業</h2>
-            <hr />
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    </div>
+    }
 
     <div class="row">
         <div class="col-md-4">
             <div class="card shadow-sm border-primary">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">1. 掃描區</h5>
+                    <h5 class="mb-0">借書掃描區</h5>
                 </div>
                 <div class="card-body">
                     <form asp-action="Create" id="checkoutForm">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div id="formErrorSummary" class="mb-3"></div>
 
                         <div class="form-group mb-4">
-                            <label asp-for="PatronID" class="control-label fw-bold text-primary">借閱人證號</label>
-                            <input asp-for="PatronID" class="form-control form-control-lg border-primary" placeholder="請刷入借閱證條碼..." autofocus />
+                            <label asp-for="PatronID" class="control-label fw-bold text-primary">1. 借閱人證號</label>
+                            <input asp-for="PatronID" class="form-control form-control-lg border-primary" id="PatronID" placeholder="請刷入借閱證..." />
                             <span asp-validation-for="PatronID" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-4">
-                            <label asp-for="ItemID" class="control-label fw-bold text-success">書籍條碼</label>
-                            <input asp-for="ItemID" class="form-control form-control-lg border-success" placeholder="請刷入書籍條碼..." />
+                            <label asp-for="ItemID" class="control-label fw-bold text-success">2. 書籍條碼</label>
+                            <input asp-for="ItemID" class="form-control form-control-lg border-success" id="ItemID" placeholder="請刷入書籍..." />
                             <span asp-validation-for="ItemID" class="text-danger"></span>
                         </div>
 
-                        <div class="form-group mb-4">
-                            <label asp-for="Notes" class="control-label fw-bold text-muted">備註 (選填)</label>
-                            <textarea asp-for="Notes" class="form-control" rows="2" placeholder="如有破損或其他狀況可記錄於此"></textarea>
-                            <span asp-validation-for="Notes" class="text-danger"></span>
-                        </div>
-
-                        <div class="d-grid gap-2 mt-4">
+                        <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">確認借出</button>
                         </div>
                     </form>
                 </div>
             </div>
-
-            <div class="mt-3">
-                <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> 返回借閱紀錄列表</a>
-            </div>
         </div>
 
         <div class="col-md-8">
-            <div class="alert alert-info shadow-sm" role="alert">
-                <h5 class="alert-heading mb-1"><i class="bi bi-person-badge"></i> 讀者狀態：請先掃描借閱證</h5>
-                <p class="mb-0 text-muted" id="patronStatusText">目前尚未載入讀者資訊。</p>
-            </div>
-
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0 text-dark"><i class="bi bi-list-check"></i> 本次借閱清單</h5>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-cart-check"></i> 本次連續掃描清單</h5>
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-hover table-striped mb-0">
-                        <thead class="table-dark">
+                        <thead class="table-light">
                             <tr>
-                                <th width="10%">#</th>
-                                <th width="30%">書籍條碼</th>
-                                <th width="40%">書名 (預覽)</th>
-                                <th width="20%" class="text-center">操作</th>
+                                <th>借閱時間</th>
+                                <th>書籍條碼</th>
+                                <th>應還日期</th>
                             </tr>
                         </thead>
-                        <tbody id="scannedItemsList">
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">
-                                    目前尚無掃描書籍，請於左側輸入書籍條碼。
+                        <tbody id="scannedList">
+                            <tr id="emptyRow">
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="bi bi-upc-scan fs-1 d-block mb-2"></i>
+                                    請於左側刷入借閱證與書籍條碼
                                 </td>
                             </tr>
-
                         </tbody>
                     </table>
                 </div>
@@ -91,4 +76,88 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+           $(function () {
+            const $form = $("#checkoutForm");
+            const $patronInput = $("#PatronID");
+            const $itemInput = $("#ItemID");
+            const $scannedList = $("#scannedList");
+            const $emptyRow = $("#emptyRow");
+            const $errorSummary = $("#formErrorSummary");
+
+
+          $("#PatronID, #ItemID").on("focus", function () {
+            $(this).select();
+        });
+
+
+            //智慧對焦：一開始游標停在借閱證號
+            $patronInput.focus();
+
+            //攔截讀者輸入框的 Enter 鍵
+            $patronInput.on("keydown", function (e) {
+                // 13 是 Enter 鍵的 key code
+                if (e.key === "Enter" || e.which === 13) {
+                    e.preventDefault(); // 阻止表單提早送出
+
+                    // $.trim 去掉空白，確保不是只輸入空白鍵
+                    if ($.trim($patronInput.val()) !== "") {
+                        $itemInput.focus(); // 游標平滑跳轉到書籍輸入框！
+                    }
+                }
+            });
+
+            // 3. 攔截表單的 submit 事件，改用 jQuery AJAX 傳送
+            $form.on("submit", function (e) {
+                // 最重要的一行：阻止網頁閃爍跟重新整理！
+                e.preventDefault();
+
+                // 清空之前的錯誤訊息
+                $errorSummary.empty();
+
+                // 如果讀者或書籍沒填，就不往下執行
+                if ($.trim($patronInput.val()) === "" || $.trim($itemInput.val()) === "") {
+                    return;
+                }
+
+                // 收集表單資料 (this 代表目前觸發 submit 的表單)
+                const formData = new FormData(this);
+
+                // 使用 jQuery 的 AJAX 發送背景請求
+                $.ajax({
+                    url: $form.attr('action'), // 去抓 <form action="..."> 的網址
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // 必填：告訴 jQuery 不要把 FormData 轉成字串
+                    contentType: false, // 必填：告訴 jQuery 不要覆蓋 FormData 預設的 Content-Type
+
+                            success: function (result) {
+            if (result.success) {
+                // 存檔成功！
+                $emptyRow.hide();
+                const newRow = `
+                    <tr>
+                        <td class="align-middle fw-bold text-secondary">${result.time}</td>
+                        <td class="align-middle"><span class="badge bg-success fs-6">${result.bookId}</span></td>
+                        <td class="align-middle text-danger fw-bold">${result.dueDate}</td>
+                    </tr>
+                `;
+                $scannedList.prepend(newRow);
+                $itemInput.val("").focus();
+                return; // 成功就直接結束
+            }
+
+            // 失敗才會執行這裡
+            $errorSummary.html(`<div class="alert alert-danger py-2 px-3">${result.message}</div>`);
+            $itemInput.trigger('select');
+        },
+                    error: function () {
+                        // 網路斷線或伺服器大當機時的攔截
+                        $errorSummary.html(`<div class="alert alert-danger py-2 px-3">連線發生錯誤，請稍後再試。</div>`);
+                    }
+                });
+            });
+        });
+    </script>
 }

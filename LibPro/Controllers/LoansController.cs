@@ -45,9 +45,9 @@ namespace LibPro.Controllers
             return View(loans);
         }
 
-        // GET: Loans/Create
+        
         public IActionResult Create()
-        {
+        {           
             ViewData["ItemID"] = new SelectList(_context.BookItems, "ItemID", "ItemID");
             ViewData["PatronID"] = new SelectList(_context.Patrons, "PatronID", "PatronID");
             return View();
@@ -55,10 +55,10 @@ namespace LibPro.Controllers
 
         // POST: Loans/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LoanID,LoanDate,DueDate,ReturnDate,RenewalCount,Notes,PatronID,ItemID")] Loans loans)
+        public async Task<IActionResult> Create(Loans loans)
         {
             ModelState.Remove("LoanID");
             ModelState.Remove("LoanDate");
@@ -66,15 +66,60 @@ namespace LibPro.Controllers
 
             if (ModelState.IsValid)
             {
+               
+            
 
-                _context.Add(loans);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var patron = await _context.Patrons.FindAsync(loans.PatronID);
+                if (patron == null)
+                {
+                   
+                    return Json(new { success = false, message = "找不到此借閱人，請確認證號是否正確。" });
+                }
+
+                var bookItem = await _context.BookItems.FindAsync(loans.ItemID);
+                if (bookItem == null || bookItem.ItmStatus != 1)
+                {
+                    return Json(new { success = false, message = "此書籍不在架上，或已被借出。" });
+                }
+
+                var loanIDResult = await _context.Database.SqlQuery<string>($"exec getLoanID").ToListAsync();
+                string newLoanID = loanIDResult.FirstOrDefault();
+                if (string.IsNullOrEmpty(newLoanID))
+                {
+                    return Json(new { success = false, message = "無法產生借閱編號，請聯絡管理員。" });
+                }
+
+                loans.LoanID = newLoanID;
+                loans.LoanDate = DateTime.Now;
+                loans.DueDate = DateTime.Now.AddDays(14);
+                loans.RenewalCount = 0;
+
+                _context.Loans.Add(loans);
+                bookItem.ItmStatus = 2;
+                _context.BookItems.Update(bookItem);
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+
+                   
+                    return Json(new
+                    {
+                        success = true,
+                        bookId = loans.ItemID,
+                        dueDate = loans.DueDate.ToString("yyyy/MM/dd"),
+                        time = loans.LoanDate.ToString("HH:mm:ss")
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = "系統錯誤：" + ex.Message });
+                }
             }
-            ViewData["ItemID"] = new SelectList(_context.BookItems, "ItemID", "ItemID", loans.ItemID);
-            ViewData["PatronID"] = new SelectList(_context.Patrons, "PatronID", "PatronID", loans.PatronID);
-            return View(loans);
+
+            return Json(new { success = false, message = "資料格式錯誤，請重新掃描。" });
         }
+
 
         // GET: Loans/Edit/5
         public async Task<IActionResult> Edit(string id)
