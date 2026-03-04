@@ -77,7 +77,7 @@ namespace LibPro.Controllers
             {
               
                 var patronIDResult = await _context.Database.SqlQuery<string>($"exec GetPatronsID").ToListAsync();
-                string newPatronID = patronIDResult.FirstOrDefault();
+                var newPatronID = patronIDResult.FirstOrDefault();
 
                 if (string.IsNullOrWhiteSpace(newPatronID))
                 {

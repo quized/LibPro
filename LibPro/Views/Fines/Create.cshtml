@@ -1,0 +1,42 @@
+﻿@model LibPro.Models.Fines
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Fines</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="FTID" class="control-label">罰款項目</label>
+                <select asp-for="FTID" class="form-select" asp-items="ViewBag.FTID"></select>
+            </div>
+
+            <div class="form-group mb-4">
+                <label asp-for="LoanID" class="control-label">關聯借閱紀錄</label>
+                <select asp-for="LoanID" class="form-select" asp-items="ViewBag.LoanID">
+                    <option value="">-- 無關聯借閱 (如補發借閱證) --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg"></i> 開立罰單</button>
+                <a asp-action="Index" class="btn btn-outline-secondary ms-2">取消返回</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

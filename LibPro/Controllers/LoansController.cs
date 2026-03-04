@@ -81,7 +81,7 @@ namespace LibPro.Controllers
                 }
 
                 var loanIDResult = await _context.Database.SqlQuery<string>($"exec getLoanID").ToListAsync();
-                string newLoanID = loanIDResult.FirstOrDefault();
+                var newLoanID = loanIDResult.FirstOrDefault();
                 if (string.IsNullOrEmpty(newLoanID))
                 {
                     return Json(new { success = false, message = "無法產生借閱編號，請聯絡管理員。" });

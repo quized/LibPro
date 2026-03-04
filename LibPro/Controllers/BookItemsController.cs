@@ -86,9 +86,20 @@ namespace LibPro.Controllers
 
             if (ModelState.IsValid)
             {
-                var itemID = await _context.Database.SqlQuery<string>($"exec GetItemID").ToListAsync();
-                bookItems.ItemID = itemID.FirstOrDefault();
+                var itemIDResult = await _context.Database.SqlQuery<string>($"exec GetItemID").ToListAsync();
+                var ItemID = itemIDResult.FirstOrDefault();
 
+
+                if (string.IsNullOrWhiteSpace(ItemID))
+                {
+                    ModelState.AddModelError("", "產生 館藏編號 失敗，請聯絡管理員。");
+                    ViewData["BibID"] = new SelectList(_context.Biblios, "BibID", "BTitle", bookItems.BibID);
+                    ViewData["ItmStatus"] = new SelectList(_context.ItemStatus, "StatusCode", "StatusName", bookItems.ItmStatus);
+                    ViewData["LocID"] = new SelectList(_context.Locations, "LocationID", "LocationName", bookItems.LocID);
+                    return View(bookItems);
+                }
+
+                bookItems.ItemID = ItemID;
 
                 _context.Add(bookItems);
                 await _context.SaveChangesAsync();

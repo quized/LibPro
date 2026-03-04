@@ -72,7 +72,7 @@ namespace LibPro.Controllers
             {
                 
                 var staffIDResult = await _context.Database.SqlQuery<string>($"exec GetStaffID").ToListAsync();
-                string newStaffID = staffIDResult.FirstOrDefault();
+                var newStaffID = staffIDResult.FirstOrDefault();
 
                 if (string.IsNullOrEmpty(newStaffID))
                 {

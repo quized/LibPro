@@ -4,11 +4,12 @@
     ViewData["Title"] = "罰金紀錄管理";
 }
 
-
 <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-    <h2 class="m-0 fw-bold text-dark">罰金結算中心</h2>
+    <h2 class="m-0 fw-bold text-dark">罰金列表</h2>
+    <a asp-action="Create" class="btn btn-warning shadow-sm px-4 fw-bold">
+        <i class="bi bi-plus-lg me-1"></i> 手動開立罰單
+    </a>
 </div>
-
 
 <div class="card shadow-sm border-0 mb-4 bg-light">
     <div class="card-body">
@@ -72,13 +73,16 @@
                                     <div class="text-muted small">@item.CreatedDate.ToString("HH:mm")</div>
                                 </td>
                                 <td>
-                                  
+
                                     <div class="fw-bold text-primary">@item.PatronName</div>
                                     <div class="text-muted small">ID: @item.PatronID</div>
                                 </td>
                                 <td>
                                     <span class="text-dark">@item.FTName</span>
-                                    <span class="badge bg-light text-secondary border ms-1">@item.OverdueDays 天</span>
+                                    @if (item.FTName == "逾期")
+                                    {
+                                        <span class="badge bg-light text-secondary border ms-1">@item.OverdueDays 天</span>
+                                    }
                                 </td>
                                 <td class="text-end fw-bold text-dark fs-5">
                                     $@item.TotalAmount.ToString("N0")
