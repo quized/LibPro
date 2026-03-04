@@ -56,7 +56,6 @@ namespace LibPro.Controllers
         {
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName");
             ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName");
-            ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName");
             return View();
         }
 
@@ -81,7 +80,6 @@ namespace LibPro.Controllers
                     ModelState.AddModelError("", "產生 員工ID 失敗，請聯絡管理員。");
                     ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
                     ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
-                    ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", staff.UserID);
                     return View(staff);
                 }
 
@@ -122,7 +120,6 @@ namespace LibPro.Controllers
             
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
             ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
-            ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", staff.UserID);
             return View(staff);
         }
 
@@ -141,7 +138,6 @@ namespace LibPro.Controllers
             }
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
             ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
-            ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", staff.UserID);
             return View(staff);
         }
 
@@ -181,7 +177,6 @@ namespace LibPro.Controllers
             }
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
             ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
-            ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", staff.UserID);
             return View(staff);
         }
 

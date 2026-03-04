@@ -5,13 +5,7 @@
 }
 
 <div class="container-fluid mt-4">
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
+    <div id="formErrorSummary" class="mb-3"></div>
 
     <div class="row">
         <div class="col-md-4">
@@ -20,7 +14,7 @@
                     <h5 class="mb-0">借書掃描區</h5>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Create" id="checkoutForm">
+                    <form asp-action="CheckOut" id="checkoutForm">
                         <div id="formErrorSummary" class="mb-3"></div>
 
                         <div class="form-group mb-4">
@@ -132,7 +126,7 @@
                     processData: false, // 必填：告訴 jQuery 不要把 FormData 轉成字串
                     contentType: false, // 必填：告訴 jQuery 不要覆蓋 FormData 預設的 Content-Type
 
-                            success: function (result) {
+                    success: function (result) {
             if (result.success) {
                 // 存檔成功！
                 $emptyRow.hide();

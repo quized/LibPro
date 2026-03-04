@@ -1,0 +1,119 @@
+﻿@model IEnumerable<LibPro.ViewModels.FineViewModel>
+
+@{
+    ViewData["Title"] = "罰金紀錄管理";
+}
+
+
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <h2 class="m-0 fw-bold text-dark">罰金結算中心</h2>
+</div>
+
+
+<div class="card shadow-sm border-0 mb-4 bg-light">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-secondary">搜尋讀者</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="searchString" class="form-control border-start-0"
+                           placeholder="輸入姓名或證號..." value="@ViewBag.CurrentFilter" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-secondary">付款狀態</label>
+                <select name="status" class="form-select">
+                    <option value="">全部狀態</option>
+                    <option value="unpaid" selected="@(ViewBag.CurrentStatus == "unpaid")">待繳納</option>
+                    <option value="paid" selected="@(ViewBag.CurrentStatus == "paid")">已付款</option>
+                </select>
+            </div>
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary px-4">搜尋</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">重置</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary">
+                    <tr class="border-bottom text-nowrap">
+                        <th class="ps-4 py-3">產生日期</th>
+                        <th class="py-3">借閱人資訊</th>
+                        <th class="py-3">罰金類型</th>
+                        <th class="py-3 text-end">應收金額</th>
+                        <th class="py-3 text-center">狀態</th>
+                        <th class="text-center pe-4 py-3" style="width: 150px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-search fs-1 d-block mb-2"></i>
+                                找不到符合條件的罰金紀錄。
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr class="border-bottom">
+                                <td class="ps-4">
+                                    <div class="text-dark">@item.CreatedDate.ToString("yyyy-MM-dd")</div>
+                                    <div class="text-muted small">@item.CreatedDate.ToString("HH:mm")</div>
+                                </td>
+                                <td>
+                                  
+                                    <div class="fw-bold text-primary">@item.PatronName</div>
+                                    <div class="text-muted small">ID: @item.PatronID</div>
+                                </td>
+                                <td>
+                                    <span class="text-dark">@item.FTName</span>
+                                    <span class="badge bg-light text-secondary border ms-1">@item.OverdueDays 天</span>
+                                </td>
+                                <td class="text-end fw-bold text-dark fs-5">
+                                    $@item.TotalAmount.ToString("N0")
+                                </td>
+                                <td class="text-center">
+                                    @if (item.ISPaid)
+                                    {
+                                        <span class="badge rounded-pill bg-success-subtle text-success border border-success border-opacity-25 px-3 py-2">已付款</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger border-opacity-25 px-3 py-2 animate__animated animate__pulse animate__infinite">待繳納</span>
+                                    }
+                                </td>
+                                <td class="text-center pe-4">
+                                    @if (!item.ISPaid)
+                                    {
+                                        <form asp-action="Pay" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@item.FineID" />
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold"
+                                                    onclick="return confirm('確認收訖 [@item.PatronName] 的罰金 $@item.TotalAmount.ToString("N0") 元？');">
+                                                收取罰金
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small"><i class="bi bi-check2-all"></i> 無須操作</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

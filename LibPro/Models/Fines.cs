@@ -16,16 +16,20 @@ namespace LibPro.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         [Display(Name = "付款與否")]
-        public bool ISPaid { get; set; } = false;     
+        public bool ISPaid { get; set; } = false;
 
+        [Display(Name = "罰金類型")]
         public byte FTID { get; set; }
 
+        [Display(Name = "借閱紀錄")]
         public string LoanID { get; set; } = null!;
 
         [ForeignKey("FTID")]
+        [Display(Name = "罰金類型")]
         public virtual FineTypes? FineType { get; set; }
 
         [ForeignKey("LoanID")]
+        [Display(Name = "借閱紀錄")]
         public virtual Loans? Loan { get; set; }
     }
 }

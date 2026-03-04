@@ -61,8 +61,6 @@ namespace LibPro.Controllers
         public IActionResult Create()
         {
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName");
-            ViewData["PtrStatus"] = new SelectList(_context.PatronsStatus, "StatusCode", "StatusName");
-            ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName");
             return View();
         }
 
@@ -84,9 +82,7 @@ namespace LibPro.Controllers
                 if (string.IsNullOrWhiteSpace(newPatronID))
                 {
                     ModelState.AddModelError("", "產生 借閱人ID 失敗，請聯絡管理員。");
-                    ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", patrons.CityID);
-                    ViewData["PtrStatus"] = new SelectList(_context.PatronsStatus, "StatusCode", "StatusName", patrons.PtrStatus);
-                    ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", patrons.UserID);
+                    ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", patrons.CityID);               
                     return View(patrons);
                 }
 
@@ -125,9 +121,7 @@ namespace LibPro.Controllers
                 }
             }
 
-            ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", patrons.CityID);
-            ViewData["PtrStatus"] = new SelectList(_context.PatronsStatus, "StatusCode", "StatusName", patrons.PtrStatus);
-            ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserName", patrons.UserID);
+            ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", patrons.CityID);          
             return View(patrons);
         }
 
@@ -187,7 +181,6 @@ namespace LibPro.Controllers
             }
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityID", patrons.CityID);
             ViewData["PtrStatus"] = new SelectList(_context.PatronsStatus, "StatusCode", "StatusName", patrons.PtrStatus);
-            ViewData["UserID"] = new SelectList(_context.UserAccounts, "UserID", "UserID", patrons.UserID);
             return View(patrons);
         }
 

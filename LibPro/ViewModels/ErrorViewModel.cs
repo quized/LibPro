@@ -1,4 +1,4 @@
-namespace LibPro.Models
+namespace LibPro.ViewModels
 {
     public class ErrorViewModel
     {

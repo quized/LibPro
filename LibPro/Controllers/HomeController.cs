@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using LibPro.Models;
+using LibPro.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibPro.Controllers

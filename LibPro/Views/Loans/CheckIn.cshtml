@@ -1,0 +1,140 @@
+﻿@{
+    ViewData["Title"] = "還書作業";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> 還書掃描區</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CheckIn" id="checkinForm">
+                        <div id="formErrorSummary" class="mb-3"></div>
+
+                        <div class="form-group mb-4">
+                            <label for="ItemID" class="control-label fw-bold text-success">1. 書籍條碼</label>
+                            <input type="text" name="ItemID" class="form-control form-control-lg border-success" id="ItemID" placeholder="請刷入要歸還的書籍..." required autocomplete="off" />
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="Notes" class="control-label fw-bold text-secondary">2. 備註 (選填)</label>
+                            <input type="text" name="Notes" class="form-control" id="Notes" placeholder="如有破損或特殊狀況請填寫..." autocomplete="off" />
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">確認歸還 (Enter)</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-check"></i> 本次連續歸還清單</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>歸還時間</th>
+                                <th>書籍條碼</th>
+                                <th>狀態 / 罰金結算</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scannedList">
+                            <tr id="emptyRow">
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="bi bi-upc-scan fs-1 d-block mb-2"></i>
+                                    請於左側刷入要歸還的書籍條碼
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            const $form = $("#checkinForm");
+            const $itemInput = $("#ItemID");
+            const $notesInput = $("#Notes");
+            const $scannedList = $("#scannedList");
+            const $emptyRow = $("#emptyRow");
+            const $errorSummary = $("#formErrorSummary");
+
+            //智慧對焦：一開始游標停在書籍條碼
+            $itemInput.focus();
+
+            // 如果游標點回書籍條碼，自動全選反白，方便重刷
+            $itemInput.on("focus", function () {
+                $(this).select();
+            });
+
+            // 攔截表單的 submit 事件，改用 AJAX 在背景傳送
+            $form.on("submit", function (e) {
+                e.preventDefault();
+                $errorSummary.empty();
+
+                if ($.trim($itemInput.val()) === "") {
+                    return;
+                }
+
+                const formData = new FormData(this);
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (result) {
+                        if (result.success) {
+                            $emptyRow.hide();
+
+                            // 判斷是否逾期，產生不同的 UI 徽章 (Badge)
+                            let statusHtml = "";
+                            if (result.isOverdue) {
+                                statusHtml = `<span class="badge bg-danger fs-6 px-3 py-2 animate__animated animate__flash">
+                                                <i class="bi bi-exclamation-triangle-fill"></i> 逾期 ${result.overdueDays} 天 | 需收罰款：$${result.fine}
+                                              </span>`;
+                            } else {
+                                statusHtml = `<span class="badge bg-success fs-6"><i class="bi bi-check-lg"></i> 準時歸還</span>`;
+                            }
+
+                            const newRow = `
+                                <tr>
+                                    <td class="align-middle fw-bold text-secondary">${result.returnTime}</td>
+                                    <td class="align-middle"><span class="badge bg-dark fs-6">${result.bookId}</span></td>
+                                    <td class="align-middle">${statusHtml}</td>
+                                </tr>
+                            `;
+
+                            $scannedList.prepend(newRow);
+
+                            // 清空條碼和備註，游標跳回條碼框，準備刷下一本
+                            $itemInput.val("").focus();
+                            $notesInput.val("");
+
+                            return;
+                        }
+
+                        // 失敗時的處理
+                        $errorSummary.html(`<div class="alert alert-danger py-2 px-3">${result.message}</div>`);
+                        $itemInput.trigger('select');
+                    },
+                    error: function () {
+                        $errorSummary.html(`<div class="alert alert-danger py-2 px-3">連線發生錯誤，請稍後再試。</div>`);
+                    }
+                });
+            });
+        });
+    </script>
+}

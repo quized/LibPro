@@ -45,11 +45,9 @@ namespace LibPro.Controllers
             return View(loans);
         }
 
-        
-        public IActionResult Create()
-        {           
-            ViewData["ItemID"] = new SelectList(_context.BookItems, "ItemID", "ItemID");
-            ViewData["PatronID"] = new SelectList(_context.Patrons, "PatronID", "PatronID");
+
+        public IActionResult CheckOut()
+        {
             return View();
         }
 
@@ -58,7 +56,7 @@ namespace LibPro.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Loans loans)
+        public async Task<IActionResult> CheckOut(Loans loans)
         {
             ModelState.Remove("LoanID");
             ModelState.Remove("LoanDate");
@@ -66,13 +64,13 @@ namespace LibPro.Controllers
 
             if (ModelState.IsValid)
             {
-               
-            
+
+
 
                 var patron = await _context.Patrons.FindAsync(loans.PatronID);
                 if (patron == null)
                 {
-                   
+
                     return Json(new { success = false, message = "找不到此借閱人，請確認證號是否正確。" });
                 }
 
@@ -89,6 +87,41 @@ namespace LibPro.Controllers
                     return Json(new { success = false, message = "無法產生借閱編號，請聯絡管理員。" });
                 }
 
+                var unpaidFines = await _context.Fines
+                    .Where(f => f.Loan.PatronID == loans.PatronID && !f.ISPaid)
+                    .Include(f => f.FineType)
+                    .Include(f => f.Loan)
+                    .ToListAsync();
+
+                decimal totalOwed = 0;
+                foreach (var fine in unpaidFines)
+                {
+                   
+                    int overdueDays = (DateTime.Now.Date - fine.Loan.DueDate.Date).Days;
+                    if (overdueDays < 0) overdueDays = 0;
+
+                    
+                    decimal fineAmount = fine.FineType.UnitPrice * overdueDays;
+                    totalOwed += fineAmount;
+                }
+
+
+            
+                var hasOverdueBooks = await _context.Loans
+                    .AnyAsync(l => l.PatronID == loans.PatronID && l.ReturnDate == null && l.DueDate < DateTime.Now);
+
+                if (hasOverdueBooks)
+                {
+                    return Json(new { success = false, message = "該讀者尚有逾期圖書未歸還，請先歸還舊書。" });
+                }
+
+                if (totalOwed >= 100) 
+                {
+                    return Json(new { success = false, message = $"欠款金額已達 ${totalOwed}，請先結清罰金。" });
+                }
+
+
+
                 loans.LoanID = newLoanID;
                 loans.LoanDate = DateTime.Now;
                 loans.DueDate = DateTime.Now.AddDays(14);
@@ -102,7 +135,7 @@ namespace LibPro.Controllers
                 {
                     await _context.SaveChangesAsync();
 
-                   
+
                     return Json(new
                     {
                         success = true,
@@ -121,65 +154,106 @@ namespace LibPro.Controllers
         }
 
 
-        // GET: Loans/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var loans = await _context.Loans.FindAsync(id);
-            if (loans == null)
-            {
-                return NotFound();
-            }
-            ViewData["ItemID"] = new SelectList(_context.BookItems, "ItemID", "ItemID", loans.ItemID);
-            ViewData["PatronID"] = new SelectList(_context.Patrons, "PatronID", "PatronID", loans.PatronID);
-            return View(loans);
+
+
+
+        public IActionResult CheckIn()
+        {
+            return View();
         }
 
-        // POST: Loans/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("LoanID,LoanDate,DueDate,ReturnDate,RenewalCount,Notes,PatronID,ItemID")] Loans loans)
+        public async Task<IActionResult> CheckIn(string ItemID, string Notes)
         {
-            if (id != loans.LoanID)
+
+            if (string.IsNullOrWhiteSpace(ItemID))
             {
-                return NotFound();
+                return Json(new { success = false, message = "請刷入書籍條碼。" });
             }
 
-            if (ModelState.IsValid)
+
+            var loan = await _context.Loans
+                .FirstOrDefaultAsync(l => l.ItemID == ItemID && l.ReturnDate == null);
+
+            if (loan == null)
             {
-                try
-                {
-                    _context.Update(loans);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LoansExists(loans.LoanID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = false, message = "找不到此書的借出紀錄，可能已歸還或條碼錯誤。" });
             }
-            ViewData["ItemID"] = new SelectList(_context.BookItems, "ItemID", "ItemID", loans.ItemID);
-            ViewData["PatronID"] = new SelectList(_context.Patrons, "PatronID", "PatronID", loans.PatronID);
-            return View(loans);
-        }
 
 
-        private bool LoansExists(string id)
-        {
-            return _context.Loans.Any(e => e.LoanID == id);
+            var bookItem = await _context.BookItems.FindAsync(ItemID);
+            if (bookItem == null)
+            {
+                return Json(new { success = false, message = "系統中找不到此書籍主檔。" });
+            }
+
+            DateTime today = DateTime.Now;
+            loan.ReturnDate = today; // 押上歸還時間
+
+            loan.Notes = Notes;
+
+            int overdueDays = 0;
+            decimal fineAmount = 0m;
+
+
+            if (today.Date > loan.DueDate.Date)
+            {
+                overdueDays = (int)(today.Date - loan.DueDate.Date).TotalDays;
+                var overdueFineType = await _context.FineTypes.FindAsync((byte)1);
+
+                if (overdueFineType != null)
+                {
+                    fineAmount = overdueDays * overdueFineType.UnitPrice;
+
+                    var fineIDResult = await _context.Database.SqlQuery<string>($"exec GetFineID").ToListAsync();
+                    string newFineID = fineIDResult.FirstOrDefault();
+
+
+
+                    var newFine = new Fines
+                    {
+                        FineID = newFineID,
+                        CreatedDate = today,
+                        ISPaid = false,
+                        FTID = overdueFineType.FTID,
+                        LoanID = loan.LoanID
+                    };
+
+
+                    _context.Fines.Add(newFine);
+                }
+            }
+
+
+            bookItem.ItmStatus = 1;
+            _context.BookItems.Update(bookItem);
+
+            try
+            {
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    bookId = loan.ItemID,
+                    returnTime = today.ToString("HH:mm:ss"),
+                    isOverdue = overdueDays > 0,
+                    overdueDays = overdueDays,
+                    fine = fineAmount
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "系統存檔錯誤：" + ex.Message });
+            }
         }
     }
+
+
+
+
 }
