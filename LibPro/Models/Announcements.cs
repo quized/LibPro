@@ -26,8 +26,10 @@ namespace LibPro.Models
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm:ss}")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-
         public string Creator { get; set; } = null!;
+
+        [Display(Name = "是否顯示")]
+        public bool IsVisible { get; set; }
 
         [ForeignKey("Creator")]
         public virtual Staff? Staff { get; set; }
