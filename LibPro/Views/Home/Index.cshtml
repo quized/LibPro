@@ -1,4 +1,4 @@
-﻿
+﻿@model IEnumerable<LibPro.Models.Biblios>
 
 @{
     ViewData["Title"] = "Home Page";
@@ -6,29 +6,53 @@
 }
 
 
-<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img src="..." class="d-block w-100" alt="...">
-        </div>
-        <div class="carousel-item">
-            <img src="..." class="d-block w-100" alt="...">
-        </div>
-        <div class="carousel-item">
-            <img src="..." class="d-block w-100" alt="...">
-        </div>
+
+<div id="carouselBanner" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        @for (int i = 0; i < Model.Count(); i++)
+        {
+            if (i == 0)
+            {
+                <button type="button"
+                        data-bs-target="#carouselBanner"
+                        data-bs-slide-to="@i"
+                        class="active"
+                        aria-current="true"
+                        aria-label="Slide @(i + 1)">
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        data-bs-target="#carouselBanner"
+                        data-bs-slide-to="@i"
+                        aria-label="Slide @(i + 1)">
+                </button>
+            }
+        }
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+    <div class="carousel-inner">
+        @foreach (var item in Model)
+        {
+
+            var a = item == Model.First() ? "active" : "";
+
+            <div class="carousel-item @a">
+                <img src="~/ImgPath/@item.ImgPath" class="d-block w-100" alt="@item.BTitle">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>@item.BTitle</h5>
+                </div>
+            </div>
+        }
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselBanner" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselBanner" data-bs-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
     </button>
 </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
