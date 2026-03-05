@@ -1,4 +1,5 @@
 ﻿using LibPro.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace LibPro.Controllers
 {
+    //[Authorize(Roles = "Staff")]
     public class AnnouncementsController : Controller
     {
         private readonly LibproContext _context;
@@ -19,11 +21,16 @@ namespace LibPro.Controllers
             _context = context;
         }
 
-        // GET: Announcements
+
         public async Task<IActionResult> Index()
         {
-            var libproContext = _context.Announcements.Include(a => a.Staff);
-            return View(await libproContext.ToListAsync());
+            // 直接撈出所有資料，並依日期排序
+            var announcements = await _context.Announcements
+                .Include(a => a.Staff)
+                .OrderByDescending(a => a.CreatedDate)
+                .ToListAsync();
+
+            return View(announcements);
         }
 
         // GET: Announcements/Details/5
@@ -48,7 +55,6 @@ namespace LibPro.Controllers
         // GET: Announcements/Create
         public IActionResult Create()
         {
-            ViewData["Creator"] = new SelectList(_context.Staffs, "StaffID", "StaffID");
             return View();
         }
 
@@ -66,12 +72,14 @@ namespace LibPro.Controllers
 
             if (ModelState.IsValid)
             {
-                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var currentStaffID = User.FindFirstValue("StaffID");
 
-                if (string.IsNullOrEmpty(currentUserId))
+                if (string.IsNullOrEmpty(currentStaffID))
                 {
-                    return Unauthorized("無法取得登入者資訊，請重新登入。");
+                    return RedirectToAction("Logout", "Login");
                 }
+
+              
 
 
                 var annIDResult = await _context.Database.SqlQuery<string>($"exec GetAnnID").ToListAsync();
@@ -80,20 +88,19 @@ namespace LibPro.Controllers
                 if (string.IsNullOrWhiteSpace(newAnnID))
                 {
                     ModelState.AddModelError("", "產生 公告編號 失敗，請聯絡管理員。");
-                    ViewData["Creator"] = new SelectList(_context.Staffs, "StaffID", "StaffID", announcements.Creator);
                     return View(announcements);
                 }
 
                 announcements.AnnID = newAnnID;
                 announcements.CreatedDate = DateTime.Now;
                 announcements.IsVisible = true;
-                announcements.Creator = currentUserId;
+                announcements.Creator = currentStaffID;
 
                 _context.Add(announcements);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Creator"] = new SelectList(_context.Staffs, "StaffID", "StaffID", announcements.Creator);
+           
             return View(announcements);
         }
 
@@ -110,7 +117,6 @@ namespace LibPro.Controllers
             {
                 return NotFound();
             }
-            ViewData["Creator"] = new SelectList(_context.Staffs, "StaffID", "StaffID", announcements.Creator);
             return View(announcements);
         }
 
@@ -119,19 +125,33 @@ namespace LibPro.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("AnnID,Title,Content,CreatedDate,Creator,IsVisible")] Announcements announcements)
+        public async Task<IActionResult> Edit(string id, Announcements announcements)
         {
             if (id != announcements.AnnID)
             {
                 return NotFound();
             }
 
+            ModelState.Remove("CreatedDate");
+            ModelState.Remove("Creator");
+
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(announcements);
+                    var existingAnn = await _context.Announcements.FindAsync(id);
+                    if (existingAnn == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingAnn.Title = announcements.Title;
+                    existingAnn.Content = announcements.Content;
+                    existingAnn.IsVisible = announcements.IsVisible;
+
                     await _context.SaveChangesAsync();
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -146,38 +166,27 @@ namespace LibPro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Creator"] = new SelectList(_context.Staffs, "StaffID", "StaffID", announcements.Creator);
             return View(announcements);
         }
 
-        // GET: Announcements/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var announcements = await _context.Announcements
-                .Include(a => a.Staff)
-                .FirstOrDefaultAsync(m => m.AnnID == id);
-            if (announcements == null)
-            {
-                return NotFound();
-            }
-
-            return View(announcements);
-        }
 
         // POST: Announcements/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> Delete(string id)
         {
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
             var announcements = await _context.Announcements.FindAsync(id);
             if (announcements != null)
             {
-                _context.Announcements.Remove(announcements);
+
+                announcements.IsVisible = false;
+                _context.Announcements.Update(announcements);
             }
 
             await _context.SaveChangesAsync();

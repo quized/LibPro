@@ -1,59 +1,195 @@
 ﻿@model IEnumerable<LibPro.Models.Announcements>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "公告管理";
 }
 
-<h1>Index</h1>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-megaphone text-primary me-2"></i>公告管理
+        </h2>
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> 發布新公告
+        </a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsVisible)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Staff)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsVisible)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Staff.StaffID)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AnnID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AnnID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AnnID">Delete</a>
-            </td>
-        </tr>
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
+
+            <ul class="nav nav-pills nav-sm" id="filter-buttons">
+                <li class="nav-item me-2">
+                    <button type="button" class="filter-btn nav-link rounded-pill px-3 active" data-filter="all">全部</button>
+                </li>
+                <li class="nav-item me-2">
+                    <button type="button" class="filter-btn nav-link rounded-pill px-3 bg-light text-muted" data-filter="visible">顯示中</button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="filter-btn nav-link rounded-pill px-3 bg-light text-muted" data-filter="hidden">已隱藏</button>
+                </li>
+            </ul>
+
+            <span class="text-muted small">共 <span id="total-count">@Model.Count()</span> 筆資料</span>
+        </div>
+
+        <div class="card-body p-0 mt-3">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center mb-0">
+                    <thead class="table-light text-muted">
+                        <tr>
+                            <th class="ps-4 text-start">@Html.DisplayNameFor(model => model.Title)</th>
+                            <th class="text-start" style="max-width: 250px;">@Html.DisplayNameFor(model => model.Content)</th>
+                            <th>狀態</th>
+                            <th>發布人</th>
+                            <th>@Html.DisplayNameFor(model => model.CreatedDate)</th>
+                            <th class="text-center pe-4" style="width: 1%; white-space: nowrap;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0" id="announcement-list">
+
+                        <tr id="empty-state-row" style="display: none;">
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 text-black-50"></i>
+                                目前沒有符合條件的公告
+                            </td>
+                        </tr>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr class="announcement-row" data-is-visible="@item.IsVisible.ToString().ToLower()">
+
+                                <td class="ps-4 text-start fw-bold text-dark">
+                                    @Html.DisplayFor(modelItem => item.Title)
+                                </td>
+
+                                <td class="text-start text-muted" title="@item.Content">
+                                    <div class="text-truncate" style="max-width: 250px;">
+                                        @Html.DisplayFor(modelItem => item.Content)
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @if (!item.IsVisible)
+                                    {
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill px-2 py-1 fw-normal">已隱藏</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <i class="bi bi-person-circle text-muted me-1"></i>
+                                    @Html.DisplayFor(modelItem => item.Staff.Name)
+                                </td>
+
+                                <td class="small">
+                                    @item.CreatedDate.ToString("yyyy/MM/dd HH:mm")
+                                </td>
+                                <td class="text-center pe-4" style="width: 1%; white-space: nowrap;">
+                                    <div class="d-flex justify-content-center align-items-center gap-2">
+
+                                        <a asp-action="Details" asp-route-id="@item.AnnID" class="btn btn-light border text-primary" title="查看詳情">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+
+                                        <a asp-action="Edit" asp-route-id="@item.AnnID" class="btn btn-light border text-success" title="編輯">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        @if (item.IsVisible)
+                                        {
+                                            <form asp-action="Delete" asp-route-id="@item.AnnID" method="post" class="m-0" onsubmit="return confirm('確定要將【@item.Title】隱藏下架嗎？');">
+                                                <button type="submit" class="btn btn-light border text-danger" title="隱藏下架">
+                                                    <i class="bi bi-eye-slash"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-light border" style="visibility: hidden;">
+                                                <i class="bi bi-eye-slash"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        
+        $(document).ready(function () {
+
+            //建立一個專門處理篩選的核心功能
+            function applyFilter(filterValue) {
+                let visibleCount = 0;
+
+                // 迴圈遍歷每一列資料
+                $('.announcement-row').each(function () {
+                   
+                    const $row = $(this);
+
+                    // 從 HTML 抓取我們印出來的 true / false
+                    const isVisible = $row.attr('data-is-visible') === 'true';
+                    let shouldShow = false;
+
+                    // 用標準清晰的邏輯判斷是否該顯示這列
+                    if (filterValue === 'all') {
+                        shouldShow = true;
+                    } else if (filterValue === 'visible' && isVisible === true) {
+                        shouldShow = true;
+                    } else if (filterValue === 'hidden' && isVisible === false) {
+                        shouldShow = true;
+                    }
+
+                    // 執行顯示或隱藏 (jQuery 的 show()/hide() 處理 display 屬性非常方便)
+                    if (shouldShow) {
+                        $row.show();
+                        visibleCount++;
+                    } else {
+                        $row.hide();
+                    }
+                });
+
+                // 更新總筆數
+                $('#total-count').text(visibleCount);
+
+                // 處理空狀態提示
+                if (visibleCount === 0) {
+                    $('#empty-state-row').show();
+                } else {
+                    $('#empty-state-row').hide();
+                }
+            }
+
+            // 監聽按鈕點擊事件
+            $('.filter-btn').on('click', function () {
+                const $btn = $(this);
+                const filterValue = $btn.attr('data-filter');
+
+                // 處理按鈕的顏色切換：先將所有按鈕重置為灰色
+                $('.filter-btn').removeClass('active bg-success bg-secondary text-white')
+                                .addClass('bg-light text-muted');
+
+                // 根據選中的按鈕套用專屬顏色
+                if (filterValue === 'all') {
+                    $btn.removeClass('bg-light text-muted').addClass('active');
+                } else if (filterValue === 'visible') {
+                    $btn.removeClass('bg-light text-muted').addClass('active bg-success text-white');
+                } else if (filterValue === 'hidden') {
+                    $btn.removeClass('bg-light text-muted').addClass('active bg-secondary text-white');
+                }
+
+                // 呼叫篩選功能
+                applyFilter(filterValue);
+            });
+
+            //網頁載入完成時，自動執行一次「全部顯示」的篩選邏輯
+            applyFilter('all');
+        });
+    </script>
 }
-    </tbody>
-</table>

@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using LibPro.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using LibPro.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LibPro.Controllers
 {
+    [Authorize(Roles = "Staff")]
     public class PatronsController : Controller
     {
         private readonly LibproContext _context;
@@ -190,6 +192,12 @@ namespace LibPro.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(string id, byte status)
         {
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
             var patrons = await _context.Patrons.FindAsync(id);
             if (patrons != null)
             {

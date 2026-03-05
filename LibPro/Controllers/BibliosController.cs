@@ -1,4 +1,5 @@
 ﻿using LibPro.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace LibPro.Controllers
 {
+    [Authorize(Roles = "Staff")]
     public class BibliosController : Controller
     {
         private readonly LibproContext _context;

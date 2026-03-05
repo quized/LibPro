@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace LibPro.Controllers
 {
-   
+
     public class LoginController : Controller
     {
         private readonly LibproContext _context;
@@ -23,7 +23,11 @@ namespace LibPro.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index","Home");
+                if (User.IsInRole("Patron"))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                return RedirectToAction("StaffCenter", "Home");
             }
 
             return View();
@@ -31,53 +35,87 @@ namespace LibPro.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = await _context.UserAccounts.FirstOrDefaultAsync(u => u.Account == model.Account);
-           
-            if (user != null)
-            {
-                // 呼叫 BCrypt 絞肉機比對密碼
-                bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
+                return View(model);
+            }
 
-                if (isPasswordCorrect)
+            var user = await _context.UserAccounts
+                                     .Include(u => u.UserRole)
+                                     .FirstOrDefaultAsync(u => u.Account == model.Account);
+
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "帳號或密碼錯誤，請重新登入。");
+                return View(model);
+            }
+
+            // 呼叫 BCrypt 比對密碼
+            bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
+            if (!isPasswordCorrect)
+            {
+                ModelState.AddModelError(string.Empty, "帳號或密碼錯誤，請重新登入。");
+                return View(model);
+            }
+
+            user.LastLoginTime = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+
+            string roleName = "Patron";
+            if (user.UserRole != null)
+            {
+                roleName = user.UserRole.RoleName;
+            }
+
+            string realName = user.Account;
+
+            // 建立 Claims
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserID),
+                new Claim(ClaimTypes.Role, roleName)
+            };
+
+            if(roleName == "Staff")
+            {
+                var staffInfo = await _context.Staffs.FirstOrDefaultAsync(s => s.UserID == user.UserID);
+                if (staffInfo != null)
                 {
-                    //更新最後登入時間並存檔
-                    user.LastLoginTime = DateTime.Now;
-                    _context.UserAccounts.Update(user);
-                    await _context.SaveChangesAsync();
-
-                    //準備發放 VIP 手環 (Claims)
-                    var claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.NameIdentifier, user.UserID),
-                            new Claim(ClaimTypes.Name, user.Account),
-                            new Claim(ClaimTypes.Role, user.UserType.ToString())
-                        };
-
-                    var claimsIdentity = new ClaimsIdentity(claims, "ManagerLogin");
-
-                    //正式登入，發放名為 "ManagerLogin" 的 Cookie
-                    await HttpContext.SignInAsync("ManagerLogin", new ClaimsPrincipal(claimsIdentity));
-
-                    return RedirectToAction("Index", "Home");
+                    claims.Add(new Claim("StaffID", staffInfo.StaffID));
+                    realName = staffInfo.Name; 
                 }
             }
 
-            // 防駭客的模糊錯誤訊息
-            ModelState.AddModelError(string.Empty, "帳號或密碼錯誤，請重新登入。");
-        }
-            return View(model);
+            if (roleName == "Patron")
+            {
+                var patronsInfo = await _context.Patrons.FirstOrDefaultAsync(s => s.UserID == user.UserID);
+                if (patronsInfo != null)
+                {
+                    claims.Add(new Claim("PatronID", patronsInfo.PatronID));
+                    realName = patronsInfo.Name;
+                }
+            }
+
+                claims.Add(new Claim(ClaimTypes.Name, realName));
+
+            var claimsIdentity = new ClaimsIdentity(claims, "ManagerLogin");
+            await HttpContext.SignInAsync("ManagerLogin", new ClaimsPrincipal(claimsIdentity));
+
+            // 智慧分流
+            string action = "Index";
+            if (roleName == "Admin" || roleName == "Staff")
+                action = "StaffCenter";
+            return RedirectToAction(action, "Home");
         }
 
-        // GET/POST: 處理登出邏輯
         public async Task<IActionResult> Logout()
         {
-           
             await HttpContext.SignOutAsync("ManagerLogin");
             return RedirectToAction("Login", "Login");
         }
     }
 }
+    

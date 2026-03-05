@@ -1,6 +1,7 @@
-using System.Diagnostics;
 using LibPro.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace LibPro.Controllers
 {
@@ -18,6 +19,7 @@ namespace LibPro.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Staff")]
         public IActionResult StaffCenter()
         {
             return View();

@@ -59,8 +59,13 @@
                 <h3 class="mb-0 fw-bold tracking-wide">圖書管理後台</h3>
             </div>
         </div>
-        <div>
-            <a asp-action="Home" class="btn btn-outline-light btn-sm rounded-pill px-4">登出系統</a>
+
+        <div class="d-flex align-items-center">
+            <div class="me-3 d-none d-md-block">
+                <i class="bi bi-person-circle me-1 text-warning"></i>
+                <span class="fw-bold">歡迎，@User.Identity.Name</span>
+            </div>
+            <a asp-controller="Login" asp-action="Logout" class="btn btn-outline-light btn-sm rounded-pill px-4">登出系統</a>
         </div>
     </header>
 
