@@ -1,63 +1,101 @@
 ﻿@model IEnumerable<LibPro.Models.Biblios>
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "首頁";
     Layout = "_PortalLayout";
 }
 
+<div class="position-relative w-100" style="margin-top: -1rem; margin-bottom: 3rem;">
+    <img src="/ImgPath/HomeIndexImg.jpg"
+         class="w-100 object-fit-cover"
+         style="height: 400px; filter: brightness(0.7);"
+         alt="圖書館大廳">
 
+    <div class="position-absolute top-50 start-50 translate-middle text-center w-100 px-3">
+        <h1 class="text-white fw-bold mb-4" style="letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+            探索知識的無盡汪洋
+        </h1>
 
-<div id="carouselBanner" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        @for (int i = 0; i < Model.Count(); i++)
-        {
-            if (i == 0)
-            {
-                <button type="button"
-                        data-bs-target="#carouselBanner"
-                        data-bs-slide-to="@i"
-                        class="active"
-                        aria-current="true"
-                        aria-label="Slide @(i + 1)">
-                </button>
-            }
-            else
-            {
-                <button type="button"
-                        data-bs-target="#carouselBanner"
-                        data-bs-slide-to="@i"
-                        aria-label="Slide @(i + 1)">
-                </button>
-            }
-        }
-    </div>
-    <div class="carousel-inner">
-        @foreach (var item in Model)
-        {
-
-            var a = item == Model.First() ? "active" : "";
-
-            <div class="carousel-item @a">
-                <img src="~/ImgPath/@item.ImgPath" class="d-block " alt="@item.BTitle">
-                <div class="carousel-caption d-none d-md-block">
-                    <h5>@item.BTitle</h5>
+        <div class="mx-auto" style="max-width: 650px;">
+            <form asp-controller="Home" asp-action="Search" method="get" class="d-flex shadow-lg rounded-pill overflow-hidden bg-white p-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-0 ps-4 text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="searchString" class="form-control border-0 fs-5 px-2" placeholder="請輸入書名、作者或關鍵字..." style="box-shadow: none;">
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold fs-5">館藏查詢</button>
                 </div>
-            </div>
-        }
+            </form>
+        </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselBanner" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselBanner" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
 </div>
 
-<h3 class="bg-info fw-bold text-center">公告</h3>
-<div>
-    @await Component.InvokeAsync("VCAnn")
+<div class="container pb-5">
+    <div class="row gx-5">
+        
+        <div class="col-lg-8 mb-4">
+            <div id="carouselBanner" class="carousel slide shadow-sm" data-bs-ride="carousel">
+                
+                <div class="carousel-indicators">
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        if (i == 0)
+                        {
+                            <button type="button"
+                                    data-bs-target="#carouselBanner"
+                                    data-bs-slide-to="@i"
+                                    class="active"
+                                    aria-current="true"
+                                    aria-label="Slide @(i + 1)">
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    data-bs-target="#carouselBanner"
+                                    data-bs-slide-to="@i"
+                                    aria-label="Slide @(i + 1)">
+                            </button>
+                        }
+                    }
+                </div>
+
+                <div class="carousel-inner bg-light border rounded-3 overflow-hidden">
+                    @foreach (var item in Model)
+                    {
+                        var a = item == Model.First() ? "active" : "";
+
+                        <div class="carousel-item @a">
+                            <div class="d-flex justify-content-center align-items-center" style="height: 400px; background-color: #f8f9fa;">
+                                <img src="~/ImgPath/@item.ImgPath" class="d-block" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="@item.BTitle">
+                            </div>
+
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3 mb-2 px-3 py-1 mx-auto" style="width: fit-content;">
+                                <h5 class="mb-0">@item.BTitle</h5>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselBanner" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon bg-dark rounded-circle p-3 bg-opacity-50" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselBanner" data-bs-slide="next">
+                    <span class="carousel-control-next-icon bg-dark rounded-circle p-3 bg-opacity-50" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <h3 class="bg-info text-white fw-bold text-center py-2 mb-0 rounded-top shadow-sm" style="font-size: 1.5rem;">
+                公告
+            </h3>
+            <div class="bg-white border border-info border-top-0 rounded-bottom shadow-sm">
+                @await Component.InvokeAsync("VCAnn")
+            </div>
+        </div>
+
+    </div>
 </div>
-
-

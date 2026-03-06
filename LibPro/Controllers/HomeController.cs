@@ -22,10 +22,34 @@ namespace LibPro.Controllers
         {
             var topBooks = await _context.Biblios
                 .Where(b => b.isDeleted == 0) 
-                .OrderByDescending(b => b.BookItems!.SelectMany(bi => bi.Loans).Count())
-                .Take(3)
+                .OrderByDescending(b => b.BibID)
+                .Take(5)
                 .ToListAsync();
             return View(topBooks);
+        }
+
+        public async Task<IActionResult> Search(string searchString)
+        {
+            var query = _context.Biblios
+                .Include(b => b.Category)
+                .Where(b => b.isDeleted == 0);
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                var keyword = searchString.Trim();
+                query = query.Where(b =>
+                    b.BTitle.Contains(keyword) ||
+                    (b.Author != null && b.Author.Contains(keyword)) ||
+                    (b.ISBN != null && b.ISBN.Contains(keyword))
+                );
+            }
+
+            var result = await query
+                .OrderByDescending(b => b.BibID)
+                .ToListAsync();
+
+            ViewData["CurrentFilter"] = searchString;
+            return View(result);
         }
 
         [Authorize(Roles = "Staff")]
