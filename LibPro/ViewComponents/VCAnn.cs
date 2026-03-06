@@ -13,6 +13,7 @@ namespace LibPro.ViewComponents
         public IViewComponentResult Invoke()
         {
             var announcements = _context.Announcements
+                .Where(a => a.IsVisible == true)
                 .OrderByDescending(a => a.CreatedDate)
                 .Take(10) 
                 .ToList();

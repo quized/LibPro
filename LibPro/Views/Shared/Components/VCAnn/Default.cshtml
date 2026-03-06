@@ -3,13 +3,32 @@
     Layout = null;
 }
 
-<!DOCTYPE html>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Default</title>
-</head>
-<body>
-</body>
-</html>
+    <div class="list-group list-group-flush">
+        @foreach (var item in Model)
+        {
+            <div class="list-group-item d-flex justify-content-between align-items-center px-1 py-3 border-bottom bg-transparent">
+                
+                <div class="d-flex align-items-center text-truncate pe-3">
+                    <span class="badge bg-secondary text-white rounded-1 me-3 px-2 py-1 fw-normal" style="letter-spacing: 1px;">
+                        公告
+                    </span>
+                    
+                    <span class="text-dark text-truncate" style="font-size: 1rem;" title="@item.Title">
+                        @item.Title
+                    </span>
+                </div>
+                
+                <span class="text-muted small" style="white-space: nowrap; font-family: Arial, sans-serif;">
+                    @item.CreatedDate.ToString("MM-dd")
+                </span>
+                
+            </div>
+        }
+    </div>
+    
+    <div class="text-end mt-2 pe-2">
+        <a href="#" class="text-muted small text-decoration-none" style="letter-spacing: 1px;">
+            MORE <i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i>
+        </a>
+    </div>
