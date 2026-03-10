@@ -10,11 +10,18 @@
         <i class="bi bi-search text-primary me-2"></i>館藏查詢
     </h2>
 
-    <div class="card shadow-sm border-0 mb-4 rounded-4 bg-light">
-        <div class="card-body">
-            <form asp-controller="Home" asp-action="Search" method="get" class="d-flex">
-                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control form-control-lg border-0 shadow-sm rounded-pill px-4 me-2" placeholder="重新輸入書名、作者或 ISBN...">
-                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm">搜尋</button>
+    <div class="row justify-content-center mb-5 mt-2">
+        <div class="col-lg-8 col-md-10">
+            <form asp-controller="Home" asp-action="Search" method="get" class="d-flex bg-white shadow-sm rounded-pill p-2 border border-light" style="transition: all 0.3s ease;" onmouseover="this.classList.add('shadow')" onmouseout="this.classList.remove('shadow', 'shadow-sm'); this.classList.add('shadow-sm')">
+                <div class="input-group align-items-center">
+                    <span class="input-group-text bg-transparent border-0 ps-4 text-primary">
+                        <i class="bi bi-search fs-5"></i>
+                    </span>
+                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control form-control-lg border-0 bg-transparent px-3" placeholder="輸入書名、作者、關鍵字或 ISBN..." style="box-shadow: none; outline: none;">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                        搜尋
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -47,17 +54,17 @@
                         <div class="card-body d-flex flex-column">
                             <span class="badge bg-secondary mb-2 align-self-start">@(item.Category.CatName)</span>
                             <h5 class="card-title fw-bold text-truncate" title="@item.BTitle">@item.BTitle</h5>
-                        <p class="card-text text-muted small mb-1"><i class="bi bi-person me-1"></i>@(item.Author)</p>
-                        <p class="card-text text-muted small mb-3"><i class="bi bi-upc-scan me-1"></i>@(item.ISBN)</p>
+                            <p class="card-text text-muted small mb-1"><i class="bi bi-person me-1"></i>@(item.Author)</p>
+                            <p class="card-text text-muted small mb-3"><i class="bi bi-upc-scan me-1"></i>@(item.ISBN)</p>
 
-                        <div class="mt-auto pt-3 border-top">
-                            <a asp-controller="Biblios" asp-action="Details" asp-route-id="@item.BibID" class="btn btn-outline-primary w-100 rounded-pill">
-                                查看詳情 / 預約
-                            </a>
+                            <div class="mt-auto pt-3 border-top">
+                                <a asp-action="BookDetails" asp-route-id="@item.BibID" class="btn btn-outline-primary w-100 rounded-pill">
+                                    查看詳情 / 預約
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             }
         </div>
     }

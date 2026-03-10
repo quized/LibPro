@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace LibPro.Controllers
 {
-    //[Authorize(Roles = "Staff")]
+    [Authorize(Roles = "Staff")]
     public class AnnouncementsController : Controller
     {
         private readonly LibproContext _context;

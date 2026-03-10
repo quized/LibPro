@@ -1,0 +1,131 @@
+﻿@model LibPro.Models.Biblios
+
+@{
+    ViewData["Title"] = Model.BTitle;
+    Layout = "_PortalLayout"; 
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill">
+            <i class="bi bi-arrow-left me-1"></i> 返回搜尋結果
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-5">
+        <div class="row g-0">
+            <div class="col-md-4 bg-light d-flex justify-content-center align-items-center p-4" style="min-height: 350px;">
+                <img src="/ImgPath/@Model.ImgPath"
+                     onerror="this.onerror=null; this.src='/ImgPath/bookcover.jpg';"
+                     class="img-fluid shadow rounded" style="max-height: 300px; object-fit: contain;" alt="@Model.BTitle">
+            </div>
+
+            <div class="col-md-8">
+                <div class="card-body p-4 p-md-5 d-flex flex-column h-100">
+                    <div class="mb-2">
+                        <span class="badge bg-success fs-6 me-2">@Html.DisplayFor(model => model.Category.CatName)</span>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-3">@Html.DisplayFor(model => model.BTitle)</h2>
+
+                    <ul class="list-unstyled text-muted mb-4 line-height-lg" style="font-size: 1.1rem;">
+                        <li class="mb-2">
+                            <strong><i class="bi bi-person-fill me-2"></i>@Html.DisplayNameFor(model => model.Author)：</strong>
+                            @Html.DisplayFor(model => model.Author)
+                        </li>
+                        <li class="mb-2">
+                            <strong><i class="bi bi-building me-2"></i>@Html.DisplayNameFor(model => model.Publisher.PubName)：</strong>
+                            @Html.DisplayFor(model => model.Publisher.PubName)
+                        </li>
+                        <li class="mb-2">
+                            <strong><i class="bi bi-calendar-event me-2"></i>@Html.DisplayNameFor(model => model.PubDate)：</strong>
+                            @Html.DisplayFor(model => model.PubDate)
+                        </li>
+                        <li class="mb-2">
+                            <strong><i class="bi bi-upc-scan me-2"></i>@Html.DisplayNameFor(model => model.ISBN)：</strong>
+                            @Html.DisplayFor(model => model.ISBN)
+                        </li>
+                    </ul>
+
+                    @if (!string.IsNullOrEmpty(Model.Summary))
+                    {
+                        <div class="mt-auto pt-3 border-top">
+                            <h6 class="fw-bold mb-2">@Html.DisplayNameFor(model => model.Summary)：</h6>
+                            <p class="text-muted small mb-0" style="line-height: 1.6;">
+                                @Html.DisplayFor(model => model.Summary)
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-3"><i class="bi bi-collection-fill text-primary me-2"></i>館藏狀態與預約</h4>
+
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        @if (Model.BookItems != null && Model.BookItems.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-borderless align-middle mb-0">
+                    <thead class="table-light text-muted">
+                        <tr>
+                            <th class="ps-4 py-3">館藏編號</th>
+                            <th class="py-3">館藏位置</th>
+                            <th class="py-3">狀態</th>
+                            <th class="pe-4 py-3 text-end">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.BookItems)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-secondary">@Html.DisplayFor(modelItem => item.ItemID)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Location.LocationName)</td>
+                                <td>
+                                    @if (item.ItmStatus == 1)
+                                    {
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1">
+                                            <i class="bi bi-check-circle-fill me-1"></i>@Html.DisplayFor(modelItem => item.ItemStatus.StatusName)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-2 py-1">
+                                            <i class="bi bi-info-circle-fill me-1"></i>@Html.DisplayFor(modelItem => item.ItemStatus.StatusName)
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="pe-4 text-end">
+                                    @if (item.ItmStatus == 1)
+                                    {
+                                        <form asp-controller="Reserves" asp-action="Create" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="itemID" value="@item.ItemID" />
+                                            <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
+                                                馬上預約
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" disabled>
+                                            無法預約
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-5 text-center text-muted">
+                <i class="bi bi-journal-x fs-1 d-block mb-3"></i>
+                <h5>目前圖書館尚未購入此書實體館藏</h5>
+            </div>
+        }
+    </div>
+</div>

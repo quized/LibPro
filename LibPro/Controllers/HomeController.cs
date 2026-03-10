@@ -43,7 +43,7 @@ namespace LibPro.Controllers
                     (b.ISBN != null && b.ISBN.Contains(keyword))
                 );
             }
-
+                        
             var result = await query
                 .OrderByDescending(b => b.BibID)
                 .ToListAsync();
@@ -51,6 +51,38 @@ namespace LibPro.Controllers
             ViewData["CurrentFilter"] = searchString;
             return View(result);
         }
+
+
+        
+        public async Task<IActionResult> BookDetails(long? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+          
+            var biblio = await _context.Biblios
+                .Include(b => b.Category)
+                .Include(b => b.Publisher)
+                .Include(b => b.BookItems.Where(bi => bi.ItmStatus != 6))
+                    .ThenInclude(bi => bi.Location)     
+                .Include(b => b.BookItems.Where(bi => bi.ItmStatus != 6))
+                    .ThenInclude(bi => bi.ItemStatus)   
+                .FirstOrDefaultAsync(m => m.BibID == id && m.isDeleted == 0);
+
+            if (biblio == null)
+            {
+                return NotFound();
+            }
+
+            return View(biblio);
+        }
+
+
+
+
+
 
         [Authorize(Roles = "Staff")]
         public IActionResult StaffCenter()
