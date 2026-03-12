@@ -174,31 +174,11 @@ public async Task<IActionResult> Edit(string id, [Bind("ResID,ResDate,ExpiryDate
     return View(reserves);
 }
 
-// GET: Reserves/Delete/5
-public async Task<IActionResult> Delete(string id)
-{
-    if (id == null)
-    {
-        return NotFound();
-    }
-
-    var reserves = await _context.Reserves
-        .Include(r => r.BookItem)
-        .Include(r => r.Patron)
-        .Include(r => r.ReserveStatus)
-        .FirstOrDefaultAsync(m => m.ResID == id);
-    if (reserves == null)
-    {
-        return NotFound();
-    }
-
-    return View(reserves);
-}
 
 // POST: Reserves/Delete/5
-[HttpPost, ActionName("Delete")]
+[HttpPost]
 [ValidateAntiForgeryToken]
-public async Task<IActionResult> DeleteConfirmed(string id)
+public async Task<IActionResult> Delete(string id)
 {
     var reserves = await _context.Reserves.FindAsync(id);
     if (reserves != null)
