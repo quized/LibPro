@@ -56,7 +56,7 @@
 
                 <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="bi bi-bank fs-3 text-primary me-2"></i>
-                    <span class="fw-bold fs-4 text-dark">書不了</span></span>
+                    <span class="fw-bold fs-4 text-dark">書不了</span>
                 </a>
 
                 <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#portalNavbar" aria-controls="portalNavbar" aria-expanded="false" aria-label="切換導覽">
@@ -66,6 +66,11 @@
                 <div class="collapse navbar-collapse" id="portalNavbar">
 
                     <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-2">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-bold" asp-controller="Home" asp-action="Announcements">
+                                <i class="bi bi-bell-fill text-warning me-1"></i> 最新公告
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link portal-nav-link px-3" href="#">借閱人服務</a>
                         </li>
