@@ -2,12 +2,12 @@
 
 @{
     ViewData["Title"] = Model.BTitle;
-    Layout = "_HomeLayout"; 
+    Layout = "_HomeLayout";
 }
 
 <div class="container py-5">
     <div class="mb-4">
-        <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill">
+        <a href="#" id="backToSearchBtn" class="btn btn-outline-secondary rounded-pill">
             <i class="bi bi-arrow-left me-1"></i> 返回搜尋結果
         </a>
     </div>
@@ -72,7 +72,7 @@
                             <th class="ps-4 py-3">館藏編號</th>
                             <th class="py-3">館藏位置</th>
                             <th class="py-3">狀態</th>
-                            <th class="pe-4 py-3 text-end">操作</th>
+                            <th class="pe-5 py-3 text-end">操作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,9 +95,20 @@
                                         </span>
                                     }
                                 </td>
-
                                 <td class="pe-4 text-end">
-                                    @if (item.ItmStatus == 1)
+                                    @if (ViewBag.HasBorrowedThisBook == true)
+                                    {
+                                        <button class="btn btn-secondary btn-sm rounded-pill px-3" disabled>
+                                            已在借閱中
+                                        </button>
+                                    }
+                                    else if (ViewBag.HasReservedThisBook == true)
+                                    {
+                                        <button class="btn btn-secondary btn-sm rounded-pill px-3" disabled>
+                                            已預約
+                                        </button>
+                                    }
+                                    else if (item.ItmStatus == 1)
                                     {
                                         <form asp-controller="Reserves" asp-action="Create" method="post" class="d-inline">
                                             @Html.AntiForgeryToken()
@@ -129,3 +140,22 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.getElementById('backToSearchBtn').addEventListener('click', function (e) {
+            e.preventDefault(); // 阻止原本的 # 跳轉
+
+            // 從瀏覽器暫存拿出剛剛的搜尋網址
+            var lastSearchUrl = sessionStorage.getItem('lastSearchUrl');
+
+            if (lastSearchUrl) {
+                // 如果有紀錄，就導向回那個精確的搜尋網址
+                window.location.href = lastSearchUrl;
+            } else {
+                // 如果沒有紀錄 (例如直接輸入網址進來明細頁)，就帶他回搜尋首頁
+                window.location.href = '@Url.Action("Search", "Home")';
+            }
+        });
+    </script>
+}

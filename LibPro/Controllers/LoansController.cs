@@ -76,11 +76,30 @@ namespace LibPro.Controllers
                     return Json(new { success = false, message = "找不到此借閱人，請確認證號是否正確。" });
                 }
 
+                int maxBorrowLimit = 10;
+
+                int currentLoanCount = await _context.Loans.CountAsync(l => l.PatronID == loans.PatronID && l.ReturnDate == null);
+
+                if (currentLoanCount >= maxBorrowLimit)
+                {
+                    return Json(new { success = false, message = $"該讀者目前已借閱 {currentLoanCount} 本書，已達借閱上限 ({maxBorrowLimit} 本)，請先歸還部分書籍。" });
+                }
+
                 var bookItem = await _context.BookItems.FindAsync(loans.ItemID);
                 if (bookItem == null || bookItem.ItmStatus != 1)
                 {
                     return Json(new { success = false, message = "此書籍不在架上，或已被借出。" });
                 }
+
+                bool hasBorrowedSameBook = await _context.Loans
+                 .Include(l => l.BookItem) 
+                 .AnyAsync(l => l.PatronID == loans.PatronID && l.ReturnDate == null && l.BookItem.BibID == bookItem.BibID);
+
+                if (hasBorrowedSameBook)
+                {
+                    return Json(new { success = false, message = "以借閱過同書目書籍，不可重複借閱。" });
+                }
+
 
                 var loanIDResult = await _context.Database.SqlQuery<string>($"exec getLoanID").ToListAsync();
                 var newLoanID = loanIDResult.FirstOrDefault();
@@ -98,17 +117,17 @@ namespace LibPro.Controllers
                 decimal totalOwed = 0;
                 foreach (var fine in unpaidFines)
                 {
-                   
+
                     int overdueDays = (DateTime.Now.Date - fine.Loan.DueDate.Date).Days;
                     if (overdueDays < 0) overdueDays = 0;
 
-                    
+
                     decimal fineAmount = fine.FineType.UnitPrice * overdueDays;
                     totalOwed += fineAmount;
                 }
 
 
-            
+
                 var hasOverdueBooks = await _context.Loans
                     .AnyAsync(l => l.PatronID == loans.PatronID && l.ReturnDate == null && l.DueDate < DateTime.Now);
 
@@ -117,7 +136,7 @@ namespace LibPro.Controllers
                     return Json(new { success = false, message = "該讀者尚有逾期圖書未歸還，請先歸還舊書。" });
                 }
 
-                if (totalOwed >= 100) 
+                if (totalOwed >= 100)
                 {
                     return Json(new { success = false, message = $"欠款金額已達 ${totalOwed}，請先結清罰金。" });
                 }

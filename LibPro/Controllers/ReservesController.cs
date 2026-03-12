@@ -61,28 +61,24 @@ namespace LibPro.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string itemID)
         {
+
             if (string.IsNullOrEmpty(itemID))
             {
                 return NotFound();
             }
-
-
             var PatronID = User.FindFirstValue("PatronID");
 
             if (string.IsNullOrEmpty(PatronID))
             {
                 return RedirectToAction("Logout", "Login");
             }
-
-            var bookItem = await _context.BookItems
-            .Include(b => b.Biblio)
-            .FirstOrDefaultAsync(b => b.ItemID == itemID);
+            
+            var bookItem = await _context.BookItems.Include(b => b.Biblio).FirstOrDefaultAsync(b => b.ItemID == itemID);
 
             if (bookItem == null)
             {
                 return NotFound();
             }
-
 
             if (bookItem.ItmStatus != 1)
             {
@@ -90,12 +86,34 @@ namespace LibPro.Controllers
                 return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
             }
 
-            var existingReserve = await _context.Reserves
-                .FirstOrDefaultAsync(r => r.PatronID == PatronID && r.ItemID == itemID && r.ResStatus == 1);
+            int maxReserveLimit = 5;
+            int currentReserveCount = await _context.Reserves.CountAsync(r => r.PatronID == PatronID && (r.ResStatus == 1 || r.ResStatus == 2));
 
-            if (existingReserve != null)
+            if (currentReserveCount >= maxReserveLimit)
             {
-                TempData["WarningMessage"] = "您已經預約過這本館藏了！";
+                TempData["WarningMessage"] = $"您的預約數量已達上限 ({maxReserveLimit} 本)！請先取消其他預約或完成取書。";
+                return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
+            }
+
+        
+            bool hasReservedSameBook = await _context.Reserves
+                .AnyAsync(r => r.PatronID == PatronID && (r.ResStatus == 1 || r.ResStatus == 2)
+                    && r.BookItem.BibID == bookItem.BibID);
+
+            if (hasReservedSameBook)
+            {
+                TempData["WarningMessage"] = "您已經預約過這本書了（請留意取書通知），不可重複預約！";
+                return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
+            }
+
+          
+            bool hasBorrowedSameBook = await _context.Loans
+                .AnyAsync(l => l.PatronID == PatronID && l.ReturnDate == null
+                    && l.BookItem.BibID == bookItem.BibID);
+
+            if (hasBorrowedSameBook)
+            {
+                TempData["WarningMessage"] = "您目前已經借閱了這本書，尚未歸還前不可預約！";
                 return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
             }
 
@@ -107,8 +125,6 @@ namespace LibPro.Controllers
                 TempData["ErrorResIDMessage"] = "產生預約編號失敗！";
                 return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
             }
-
-
 
             var reserve = new Reserves
             {
@@ -126,10 +142,7 @@ namespace LibPro.Controllers
             bookItem.ItmStatus = 3;
             _context.Update(bookItem);
 
-
-
             await _context.SaveChangesAsync();
-
 
             TempData["SuccessMessage"] = $"預約成功！您已保留《{bookItem.Biblio.BTitle}》，請留意取書通知。";
             return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
@@ -194,6 +207,25 @@ namespace LibPro.Controllers
                     {
                         existingReserve.BookItem.ItmStatus = 1;
                     }
+                }
+
+                if (new[] { 1, 2 }.Contains(reservesUpdate.ResStatus) && existingReserve.ResStatus != reservesUpdate.ResStatus)
+                {
+                    if (existingReserve.BookItem == null)
+                    {
+                        ModelState.AddModelError("", "找不到對應的館藏資料！");
+                        ViewData["ResStatus"] = new SelectList(_context.ReserveStatus, "StatusCode", "StatusName", reservesUpdate.ResStatus);
+                        return View(reservesUpdate);
+                    }
+
+                    if (existingReserve.BookItem.ItmStatus != 1)
+                    {
+                        ModelState.AddModelError("", "無法恢復預約，因為該實體書已被借出或不在架上！");
+                        ViewData["ResStatus"] = new SelectList(_context.ReserveStatus, "StatusCode", "StatusName", reservesUpdate.ResStatus);
+                        return View(reservesUpdate);
+                    }
+
+                    existingReserve.BookItem.ItmStatus = 3;
                 }
 
                 existingReserve.ResStatus = reservesUpdate.ResStatus;

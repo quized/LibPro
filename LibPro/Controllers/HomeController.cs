@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace LibPro.Controllers
 {
@@ -75,6 +76,33 @@ namespace LibPro.Controllers
             {
                 return NotFound();
             }
+
+            bool hasReservedThisBook = false;
+            bool hasBorrowedThisBook = false;
+
+           
+            if (User.Identity!.IsAuthenticated && User.IsInRole("Patron"))
+            {
+                var patronId = User.FindFirstValue("PatronID");
+                if (!string.IsNullOrEmpty(patronId))
+                {
+                    
+                    hasReservedThisBook = await _context.Reserves
+                        .AnyAsync(r => r.PatronID == patronId
+                                    && (r.ResStatus == 1 || r.ResStatus == 2)
+                                    && r.BookItem.BibID == id);
+
+                 
+                    hasBorrowedThisBook = await _context.Loans
+                        .AnyAsync(l => l.PatronID == patronId
+                                    && l.ReturnDate == null
+                                    && l.BookItem.BibID == id);
+                }
+            }
+
+         
+            ViewBag.HasReservedThisBook = hasReservedThisBook;
+            ViewBag.HasBorrowedThisBook = hasBorrowedThisBook;
 
             return View(biblio);
         }

@@ -69,3 +69,10 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        // 每次進到搜尋頁，就把帶有搜尋條件的完整網址存起來
+        sessionStorage.setItem('lastSearchUrl', window.location.href);
+    </script>
+}
