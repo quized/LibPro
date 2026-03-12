@@ -1,59 +1,75 @@
 ﻿@model LibPro.Models.Reserves
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "編輯預約狀態";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">編輯預約狀態</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<h4>Reserves</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ResID" />
-            <div class="form-group">
-                <label asp-for="ResDate" class="control-label"></label>
-                <input asp-for="ResDate" class="form-control" />
-                <span asp-validation-for="ResDate" class="text-danger"></span>
+                        <input type="hidden" asp-for="ResID" />
+
+                        <div class="row">
+
+                            <div class="col-md-5 mb-4 mb-md-0">
+                                <div class="bg-light p-3 rounded h-100">
+                                    <h6 class="text-secondary border-bottom pb-2 mb-3 fw-bold">預約單資訊</h6>
+                                    <p class="mb-2 text-muted text-sm">預約單號</p>
+                                    <p class="mb-3 fw-bold text-primary fs-5">@Model.ResID</p>
+
+                                    <p class="mb-1 text-muted text-sm">讀者編號</p>
+                                    <p class="mb-3 fw-bold">@Model.PatronID</p>
+
+                                    <p class="mb-1 text-muted text-sm">館藏條碼</p>
+                                    <p class="mb-3 fw-bold">@Model.ItemID</p>
+
+                                    <p class="mb-1 text-muted text-sm">預約日期</p>
+                                    <p class="mb-0 fw-bold">@Model.ResDate.ToString("yyyy-MM-dd HH:mm")</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-7 ps-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="ResStatus" class="control-label fw-bold mb-1">預約狀態</label>
+                                    <select asp-for="ResStatus" class="form-select" asp-items="ViewBag.ResStatus"></select>
+                                    <span asp-validation-for="ResStatus" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="ExpiryDate" class="control-label fw-bold mb-1">保留期限</label>
+                                    <input asp-for="ExpiryDate" class="form-control" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+                                    <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label asp-for="Notes" class="control-label fw-bold mb-1">備註說明</label>
+                                    <textarea asp-for="Notes" class="form-control" rows="4" placeholder="輸入處理備註..."></textarea>
+                                    <span asp-validation-for="Notes" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                    <a asp-action="Index" class="btn btn-light border">返回列表</a>
+                                    <button type="submit" class="btn btn-primary px-4">儲存變更</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ExpiryDate" class="control-label"></label>
-                <input asp-for="ExpiryDate" class="form-control" />
-                <span asp-validation-for="ExpiryDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Notes" class="control-label"></label>
-                <textarea asp-for="Notes" class="form-control"></textarea>
-                <span asp-validation-for="Notes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ResStatus" class="control-label"></label>
-                <select asp-for="ResStatus" class="form-control" asp-items="ViewBag.ResStatus"></select>
-                <span asp-validation-for="ResStatus" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PatronID" class="control-label"></label>
-                <select asp-for="PatronID" class="form-control" asp-items="ViewBag.PatronID"></select>
-                <span asp-validation-for="PatronID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ItemID" class="control-label"></label>
-                <select asp-for="ItemID" class="form-control" asp-items="ViewBag.ItemID"></select>
-                <span asp-validation-for="ItemID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -1,65 +1,87 @@
 ﻿@model IEnumerable<LibPro.Models.Reserves>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "預約管理清單";
 }
 
-<h1>Index</h1>
+<div class="container mt-4">
+    <div class="row align-items-center mb-3">
+        <div class="col-md-4">
+            <h3 class="mb-0 text-primary fw-bold">預約管理清單</h3>
+        </div>
+        <div class="col-md-8">
+            <form asp-action="Index" method="get" class="d-flex justify-content-end">
+                <div class="input-group" style="max-width: 400px;">
+                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="請輸入借閱人、館藏條碼或單號...">
+                    <button class="btn btn-outline-primary" type="submit">搜尋</button>
+                    @if (ViewData["CurrentFilter"] != null)
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary">清除</a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ResDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ExpiryDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReserveStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patron)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BookItem)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ResDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ExpiryDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReserveStatus.StatusName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Patron.PatronID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BookItem.ItemID)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ResID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ResID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ResID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark text-nowrap">
+                        <tr>
+                            <th>預約單號</th>
+                            <th>@Html.DisplayNameFor(model => model.ResDate)</th>
+                            <th>保留期限</th>
+                            <th>@Html.DisplayNameFor(model => model.ReserveStatus)</th>
+                            <th>借閱人姓名</th>
+                            <th>館藏條碼</th>
+                            <th>@Html.DisplayNameFor(model => model.Notes)</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold text-secondary">@item.ResID</td>
+                                <td>@(item.ResDate.ToString("yyyy-MM-dd HH:mm"))</td>
+                                <td>@(item.ExpiryDate.ToString("yyyy-MM-dd"))</td>
+                                <td>
+                                    @if (item.ResStatus == 1)
+                                    {
+                                        <span class="badge bg-warning text-dark">@item.ReserveStatus.StatusName</span>
+                                    }
+                                    else if (item.ResStatus == 2)
+                                    {
+                                        <span class="badge bg-success">@item.ReserveStatus.StatusName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@item.ReserveStatus.StatusName</span>
+                                    }
+                                </td>
+                                <td>@item.Patron.Name</td>
+                                <td>@item.BookItem.ItemID</td>
+                                <td>
+                                    <span class="d-inline-block text-truncate text-muted" style="max-width: 150px;" title="@item.Notes">
+                                        @item.Notes
+                                    </span>
+                                </td>
+                                <td class="text-nowrap">
+                                    <a asp-action="Edit" asp-route-id="@item.ResID" class="btn btn-sm btn-outline-primary">編輯</a>
+
+                                    @if (item.ResStatus != 3 && item.ResStatus != 4)
+                                    {
+                                        <form asp-action="Delete" asp-route-id="@item.ResID" method="post" class="d-inline" onsubmit="return confirm('確定要取消這筆預約紀錄嗎？');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">取消</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

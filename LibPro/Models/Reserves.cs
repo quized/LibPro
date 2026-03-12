@@ -25,19 +25,25 @@ namespace LibPro.Models
         [DataType(DataType.MultilineText)]
         public string? Notes { get; set; }
 
+        [Display(Name = "預約狀態")]
         public byte ResStatus { get; set; }
 
+        [Display(Name = "借閱人")]
         public string PatronID { get; set; } = null!;
 
+        [Display(Name = "館藏編號")]
         public string ItemID { get; set; } = null!;
 
         [ForeignKey("ResStatus")]
+        [Display(Name = "預約狀態")]
         public virtual ReserveStatus? ReserveStatus { get; set; }
 
         [ForeignKey("PatronID")]
+        [Display(Name = "借閱人")]
         public virtual Patrons? Patron { get; set; }
 
         [ForeignKey("ItemID")]
+        [Display(Name = "館藏編號")]
         public virtual BookItems? BookItem { get; set; }
     }
 }

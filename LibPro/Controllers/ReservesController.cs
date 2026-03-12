@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace LibPro.Controllers
 {
-    [Authorize(Roles = "Patron")]
+
     public class ReservesController : Controller
     {
         private readonly LibproContext _context;
@@ -22,21 +22,41 @@ namespace LibPro.Controllers
         }
 
         // GET: Reserves
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var libproContext = _context.Reserves.Include(r => r.BookItem).Include(r => r.Patron).Include(r => r.ReserveStatus);
-            return View(await libproContext.ToListAsync());
+     
+            ViewData["CurrentFilter"] = searchString;
+
+           
+            var reservesQuery = _context.Reserves
+                .Include(r => r.BookItem)
+                .Include(r => r.Patron)
+                .Include(r => r.ReserveStatus)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                reservesQuery = reservesQuery.Where(r =>
+                    r.ResID.Contains(searchString) ||
+                    r.Patron.Name.Contains(searchString) ||
+                    r.ItemID.Contains(searchString)
+                );
+            }
+
+      
+            reservesQuery = reservesQuery.OrderByDescending(r => r.ResDate);
+
+            
+            return View(await reservesQuery.ToListAsync());
         }
 
 
 
-      
 
 
 
-        // POST: Reserves/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        [Authorize(Roles = "Patron")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string itemID)
@@ -107,92 +127,128 @@ namespace LibPro.Controllers
             _context.Update(bookItem);
 
 
-           
+
             await _context.SaveChangesAsync();
 
-           
+
             TempData["SuccessMessage"] = $"預約成功！您已保留《{bookItem.Biblio.BTitle}》，請留意取書通知。";
             return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
         }
-    
 
 
-// GET: Reserves/Edit/5
-public async Task<IActionResult> Edit(string id)
-{
-    if (id == null)
-    {
-        return NotFound();
-    }
 
-    var reserves = await _context.Reserves.FindAsync(id);
-    if (reserves == null)
-    {
-        return NotFound();
-    }
-    ViewData["ItemID"] = new SelectList(_context.BookItems, "ItemID", "ItemID", reserves.ItemID);
-    ViewData["PatronID"] = new SelectList(_context.Patrons, "PatronID", "PatronID", reserves.PatronID);
-    ViewData["ResStatus"] = new SelectList(_context.ReserveStatus, "StatusCode", "StatusName", reserves.ResStatus);
-    return View(reserves);
-}
-
-// POST: Reserves/Edit/5
-// To protect from overposting attacks, enable the specific properties you want to bind to.
-// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-[HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Edit(string id, [Bind("ResID,ResDate,ExpiryDate,Notes,ResStatus,PatronID,ItemID")] Reserves reserves)
-{
-    if (id != reserves.ResID)
-    {
-        return NotFound();
-    }
-
-    if (ModelState.IsValid)
-    {
-        try
+        // GET: Reserves/Edit/5
+        public async Task<IActionResult> Edit(string id)
         {
-            _context.Update(reserves);
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!ReservesExists(reserves.ResID))
+            if (id == null)
             {
                 return NotFound();
             }
-            else
+
+            var reserves = await _context.Reserves.FindAsync(id);
+            if (reserves == null)
             {
+                return NotFound();
+            }
+            ViewData["ItemID"] = new SelectList(_context.BookItems, "ItemID", "ItemID", reserves.ItemID);
+            ViewData["PatronID"] = new SelectList(_context.Patrons, "PatronID", "PatronID", reserves.PatronID);
+            ViewData["ResStatus"] = new SelectList(_context.ReserveStatus, "StatusCode", "StatusName", reserves.ResStatus);
+            return View(reserves);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Staff")]
+        public async Task<IActionResult> Edit(string id, [Bind("ResID,ExpiryDate,Notes,ResStatus")] Reserves reservesUpdate)
+        {
+            if (id != reservesUpdate.ResID)
+                return NotFound();
+
+            ModelState.Remove("PatronID");
+            ModelState.Remove("ItemID");
+            ModelState.Remove("ResDate");
+
+
+            if (!ModelState.IsValid)
+            {
+
+                ViewData["ResStatus"] = new SelectList(_context.ReserveStatus, "StatusCode", "StatusName", reservesUpdate.ResStatus);
+                return View(reservesUpdate);
+            }
+
+            try
+            {
+                var existingReserve = await _context.Reserves
+                    .Include(r => r.BookItem)
+                    .FirstOrDefaultAsync(r => r.ResID == id);
+
+                if (existingReserve == null)
+                {
+                    return NotFound();
+                }
+
+                if (new[] { 3, 4 }.Contains(reservesUpdate.ResStatus) && existingReserve.ResStatus != reservesUpdate.ResStatus)
+                {
+                    if (existingReserve.BookItem != null)
+                    {
+                        existingReserve.BookItem.ItmStatus = 1;
+                    }
+                }
+
+                existingReserve.ResStatus = reservesUpdate.ResStatus;
+                existingReserve.ExpiryDate = reservesUpdate.ExpiryDate;
+                existingReserve.Notes = reservesUpdate.Notes;
+
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "預約狀態已成功更新！";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ReservesExists(reservesUpdate.ResID))
+                    return NotFound();
                 throw;
             }
         }
-        return RedirectToAction(nameof(Index));
-    }
-    ViewData["ItemID"] = new SelectList(_context.BookItems, "ItemID", "ItemID", reserves.ItemID);
-    ViewData["PatronID"] = new SelectList(_context.Patrons, "PatronID", "PatronID", reserves.PatronID);
-    ViewData["ResStatus"] = new SelectList(_context.ReserveStatus, "StatusCode", "StatusName", reserves.ResStatus);
-    return View(reserves);
-}
 
 
-// POST: Reserves/Delete/5
-[HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Delete(string id)
-{
-    var reserves = await _context.Reserves.FindAsync(id);
-    if (reserves != null)
-    {
-        _context.Reserves.Remove(reserves);
-    }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
 
-    await _context.SaveChangesAsync();
-    return RedirectToAction(nameof(Index));
-}
 
-private bool ReservesExists(string id)
-{
-    return _context.Reserves.Any(e => e.ResID == id);
-}
+            var reserves = await _context.Reserves.Include(r => r.BookItem).FirstOrDefaultAsync(r => r.ResID == id);
+
+
+            if (reserves == null || reserves.BookItem == null)
+            {
+                return NotFound();
+            }
+
+
+
+            reserves.ResStatus = 4;
+
+            reserves.BookItem.ItmStatus = 1;
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "預約已成功註銷，館藏已釋放！";
+
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool ReservesExists(string id)
+        {
+            return _context.Reserves.Any(e => e.ResID == id);
+        }
     }
 }
