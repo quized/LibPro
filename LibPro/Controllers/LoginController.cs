@@ -114,7 +114,7 @@ namespace LibPro.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("ManagerLogin");
-            return RedirectToAction("Login", "Login");
+            return RedirectToAction("Index", "Home");
         }
     }
 }

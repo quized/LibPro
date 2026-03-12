@@ -12,41 +12,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - 圖書館管理系統</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <style>
+        /* 設定背景圖片 */
+        body {
+          
+            background-image: url(/ImgPath/LoginBG.jpg); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0;
+        }
+        
+       
+        .bg-overlay {
+            background-color: rgba(0, 0, 0, 0.4); 
+            min-height: 100vh;
+            width: 100%;
+        }
+    </style>
 </head>
-<body class="bg-light d-flex align-items-center" style="height: 100vh;">
+<body>
+    <div class="bg-overlay d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card shadow border-0" style="border-radius: 10px; overflow: hidden;">
+                        <div class="card-header bg-primary text-white text-center py-3">
+                            <h4 class="mb-0">書不了登入系統</h4>
+                        </div>
+                        <div class="card-body p-4 bg-white">
+                            <form asp-action="Login" method="post">
+                                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 fw-bold"></div>
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-primary text-white text-center py-3">
-                        <h4 class="mb-0">圖書館後台管理系統</h4>
-                    </div>
-                    <div class="card-body p-4">
-                        <form asp-action="Login" method="post">
-                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 fw-bold"></div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="Account" class="control-label fw-bold"></label>
+                                    <input asp-for="Account" class="form-control" placeholder="請輸入您的帳號 (預設為手機)" />
+                                    <span asp-validation-for="Account" class="text-danger"></span>
+                                </div>
 
-                            <div class="form-group mb-3">
-                                <label asp-for="Account" class="control-label fw-bold"></label>
-                                <input asp-for="Account" class="form-control" placeholder="請輸入您的帳號 (預設為手機)" />
-                                <span asp-validation-for="Account" class="text-danger"></span>
-                            </div>
+                                <div class="form-group mb-4">
+                                    <label asp-for="Password" class="control-label fw-bold"></label>
+                                    <input asp-for="Password" class="form-control" type="password" placeholder="請輸入您的密碼" />
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
 
-                            <div class="form-group mb-4">
-                                <label asp-for="Password" class="control-label fw-bold"></label>
-                                <input asp-for="Password" class="form-control" placeholder="請輸入您的密碼" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">登入系統</button>
-                            </div>
-                        </form>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">登入系統</button>
+                                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg">返回首頁</a>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </body>
 </html>
