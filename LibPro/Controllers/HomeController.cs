@@ -110,7 +110,7 @@ namespace LibPro.Controllers
 
         public async Task<IActionResult> Announcements()
         {
-            // 抓取所有設定為公開 (IsVisible == true) 的公告，並依日期由新到舊排序
+          
             var allAnnouncements = await _context.Announcements
                 .Where(a => a.IsVisible == true)
                 .OrderByDescending(a => a.CreatedDate)

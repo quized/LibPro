@@ -102,7 +102,7 @@ namespace LibPro.Models
                 context.SystemStatus.AddRange(
                     new SystemStatus
                     {
-                        StatusName = "刪除"
+                        StatusName = "隱藏"
                     },
                     new SystemStatus
                     {

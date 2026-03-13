@@ -1,0 +1,108 @@
+﻿@model IEnumerable<LibPro.Models.Reviews>
+
+@{
+    ViewData["Title"] = "書評審核管理";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0 text-primary fw-bold">書評審核管理</h3>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0 text-start">
+                    <thead class="table-dark text-nowrap">
+                        <tr>
+                            <th class="ps-3">書名</th>
+                            <th>借閱人</th>
+                            <th>評分</th>
+                            <th style="max-width: 250px;">評論內容 (滑鼠移入看全文)</th>
+                            <th>發布時間</th>
+                            <th>狀態</th>
+                            <th class="text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-3 fw-bold text-dark">
+                                    <span class="d-inline-block text-truncate" style="max-width: 150px;" title="@item.Biblio.BTitle">
+                                        @item.Biblio?.BTitle
+                                    </span>
+                                </td>
+                                <td>@item.Patron?.Name<br><small class="text-muted">@item.PatronID</small></td>
+                                <td class="text-warning text-nowrap">
+                                    @for (int i = 0; i < item.Rating; i++)
+                                    {
+                                        <i class="bi bi-star-fill"></i>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark text-truncate" style="max-width: 250px;" title="@item.Title">
+                                        @item.Title
+                                    </div>
+                                    <div class="text-muted small text-truncate" style="max-width: 250px;" title="@item.Content">
+                                        @(string.IsNullOrEmpty(item.Content) ? "(無內文)" : item.Content)
+                                    </div>
+                                </td>
+                                <td>@item.PostDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    @if (item.RevStatus == 1)
+                                    {
+                                        <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-hourglass-split me-1"></i>待審核</span>
+                                    }
+                                    else if (item.RevStatus == 2)
+                                    {
+                                        <span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>已通過</span>
+                                    }
+                                    else 
+                                    {
+                                        <span class="badge bg-secondary px-2 py-1"><i class="bi bi-eye-slash me-1"></i>已隱藏</span>
+                                    }
+                                    
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    @if (item.RevStatus == 1)
+                                    {
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@item.ReviewID" />
+                                            <input type="hidden" name="status" value="2" />
+                                            <button type="submit" class="btn btn-outline-success" title="通過審核">通過</button>
+                                        </form>
+                                    }
+
+                                    @if (item.RevStatus != 3)
+                                    {
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@item.ReviewID" />
+                                            <input type="hidden" name="status" value="3" />
+                                            <button type="submit" class="btn btn-outline-secondary" title="隱藏此評論">隱藏</button>
+                                        </form>
+                                    }
+
+                                    @if (item.RevStatus == 3)
+                                    {
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline" onsubmit="return confirm('確定要復原這筆評論嗎？復原後將回到「待審核」狀態。');">
+                                            <input type="hidden" name="id" value="@item.ReviewID" />
+                                            <input type="hidden" name="status" value="1" /> <button type="submit" class="btn btn-outline-info" title="復原此評論">復原</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (!Model.Any())
+                {
+                    <div class="text-center text-muted p-5">
+                        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                        <h5>目前沒有任何書評資料</h5>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,178 @@
+﻿@model IEnumerable<LibPro.Models.Reviews>
+
+<style>
+   
+    .star-rating i {
+        transition: transform 0.1s ease-in-out;
+        display: inline-block;
+    }
+
+        .star-rating i:hover {
+            transform: scale(1.2);
+        }
+</style>
+
+
+<div class="mt-5">
+    <h4 class="fw-bold mb-4 border-bottom pb-2">
+        <i class="bi bi-chat-left-text text-primary me-2"></i>借閱人書評 (@Model.Count())
+    </h4>
+
+    <div class="mb-5">
+        @if (Model.Any())
+        {
+            foreach (var review in Model)
+            {
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0 text-dark">@review.Title</h6>
+                            <span class="text-muted small">@review.PostDate.ToString("yyyy-MM-dd")</span>
+                        </div>
+                        <div class="mb-2 text-warning">
+                            @for (int i = 0; i < 5; i++)
+                            {
+                                if (i < review.Rating)
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star"></i>
+                                }
+                            }
+                            <span class="text-muted ms-2 small">
+                                by @review.Patron.Name
+                            </span>
+                        </div>
+                        <p class="text-secondary mb-0" style="line-height: 1.6;">
+                            @review.Content
+                        </p>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center text-muted py-4 bg-light rounded">
+                目前還沒有人留下評論，搶先成為第一個評論的人吧！
+            </div>
+        }
+    </div>
+
+    @if (User.Identity!.IsAuthenticated && User.IsInRole("Patron"))
+    {
+        <div class="card border border-primary border-opacity-25 shadow-sm rounded-3">
+            <div class="card-header bg-primary bg-opacity-10 fw-bold text-primary py-3">
+                <i class="bi bi-pencil-square me-2"></i>撰寫您的書評
+            </div>
+            <div class="card-body p-4">
+                <form asp-controller="Reviews" asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="BibID" value="@ViewBag.BibID" />
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label fw-bold">標題 <span class="text-danger">*</span></label>
+                            <input type="text" name="Title" class="form-control" placeholder="用一句話總結您的心得 (最多 50 字)" required maxlength="50" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">評分 <span class="text-danger">*</span></label>
+
+                            <input type="hidden" name="Rating" id="ratingValue" value="5" required />
+
+                            <div class="star-rating fs-4 text-warning" style="cursor: pointer; line-height: 1;">
+                                <i class="bi bi-star-fill" data-rating="1"></i>
+                                <i class="bi bi-star-fill" data-rating="2"></i>
+                                <i class="bi bi-star-fill" data-rating="3"></i>
+                                <i class="bi bi-star-fill" data-rating="4"></i>
+                                <i class="bi bi-star-fill" data-rating="5"></i>
+                            </div>
+
+                            <div id="ratingText" class="form-text text-muted mt-1 fw-bold">⭐⭐⭐⭐⭐ (5) 極力推薦</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">內容</label>
+                        <textarea name="Content" class="form-control" rows="4" placeholder="分享您對這本書的詳細看法... (選填，最多 500 字)" maxlength="500"></textarea>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            送出評論 (需經審核)
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-secondary text-center">
+            <a asp-controller="Login" asp-action="Login" class="text-primary fw-bold text-decoration-none">登入</a> 後即可留下您的專屬書評。
+        </div>
+    }
+</div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 抓取畫面上的元素
+            const stars = document.querySelectorAll(".star-rating i");
+            const ratingValue = document.getElementById("ratingValue");
+            const ratingText = document.getElementById("ratingText");
+
+            // 定義每個星數對應的文字
+            const ratingDescriptions = {
+                1: "⭐ (1) 不推薦",
+                2: "⭐⭐ (2) 不太符合期待",
+                3: "⭐⭐⭐ (3) 普通/還可以",
+                4: "⭐⭐⭐⭐ (4) 值得一讀",
+                5: "⭐⭐⭐⭐⭐ (5) 極力推薦"
+            };
+
+            // 目前鎖定的星數 (對應隱藏 input 的預設值)
+            let currentRating = parseInt(ratingValue.value);
+
+            // 負責渲染星星顏色的函數
+            function updateStars(rating) {
+                stars.forEach(star => {
+                    const starRating = parseInt(star.getAttribute("data-rating"));
+                    if (starRating <= rating) {
+                        star.classList.remove("bi-star");      
+                        star.classList.add("bi-star-fill");    
+                    } else {
+                        star.classList.remove("bi-star-fill"); 
+                        star.classList.add("bi-star");         
+                    }
+                });
+                // 更新下方文字
+                ratingText.innerText = ratingDescriptions[rating];
+            }
+
+            // 綁定事件到每顆星星上
+            stars.forEach(star => {
+                //滑鼠移入：預覽星數
+                star.addEventListener("mouseover", function () {
+                    const hoverRating = parseInt(this.getAttribute("data-rating"));
+                    updateStars(hoverRating);
+                });
+
+                //點擊：正式鎖定星數，並把值塞給隱藏的 input 讓表單送出
+                star.addEventListener("click", function () {
+                    currentRating = parseInt(this.getAttribute("data-rating"));
+                    ratingValue.value = currentRating;
+                    updateStars(currentRating);
+                });
+            });
+
+            // 滑鼠移出整個星星區塊：恢復成「最後點擊鎖定」的星數
+            const starContainer = document.querySelector(".star-rating");
+            if (starContainer) {
+                starContainer.addEventListener("mouseleave", function () {
+                    updateStars(currentRating);
+                });
+            }
+        });
+    </script>
