@@ -24,10 +24,10 @@ namespace LibPro.Controllers
         [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Index(string searchString)
         {
-     
+
             ViewData["CurrentFilter"] = searchString;
 
-           
+
             var reservesQuery = _context.Reserves
                 .Include(r => r.BookItem)
                 .Include(r => r.Patron)
@@ -43,10 +43,10 @@ namespace LibPro.Controllers
                 );
             }
 
-      
+
             reservesQuery = reservesQuery.OrderByDescending(r => r.ResDate);
 
-            
+
             return View(await reservesQuery.ToListAsync());
         }
 
@@ -72,7 +72,7 @@ namespace LibPro.Controllers
             {
                 return RedirectToAction("Logout", "Login");
             }
-            
+
             var bookItem = await _context.BookItems.Include(b => b.Biblio).FirstOrDefaultAsync(b => b.ItemID == itemID);
 
             if (bookItem == null)
@@ -80,9 +80,10 @@ namespace LibPro.Controllers
                 return NotFound();
             }
 
-            if (bookItem.ItmStatus != 1)
+
+            if (bookItem.ItmStatus != 1 && bookItem.ItmStatus != 2)
             {
-                TempData["ErrorBookItemMessage"] = "書籍狀態不正確！";
+                TempData["ErrorBookItemMessage"] = "此實體書籍目前已被保留或狀態異常，無法預約！";
                 return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
             }
 
@@ -95,7 +96,7 @@ namespace LibPro.Controllers
                 return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
             }
 
-        
+
             bool hasReservedSameBook = await _context.Reserves
                 .AnyAsync(r => r.PatronID == PatronID && (r.ResStatus == 1 || r.ResStatus == 2)
                     && r.BookItem.BibID == bookItem.BibID);
@@ -106,7 +107,7 @@ namespace LibPro.Controllers
                 return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
             }
 
-          
+
             bool hasBorrowedSameBook = await _context.Loans
                 .AnyAsync(l => l.PatronID == PatronID && l.ReturnDate == null
                     && l.BookItem.BibID == bookItem.BibID);
@@ -126,6 +127,17 @@ namespace LibPro.Controllers
                 return RedirectToAction("BookDetails", "Home", new { id = bookItem.BibID });
             }
 
+            byte resStatus = 1;
+            string successMsg = $"預約成功！您已排隊預約《{bookItem.Biblio.BTitle}》，請留意系統到館通知。";
+
+            bool isReserved = await _context.Reserves.AnyAsync(r => r.ItemID == itemID && (r.ResStatus == 1 || r.ResStatus == 2));
+
+            if (!isReserved && bookItem.ItmStatus == 1)
+            {
+                resStatus = 2;
+                successMsg = $"預約成功！《{bookItem.Biblio.BTitle}》已為您保留，請盡速前往櫃檯取書。";
+            }
+
             var reserve = new Reserves
             {
                 ResID = newResID,
@@ -133,14 +145,17 @@ namespace LibPro.Controllers
                 ItemID = itemID,
                 ResDate = DateTime.Now,
                 ExpiryDate = DateTime.Now.AddDays(7),
-                ResStatus = 1,
+                ResStatus = resStatus,
                 Notes = "前台線上預約"
             };
 
             _context.Reserves.Add(reserve);
 
-            bookItem.ItmStatus = 3;
-            _context.Update(bookItem);
+            if (bookItem.ItmStatus == 1)
+            {
+                bookItem.ItmStatus = 3;
+                _context.Update(bookItem);
+            }
 
             await _context.SaveChangesAsync();
 

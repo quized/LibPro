@@ -108,7 +108,7 @@ namespace LibPro.Controllers
                     }
                 }
 
-                // 程式能順利走到這裡，代表「書在架上(1)」或是「這本書剛好是這位讀者預約的(3)」，可以放心繼續往下執行借書邏輯！
+               
 
 
                 bool hasBorrowedSameBook = await _context.Loans

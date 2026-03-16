@@ -121,74 +121,59 @@
 
 @section Scripts {
     <script>
-        
         $(document).ready(function () {
 
-            //建立一個專門處理篩選的核心功能
+            // 建立「樣式字典」，把狀態與對應的 Class 綁定
+            const btnStyles = {
+                'all': 'active',
+                'visible': 'active bg-success text-white',
+                'hidden': 'active bg-secondary text-white'
+            };
+
             function applyFilter(filterValue) {
                 let visibleCount = 0;
 
-                // 迴圈遍歷每一列資料
                 $('.announcement-row').each(function () {
-                   
                     const $row = $(this);
-
-                    // 從 HTML 抓取我們印出來的 true / false
                     const isVisible = $row.attr('data-is-visible') === 'true';
-                    let shouldShow = false;
 
-                    // 用標準清晰的邏輯判斷是否該顯示這列
-                    if (filterValue === 'all') {
-                        shouldShow = true;
-                    } else if (filterValue === 'visible' && isVisible === true) {
-                        shouldShow = true;
-                    } else if (filterValue === 'hidden' && isVisible === false) {
-                        shouldShow = true;
-                    }
+                  
+                    // 只要滿足「全部」、「選顯示且為 true」、「選隱藏且為 false」其中一項，就是 true
+                    const shouldShow = (filterValue === 'all') ||
+                                       (filterValue === 'visible' && isVisible) ||
+                                       (filterValue === 'hidden' && !isVisible);
 
-                    // 執行顯示或隱藏 (jQuery 的 show()/hide() 處理 display 屬性非常方便)
-                    if (shouldShow) {
-                        $row.show();
-                        visibleCount++;
-                    } else {
-                        $row.hide();
-                    }
+                 
+                    $row.toggle(shouldShow);
+
+                                  if (shouldShow) {
+                                     visibleCount++;
+                                  }
                 });
 
                 // 更新總筆數
                 $('#total-count').text(visibleCount);
 
-                // 處理空狀態提示
-                if (visibleCount === 0) {
-                    $('#empty-state-row').show();
-                } else {
-                    $('#empty-state-row').hide();
-                }
+                
+                $('#empty-state-row').toggle(visibleCount === 0);
             }
 
-            // 監聽按鈕點擊事件
             $('.filter-btn').on('click', function () {
                 const $btn = $(this);
                 const filterValue = $btn.attr('data-filter');
 
-                // 處理按鈕的顏色切換：先將所有按鈕重置為灰色
+                // 先將所有按鈕重置為灰色未選取狀態
                 $('.filter-btn').removeClass('active bg-success bg-secondary text-white')
                                 .addClass('bg-light text-muted');
 
-                // 根據選中的按鈕套用專屬顏色
-                if (filterValue === 'all') {
-                    $btn.removeClass('bg-light text-muted').addClass('active');
-                } else if (filterValue === 'visible') {
-                    $btn.removeClass('bg-light text-muted').addClass('active bg-success text-white');
-                } else if (filterValue === 'hidden') {
-                    $btn.removeClass('bg-light text-muted').addClass('active bg-secondary text-white');
-                }
+               
+                $btn.removeClass('bg-light text-muted').addClass(btnStyles[filterValue]);
 
                 // 呼叫篩選功能
                 applyFilter(filterValue);
             });
 
-            //網頁載入完成時，自動執行一次「全部顯示」的篩選邏輯
+            // 網頁載入完成時，自動執行一次「全部顯示」
             applyFilter('all');
         });
     </script>
