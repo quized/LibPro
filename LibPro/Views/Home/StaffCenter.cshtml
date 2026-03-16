@@ -70,8 +70,7 @@
     </header>
 
     <main class="container py-5">
-        <div class="row g-4 ">
-
+        <div class="row g-4">
             <div class="col-6 col-md-4 col-xl-3">
                 <a asp-controller="Loans" asp-action="CheckOut" class="card h-100 shadow-sm text-decoration-none">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
@@ -93,6 +92,16 @@
             </div>
 
             <div class="col-6 col-md-4 col-xl-3">
+                <a asp-controller="Reserves" asp-action="Index" class="card h-100 shadow-sm text-decoration-none">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
+                        <i class="bi bi-clock-history text-info display-4 mb-2"></i>
+                        <span class="fs-4 fw-bold text-dark">預約管理</span>
+                        <p class="text-muted small mt-2 mb-0">讀者預約紀錄與取書狀態控管</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-3">
                 <a asp-controller="Fines" asp-action="Index" class="card h-100 shadow-sm text-decoration-none">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
                         <i class="bi bi-cash-coin text-danger display-4 mb-2"></i>
@@ -107,7 +116,7 @@
                     <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
                         <i class="bi bi-person-vcard text-warning display-4 mb-2"></i>
                         <span class="fs-4 fw-bold text-dark">借閱人管理</span>
-                        <p class="text-muted small mt-2 mb-0">借閱人辦證、資料維護與狀態管理</p>
+                        <p class="text-muted small mt-2 mb-0">辦證、資料維護與狀態管理</p>
                     </div>
                 </a>
             </div>
@@ -115,7 +124,7 @@
             <div class="col-6 col-md-4 col-xl-3">
                 <a asp-controller="Biblios" asp-action="Index" class="card h-100 shadow-sm text-decoration-none">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
-                        <i class="bi bi-journal-text text-info display-4 mb-2"></i>
+                        <i class="bi bi-journal-text text-primary display-4 mb-2"></i>
                         <span class="fs-4 fw-bold text-dark">書目管理</span>
                         <p class="text-muted small mt-2 mb-0">核心書目建檔與資料維護</p>
                     </div>
@@ -125,9 +134,19 @@
             <div class="col-6 col-md-4 col-xl-3">
                 <a asp-controller="BookItems" asp-action="Index" class="card h-100 shadow-sm text-decoration-none">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
-                        <i class="bi bi-box-seam text-secondary display-4 mb-2"></i>
+                        <i class="bi bi-box-seam text-success display-4 mb-2"></i>
                         <span class="fs-4 fw-bold text-dark">館藏管理</span>
                         <p class="text-muted small mt-2 mb-0">館藏書籍與借閱狀態控管</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-3">
+                <a asp-controller="Reviews" asp-action="Index" class="card h-100 shadow-sm text-decoration-none">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
+                        <i class="bi bi-chat-square-text text-info display-4 mb-2"></i>
+                        <span class="fs-4 fw-bold text-dark">審核評論</span>
+                        <p class="text-muted small mt-2 mb-0">讀者書評審查與不當留言管理</p>
                     </div>
                 </a>
             </div>
@@ -157,27 +176,7 @@
                     <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
                         <i class="bi bi-geo-alt text-secondary display-4 mb-2"></i>
                         <span class="fs-4 fw-bold text-dark">位置管理</span>
-                        <p class="text-muted small mt-2 mb-0">實體館藏地、樓層與書架區劃</p>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-4 col-xl-3">
-                <a asp-controller="Reserves" asp-action="Index" class="card h-100 shadow-sm text-decoration-none">
-                    <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
-                        <i class="bi bi-geo-alt text-secondary display-4 mb-2"></i>
-                        <span class="fs-4 fw-bold text-dark">預約管理</span>
-                        <p class="text-muted small mt-2 mb-0">實體館藏地、樓層與書架區劃</p>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-4 col-xl-3">
-                <a asp-controller="Reviews" asp-action="Index" class="card h-100 shadow-sm text-decoration-none">
-                    <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
-                        <i class="bi bi-geo-alt text-secondary display-4 mb-2"></i>
-                        <span class="fs-4 fw-bold text-dark">審核評論</span>
-                        <p class="text-muted small mt-2 mb-0">實體館藏地、樓層與書架區劃</p>
+                        <p class="text-muted small mt-2 mb-0">實體館藏地、樓層與區劃</p>
                     </div>
                 </a>
             </div>
@@ -185,14 +184,15 @@
             <div class="col-6 col-md-4 col-xl-3">
                 <a asp-controller="Announcements" asp-action="Index" class="card h-100 shadow-sm text-decoration-none">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
-                        <i class="bi bi-geo-alt text-secondary display-4 mb-2"></i>
+                        <i class="bi bi-megaphone text-warning display-4 mb-2"></i>
                         <span class="fs-4 fw-bold text-dark">公告管理</span>
-                        <p class="text-muted small mt-2 mb-0">實體館藏地、樓層與書架區劃</p>
+                        <p class="text-muted small mt-2 mb-0">圖書館最新消息與系統公告</p>
                     </div>
                 </a>
             </div>
-
         </div>
+
+       
     </main>
 
    

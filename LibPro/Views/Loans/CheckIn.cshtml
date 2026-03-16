@@ -99,14 +99,23 @@
                         if (result.success) {
                             $emptyRow.hide();
 
-                            // 判斷是否逾期，產生不同的 UI 徽章 (Badge)
-                            let statusHtml = "";
+                         // 先給予「準時歸還」的綠色徽章
+                            let statusHtml = `<span class="badge bg-success fs-6 me-2"><i class="bi bi-check-lg"></i> 準時歸還</span>`;
+
+                            //如果有逾期，把徽章「替換」成紅色的逾期警告
                             if (result.isOverdue) {
-                                statusHtml = `<span class="badge bg-danger fs-6 px-3 py-2 animate__animated animate__flash">
+                                statusHtml = `<span class="badge bg-danger fs-6 px-3 py-2 animate__animated animate__flash me-2">
                                                 <i class="bi bi-exclamation-triangle-fill"></i> 逾期 ${result.overdueDays} 天 | 需收罰款：$${result.fine}
                                               </span>`;
-                            } else {
-                                statusHtml = `<span class="badge bg-success fs-6"><i class="bi bi-check-lg"></i> 準時歸還</span>`;
+                            }
+
+                            //如果被預約了，在後面「疊加 (+=)」黃色的預約提醒
+                            if (result.isReserved) {
+                                statusHtml += `<span class="badge bg-warning text-dark fs-6 px-3 py-2 animate__animated animate__pulse mt-1 mt-md-0 d-inline-block">
+                                                <i class="bi bi-bell-fill"></i> ${result.reserveMsg}
+                                               </span>`;
+
+                                alert("⚠️ 預約書提醒 ⚠️\n\n" + result.reserveMsg);
                             }
 
                             const newRow = `

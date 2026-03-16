@@ -85,11 +85,31 @@ namespace LibPro.Controllers
                     return Json(new { success = false, message = $"該讀者目前已借閱 {currentLoanCount} 本書，已達借閱上限 ({maxBorrowLimit} 本)，請先歸還部分書籍。" });
                 }
 
+
                 var bookItem = await _context.BookItems.FindAsync(loans.ItemID);
-                if (bookItem == null || bookItem.ItmStatus != 1)
+                Reserves targetReserve = null; 
+
+               
+                if (bookItem == null || (bookItem.ItmStatus != 1 && bookItem.ItmStatus != 3))
                 {
                     return Json(new { success = false, message = "此書籍不在架上，或已被借出。" });
                 }
+
+               
+                if (bookItem.ItmStatus == 3)
+                {
+                    targetReserve = await _context.Reserves.FirstOrDefaultAsync(r =>
+                        r.ItemID == bookItem.ItemID && r.PatronID == loans.PatronID && r.ResStatus == 2);
+
+                   
+                    if (targetReserve == null)
+                    {
+                        return Json(new { success = false, message = "此書籍為其他讀者預約保留中，不可借閱。" });
+                    }
+                }
+
+                // 程式能順利走到這裡，代表「書在架上(1)」或是「這本書剛好是這位讀者預約的(3)」，可以放心繼續往下執行借書邏輯！
+
 
                 bool hasBorrowedSameBook = await _context.Loans
                  .Include(l => l.BookItem) 
@@ -148,14 +168,22 @@ namespace LibPro.Controllers
                 loans.DueDate = DateTime.Now.AddDays(14);
                 loans.RenewalCount = 0;
 
+
+             
                 _context.Loans.Add(loans);
                 bookItem.ItmStatus = 2;
                 _context.BookItems.Update(bookItem);
 
+                
+                if (targetReserve != null)
+                {
+                    targetReserve.ResStatus = 3;
+                    _context.Reserves.Update(targetReserve);
+                }
+
                 try
                 {
                     await _context.SaveChangesAsync();
-
 
                     return Json(new
                     {
@@ -249,8 +277,37 @@ namespace LibPro.Controllers
             }
 
 
+
+            var topReserve = await _context.Reserves
+                  .Where(r => r.BookItem.BibID == bookItem.BibID && r.ResStatus == 1)
+                  .OrderBy(r => r.ResDate) 
+                  .FirstOrDefaultAsync();
+
+            bool isReservedNow = false;
+            string reserveMessage = "";
+
+            
             bookItem.ItmStatus = 1;
+
+          
+            if (topReserve != null)
+            {
+               
+                bookItem.ItmStatus = 3;
+
+            
+                topReserve.ResStatus = 2; 
+                topReserve.ItemID = bookItem.ItemID; 
+                topReserve.ExpiryDate = today.AddDays(7); 
+
+                _context.Reserves.Update(topReserve);
+                isReservedNow = true;
+                reserveMessage = $"此書已為預約者 (證號:{topReserve.PatronID}) 保留，請移至預約保留區！";
+            }
+
+           
             _context.BookItems.Update(bookItem);
+            
 
             try
             {
@@ -264,7 +321,9 @@ namespace LibPro.Controllers
                     returnTime = today.ToString("HH:mm:ss"),
                     isOverdue = overdueDays > 0,
                     overdueDays = overdueDays,
-                    fine = fineAmount
+                    fine = fineAmount,
+                    isReserved = isReservedNow,
+                    reserveMsg = reserveMessage
                 });
             }
             catch (Exception ex)

@@ -23,6 +23,9 @@
         <hr class="text-white-50 mt-0 mb-3">
 
         <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item mt-2 mb-1">
+                <small class="text-white-50 fw-bold px-3">流通服務</small>
+            </li>
             <li class="nav-item">
                 <a class="nav-link py-2 px-3" asp-controller="Loans" asp-action="CheckOut">
                     <i class="bi bi-upc-scan me-2"></i> 借書作業
@@ -33,7 +36,11 @@
                     <i class="bi bi-upc me-2"></i> 還書作業
                 </a>
             </li>
-
+            <li class="nav-item">
+                <a class="nav-link py-2 px-3" asp-controller="Reserves" asp-action="Index">
+                    <i class="bi bi-clock-history me-2"></i> 預約管理
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link py-2 px-3" asp-controller="Fines" asp-action="Index">
                     <i class="bi bi-cash-coin me-2"></i> 罰金繳納
@@ -41,9 +48,8 @@
             </li>
 
             <li class="nav-item mt-3 mb-1">
-                <small class="text-white-50 fw-bold px-3">資料管理</small>
+                <small class="text-white-50 fw-bold px-3">讀者與館藏</small>
             </li>
-
             <li class="nav-item">
                 <a class="nav-link py-2 px-3" asp-controller="Patrons" asp-action="Index">
                     <i class="bi bi-person-vcard me-2"></i> 借閱人管理
@@ -60,6 +66,15 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link py-2 px-3" asp-controller="Reviews" asp-action="Index">
+                    <i class="bi bi-chat-square-text me-2"></i> 書評審核
+                </a>
+            </li>
+
+            <li class="nav-item mt-3 mb-1">
+                <small class="text-white-50 fw-bold px-3">系統設定</small>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link py-2 px-3" asp-controller="Categories" asp-action="Index">
                     <i class="bi bi-tags me-2"></i> 類別管理
                 </a>
@@ -72,6 +87,11 @@
             <li class="nav-item">
                 <a class="nav-link py-2 px-3" asp-controller="Locations" asp-action="Index">
                     <i class="bi bi-geo-alt me-2"></i> 位置管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link py-2 px-3" asp-controller="Announcements" asp-action="Index">
+                    <i class="bi bi-megaphone me-2"></i> 公告管理
                 </a>
             </li>
         </ul>
