@@ -21,7 +21,7 @@ namespace LibPro.Controllers
             _context = context;
         }
 
-        // GET: Reserves
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Index(string searchString)
         {
      
@@ -248,6 +248,7 @@ namespace LibPro.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
