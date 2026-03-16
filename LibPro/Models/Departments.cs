@@ -6,6 +6,7 @@ namespace LibPro.Models
     {
         [Key]
         [RegularExpression("D[0-9][1-9]")]
+        [Display(Name = "部門代號")]
         public string DeptID { get; set; } = null!;
 
         [Display(Name ="部門名稱")]

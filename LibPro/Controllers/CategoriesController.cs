@@ -28,11 +28,7 @@ namespace LibPro.Controllers
 
         
 
-        // GET: Categories/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        
 
         // POST: Categories/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -47,24 +43,10 @@ namespace LibPro.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(categories);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Categories/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var categories = await _context.Categories.FindAsync(id);
-            if (categories == null)
-            {
-                return NotFound();
-            }
-            return View(categories);
-        }
+  
 
         // POST: Categories/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -98,7 +80,7 @@ namespace LibPro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(categories);
+            return RedirectToAction(nameof(Index));
         }
 
         

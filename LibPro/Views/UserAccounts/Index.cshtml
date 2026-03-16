@@ -1,0 +1,138 @@
+﻿@model IEnumerable<LibPro.Models.UserAccounts>
+
+@{
+    ViewData["Title"] = "系統帳號管理";
+}
+
+<div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark mb-0"><i class="bi bi-shield-lock-fill me-2 text-primary"></i>@ViewData["Title"]</h3>
+        <span class="text-muted small">帳號由系統自動產生，此處僅提供資料維護。</span>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="mb-0 fw-bold text-muted"><i class="bi bi-list-ul me-1"></i> 帳號列表</h6>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary">
+                        <tr>
+                            <th class="ps-4">登入帳號</th>
+                            <th>系統編號</th>
+                            <th>權限身分</th>
+                            <th>最後登入時間</th>
+                            <th class="text-end pe-4">操作選項</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">@item.Account</td>
+                                <td class="text-muted font-monospace">@item.UserID</td>
+                                <td>
+                                    @if (item.UserType == 1)
+                                    {
+                                        <span class="badge bg-danger">管理員</span>
+                                    }
+                                    else if (item.UserType == 2)
+                                    {
+                                        <span class="badge bg-primary">一般館員</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">讀者</span>
+                                    }
+                                </td>
+                                <td class="text-muted small">
+                                    @(item.LastLoginTime.HasValue? item.LastLoginTime.Value.ToString("yyyy-MM-dd HH:mm") : "從未登入")
+                                </td>
+                                <td class="text-end pe-4">
+                                    <button type="button" class="btn btn-sm btn-outline-primary px-3" data-bs-toggle="modal" data-bs-target="#editUserModal-@item.UserID">
+                                        <i class="bi bi-key-fill"></i> 變更設定
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <div class="modal fade" id="editUserModal-@item.UserID" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow">
+                                        <form asp-action="Edit" method="post" onsubmit="return validatePassword('@item.UserID')">
+                                            <div class="modal-header bg-light">
+                                                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-person-gear me-2 text-primary"></i>變更帳號設定</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+
+                                            <div class="modal-body p-4">
+                                                <input type="hidden" name="UserID" value="@item.UserID" />
+
+                                                <div class="alert alert-warning py-2 small mb-3">
+                                                    <i class="bi bi-exclamation-circle me-1"></i> 若不修改密碼，請將密碼欄位留空。
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label fw-bold text-muted">登入帳號 <span class="text-danger">*</span></label>
+                                                    <input name="Account" value="@item.Account" class="form-control" required minlength="8" maxlength="30" />
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label fw-bold text-muted">新密碼</label>
+                                                    <input type="password" id="NewPassword-@item.UserID" name="NewPassword" class="form-control" minlength="8" placeholder="請輸入新密碼 (至少 8 碼)" />
+                                                </div>
+
+                                                <div class="form-group mb-2">
+                                                    <label class="form-label fw-bold text-muted">確認新密碼</label>
+                                                    <input type="password" id="ConfirmPassword-@item.UserID" name="ConfirmPassword" class="form-control" placeholder="請再次輸入新密碼" />
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer bg-light">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                                <button type="submit" class="btn btn-primary fw-bold">儲存變更</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // 前端驗證密碼是否一致
+        function validatePassword(userId) {
+            const pwd = document.getElementById('NewPassword-' + userId).value;
+            const confirm = document.getElementById('ConfirmPassword-' + userId).value;
+
+            // 如果有填寫新密碼，才需要檢查是否一致
+            if (pwd !== "" && pwd !== confirm) {
+                alert("【錯誤】兩次輸入的密碼不一致，請重新檢查！");
+                return false; // 擋下表單，不讓它送出
+            }
+            return true; // 允許送出
+        }
+    </script>
+}

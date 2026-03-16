@@ -1,35 +1,120 @@
 ﻿@model IEnumerable<LibPro.Models.Departments>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "部門管理";
 }
 
-<h1>Index</h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark mb-0"><i class="bi bi-building-fill me-2 text-primary"></i>@ViewData["Title"]</h3>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DeptName)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DeptName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.DeptID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.DeptID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.DeptID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        <button type="button" class="btn btn-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#createDeptModal">
+            <i class="bi bi-plus-lg me-1"></i> 新增部門
+        </button>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="mb-0 fw-bold text-muted"><i class="bi bi-list-ul me-1"></i> 部門列表</h6>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary">
+                        <tr>
+                            <th class="text-start ps-4" style="width: 25%;">部門代號</th>
+                            <th class="text-center" style="width: 50%;">部門名稱</th>
+                            <th class="text-end pe-4" style="width: 25%;">操作選項</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="bi bi-info-circle text-warning fs-4 d-block mb-2"></i>
+                                    目前沒有部門資料，請點擊上方按鈕新增。
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="text-start ps-4 fw-bold text-muted font-monospace">
+                                        @item.DeptID
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning bg-opacity-10 text-dark border border-warning-subtle px-4 py-2 fs-6">
+                                            @item.DeptName
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <button type="button" class="btn btn-sm btn-outline-primary px-3" data-bs-toggle="modal" data-bs-target="#editDeptModal-@item.DeptID">
+                                            <i class="bi bi-pencil-square"></i> 編輯
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <div class="modal fade" id="editDeptModal-@item.DeptID" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow">
+                                            <form asp-action="Edit" method="post">
+                                                <div class="modal-header bg-light">
+                                                    <h5 class="modal-title fw-bold text-dark"><i class="bi bi-pencil-square me-2 text-primary"></i>修改部門</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-4">
+                                                    <div class="form-group mb-3">
+                                                        <label class="form-label fw-bold text-muted">部門代號</label>
+                                                        <input name="DeptID" value="@item.DeptID" class="form-control bg-light text-muted font-monospace" readonly />
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label fw-bold text-muted">部門名稱 <span class="text-danger">*</span></label>
+                                                        <input name="DeptName" value="@item.DeptName" class="form-control" required maxlength="20" placeholder="請輸入部門名稱" />
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer bg-light">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                                    <button type="submit" class="btn btn-primary fw-bold">儲存修改</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createDeptModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form asp-action="Create" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-plus-lg me-2"></i>新增部門</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="bi bi-info-circle me-1"></i> 部門代號將由系統自動產生。
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="form-label fw-bold text-muted">部門名稱 <span class="text-danger">*</span></label>
+                        <input name="DeptName" class="form-control" required maxlength="20" placeholder="例如：採編組、推廣組..." />
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary fw-bold">確認新增</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -25,11 +25,7 @@ namespace LibPro.Controllers
         }
 
        
-        // GET: Departments/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+      
 
         // POST: Departments/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -62,25 +58,10 @@ namespace LibPro.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(departments);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Departments/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var departments = await _context.Departments.FindAsync(id);
-            if (departments == null)
-            {
-                return NotFound();
-            }
-            return View(departments);
-        }
-
+     
         // POST: Departments/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -113,7 +94,7 @@ namespace LibPro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(departments);
+            return RedirectToAction(nameof(Index));
         }
 
       
