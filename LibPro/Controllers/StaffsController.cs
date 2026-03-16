@@ -70,20 +70,20 @@ namespace LibPro.Controllers
 
             if (ModelState.IsValid)
             {
-                
+
                 var staffIDResult = await _context.Database.SqlQuery<string>($"exec GetStaffID").ToListAsync();
                 var newStaffID = staffIDResult.FirstOrDefault();
 
                 if (string.IsNullOrEmpty(newStaffID))
                 {
-                    
+
                     ModelState.AddModelError("", "產生 員工ID 失敗，請聯絡管理員。");
                     ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
                     ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
                     return View(staff);
                 }
 
-                string newUserID = "L" + newStaffID; 
+                string newUserID = "L" + newStaffID;
                 string loginAccount = staff.Phone;
                 string loginPassword = staff.Birthday.ToString("yyyyMMdd");
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(loginPassword);
@@ -103,21 +103,21 @@ namespace LibPro.Controllers
                 staff.UserID = newUserID;
                 _context.Add(staff);
 
-                
+
                 try
                 {
-                    
+
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    
+
                     ModelState.AddModelError("", "新增員工失敗: " + ex.Message);
                 }
             }
 
-            
+
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
             ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
             return View(staff);
@@ -131,13 +131,27 @@ namespace LibPro.Controllers
                 return NotFound();
             }
 
-            var staff = await _context.Staffs.FindAsync(id);
+            var staff = await _context.Staffs.Include(s => s.UserAccount).FirstOrDefaultAsync(m => m.StaffID == id);
+
             if (staff == null)
             {
                 return NotFound();
             }
+
+
+            var userTypeOptions = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "2", Text = "一般館員 (僅能操作流通、預約與基礎業務)" },
+                new SelectListItem { Value = "1", Text = "系統管理員 (可異動人事、部門與系統設定)" }
+            };
+            string currentUserType = staff.UserAccount.UserType.ToString();
+
+           
+            ViewBag.UserTypeList = new SelectList(userTypeOptions, "Value", "Text", currentUserType);
+
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
             ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
+
             return View(staff);
         }
 
@@ -153,6 +167,9 @@ namespace LibPro.Controllers
                 return NotFound();
             }
 
+
+
+
             ModelState.Remove("StaffID");
 
             if (ModelState.IsValid)
@@ -164,7 +181,7 @@ namespace LibPro.Controllers
                     var userAccount = await _context.UserAccounts.FirstOrDefaultAsync(u => u.UserID == id);
                     if (userAccount != null)
                     {
-                        userAccount.UserType = userType; 
+                        userAccount.UserType = userType;
                         _context.Update(userAccount);
                     }
 
@@ -182,7 +199,19 @@ namespace LibPro.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
+
             }
+
+            var userTypeOptions = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "2", Text = "一般館員 (僅能操作流通、預約與基礎業務)" },
+                new SelectListItem { Value = "1", Text = "系統管理員 (可異動人事、部門與系統設定)" }
+            };
+            string currentUserType = staff.UserAccount.UserType.ToString();
+
+
+            ViewBag.UserTypeList = new SelectList(userTypeOptions, "Value", "Text", currentUserType);
+
             ViewData["CityID"] = new SelectList(_context.Cities, "CityID", "CityName", staff.CityID);
             ViewData["DeptID"] = new SelectList(_context.Departments, "DeptID", "DeptName", staff.DeptID);
             return View(staff);
