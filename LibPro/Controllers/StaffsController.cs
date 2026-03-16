@@ -64,7 +64,7 @@ namespace LibPro.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Staff staff)
+        public async Task<IActionResult> Create(Staff staff, byte userType)
         {
             ModelState.Remove("StaffID");
 
@@ -94,7 +94,7 @@ namespace LibPro.Controllers
                     Account = loginAccount,
                     Password = hashedPassword,
                     CreatedDate = DateTime.Now,
-                    UserType = 2 // 2 代表館員
+                    UserType = userType
                 };
 
                 _context.UserAccounts.Add(newUserAccount);
@@ -146,7 +146,7 @@ namespace LibPro.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("StaffID,Name,Education,Birthday,Gender,Email,Phone,Address,ZipCode,IsResigned,UserID,CityID,DeptID")] Staff staff)
+        public async Task<IActionResult> Edit(string id, [Bind("StaffID,Name,Education,Birthday,Gender,Email,Phone,Address,ZipCode,IsResigned,UserID,CityID,DeptID")] Staff staff, byte userType)
         {
             if (id != staff.StaffID)
             {
@@ -160,6 +160,14 @@ namespace LibPro.Controllers
                 try
                 {
                     _context.Update(staff);
+
+                    var userAccount = await _context.UserAccounts.FirstOrDefaultAsync(u => u.UserID == id);
+                    if (userAccount != null)
+                    {
+                        userAccount.UserType = userType; 
+                        _context.Update(userAccount);
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

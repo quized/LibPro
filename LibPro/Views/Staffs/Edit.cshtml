@@ -107,6 +107,15 @@
                                 </select>
                                 <span asp-validation-for="DeptID" class="text-danger small"></span>
                             </div>
+
+                            <div class="form-group mb-3">
+                                <label class="control-label fw-bold">系統權限 <span class="text-danger">*</span></label>
+                                <select name="userType" class="form-select" required>
+                                    <option value="2">一般館員 (僅能操作流通、預約與基礎業務)</option>
+                                    <option value="1">系統管理員 (可異動人事、部門與系統設定)</option>
+                                </select>
+                                <small class="text-muted">決定該員工登入後可使用的系統功能層級。</small>
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-end mt-4 pt-3 border-top">
