@@ -3,35 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - 書不了圖書館</title>
+    <title>@ViewData["Title"] - 系統管理後台 | 書不了圖書館</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/LibPro.styles.css" asp-append-version="true" />
 
     <style>
-        .portal-nav-link {
-            font-weight: 500;
-            color: #495057;
-            transition: color 0.2s ease;
-            position: relative;
-        }
-
-            .portal-nav-link:hover {
-                color: #0d6efd;
-            }
-
-            .portal-nav-link.active::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 10%;
-                width: 80%;
-                height: 3px;
-                background-color: #0d6efd;
-                border-radius: 3px 3px 0 0;
-            }
-
         body {
             display: flex;
             flex-direction: column;
@@ -42,82 +20,71 @@
             flex: 1;
         }
 
-        /* 頁尾連結的 Hover 特效 */
-        .footer-link:hover {
-            color: #ffffff !important;
+        .portal-nav-link {
+            font-weight: 500;
+            color: #f8f9fa;
+            transition: color 0.2s ease;
         }
+
+            .portal-nav-link:hover, .portal-nav-link.active {
+                color: #ffc107 !important;
+            }
     </style>
 </head>
 <body class="bg-light">
 
-    <header class="sticky-top shadow-sm bg-white">
-        <nav class="navbar navbar-expand-lg navbar-light py-3">
+    <header class="sticky-top shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
             <div class="container">
 
-                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-bank fs-3 text-primary me-2"></i>
-                    <span class="fw-bold fs-4 text-dark">書不了</span>
+                <a class="navbar-brand d-flex align-items-center" asp-controller="UserAccounts" asp-action="Index">
+                    <i class="bi bi-shield-lock fs-3 text-warning me-2"></i>
+                    <span class="fw-bold fs-4 text-white">系統管理後台</span>
                 </a>
 
-                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#portalNavbar" aria-controls="portalNavbar" aria-expanded="false" aria-label="切換導覽">
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="切換導覽">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse" id="portalNavbar">
-
+                <div class="collapse navbar-collapse" id="adminNavbar">
                     <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-2">
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark fw-bold" asp-controller="Home" asp-action="Announcements">
-                                <i class="bi bi-bell-fill text-warning me-1"></i> 最新公告
+                            <a class="nav-link portal-nav-link px-3" asp-controller="UserAccounts" asp-action="Index">
+                                <i class="bi bi-person-lock me-1"></i> 登入資料維護
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link portal-nav-link px-3" href="#">借閱人服務</a>
+                            <a class="nav-link portal-nav-link px-3" asp-controller="Departments" asp-action="Index">
+                                <i class="bi bi-diagram-3-fill me-1"></i> 部門管理
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link portal-nav-link px-3" href="#">館內介紹</a>
+                            <a class="nav-link portal-nav-link px-3" asp-controller="Staffs" asp-action="Index">
+                                <i class="bi bi-person-vcard-fill me-1"></i> 員工管理
+                            </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link portal-nav-link px-3" href="#">館內歷史</a>
-                        </li>
+
                     </ul>
 
-                    <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+                    <div class="d-flex align-items-center mt-3 mt-lg-0">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <div class="dropdown">
-                                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 35px; height: 35px;">
-                                        <i class="bi bi-person-fill"></i>
+                                <a href="#" class="d-block text-white text-decoration-none dropdown-toggle d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="bg-warning text-dark rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 35px; height: 35px;">
+                                        <i class="bi bi-person-fill-gear"></i>
                                     </div>
-                                    <span class="fw-medium">我的帳戶</span>
+                                    <span class="fw-medium">@User.Identity.Name (管理員)</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userDropdown">
                                     <li>
-                                        <a class="dropdown-item py-2" asp-controller="PatronCenter" asp-action="Index">
-                                            <i class="bi bi-person-badge text-muted me-2"></i>借閱人中心
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item py-2" asp-controller="PatronCenter" asp-action="Reserves">
-                                            <i class="bi bi-bookmark-fill text-muted me-2"></i>預約紀錄
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item py-2 text-danger" asp-controller="Login" asp-action="Logout">
-                                            <i class="bi bi-box-arrow-right me-2"></i>登出
+                                        <a class="dropdown-item py-2 text-danger fw-bold" asp-controller="Login" asp-action="Logout">
+                                            <i class="bi bi-box-arrow-right me-2"></i>安全登出系統
                                         </a>
                                     </li>
                                 </ul>
                             </div>
-                        }
-                        else
-                        {
-                            <a asp-controller="Login" asp-action="Login" class="btn btn-outline-primary rounded-pill px-4 fw-medium">
-                                登入
-                            </a>
-                            
                         }
                     </div>
 
@@ -130,40 +97,37 @@
         @RenderBody()
     </main>
 
-    <footer class="bg-secondary text-white py-5 mt-auto">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-bank text-light me-2"></i>書不了 圖書館</h5>
-                    <p class="text-white small mb-0">致力於提供最豐富的館藏與最優質的閱讀空間，讓知識成為您前進的力量。</p>
-                </div>
-                <div class="col-md-4">
-                    <h5 class="fw-bold mb-3">開館時間</h5>
-                    <ul class="list-unstyled text-white small mb-0 line-height-lg">
-                        <li>週一至週五：08:30 - 21:00</li>
-                        <li>週六至週日：09:00 - 17:00</li>
-                        <li>國定假日及月底清潔日休館</li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5 class="fw-bold mb-3">聯絡我們</h5>
-                    <ul class="list-unstyled text-white small mb-0 line-height-lg">
-                        <li><i class="bi bi-geo-alt me-2"></i>高雄市苓雅區四維三路 2 號</li>
-                        <li><i class="bi bi-telephone me-2"></i>(07) 336-8333</li>
-                        <li><i class="bi bi-envelope me-2"></i>service@gmail.com</li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="border-light opacity-50 my-4">
-            <div class="text-center text-white small">
-                &copy; 2026 書不了圖書館版權所有.
-            </div>
+    <footer class="bg-dark text-white py-3 mt-auto border-top border-secondary">
+        <div class="container text-center small">
+            <span class="text-muted">&copy; 2026 書不了圖書館系統. 保留所有權利.</span>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function () {
+            // 取得目前瀏覽器的網址路徑，並全部轉為小寫
+            const currentPath = window.location.pathname.toLowerCase();
+
+            // 抓出所有帶有 portal-nav-link 的導覽按鈕
+            $('.portal-nav-link').each(function () {
+                const linkHref = $(this).attr('href');
+
+                if (linkHref) {
+                    const linkPath = linkHref.toLowerCase();
+
+                    // 若當前的網址包含了該連結的路徑，就幫它加上 active 樣式
+                    if (linkPath !== '/' && currentPath.includes(linkPath)) {
+                        $(this).addClass('active');
+                    }
+                }
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
