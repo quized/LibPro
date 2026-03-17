@@ -23,7 +23,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-dark mb-0"><i class="bi bi-shield-lock-fill me-2 text-primary"></i>@ViewData["Title"]</h3>
-        <span class="text-muted small">帳號由系統自動產生，此處僅提供資料維護。</span>
+        <span class="text-muted small">為維護系統安全，強制變更帳號或重設密碼前，請務必落實當事人身分核對程序。</span>
     </div>
 
     <div class="card shadow-sm border-0 rounded-3">
@@ -40,7 +40,7 @@
                             <th>系統編號</th>
                             <th>權限身分</th>
                             <th>最後登入時間</th>
-                            <th class="text-end pe-4">操作選項</th>
+                            <th class="text-end pe-5">操作選項</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -144,26 +144,25 @@
             return true;
         }
 
-        // 密碼顯示/隱藏
+        // 密碼顯示/隱藏     
         $(document).ready(function () {
-           
             $('.toggle-password').click(function () {
-                
                 const targetId = $(this).data('target');
                 const $input = $('#' + targetId);
                 const $icon = $(this).find('i');
 
-              
+
                 if ($input.attr('type') === 'password') {
-                    
                     $input.attr('type', 'text');
                     $icon.removeClass('bi-eye').addClass('bi-eye-slash');
-                } else {
-                  
-                    $input.attr('type', 'password');
-                    $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+                    return;
                 }
+
+
+                $input.attr('type', 'password');
+                $icon.removeClass('bi-eye-slash').addClass('bi-eye');
             });
         });
+   
     </script>
 }

@@ -2,7 +2,7 @@
 @model LoginViewModel
 @{
     ViewData["Title"] = "系統登入";
-    Layout = null; 
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -12,22 +12,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - 圖書館管理系統</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
     <style>
-        /* 設定背景圖片 */
         body {
-          
-            background-image: url(/ImgPath/LoginBG.jpg); 
+            background-image: url(/ImgPath/LoginBG.jpg);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
             margin: 0;
         }
-        
-       
+
         .bg-overlay {
-            background-color: rgba(0, 0, 0, 0.4); 
+            background-color: rgba(0, 0, 0, 0.4);
             min-height: 100vh;
             width: 100%;
         }
@@ -54,7 +52,14 @@
 
                                 <div class="form-group mb-4">
                                     <label asp-for="Password" class="control-label fw-bold"></label>
-                                    <input asp-for="Password" class="form-control" type="password" placeholder="請輸入您的密碼" />
+
+                                    <div class="input-group">
+                                        <input asp-for="Password" class="form-control" type="password" placeholder="請輸入您的密碼" />
+                                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="Password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+
                                     <span asp-validation-for="Password" class="text-danger"></span>
                                 </div>
 
@@ -69,5 +74,27 @@
             </div>
         </div>
     </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.toggle-password').click(function () {
+                const targetId = $(this).data('target');
+                const $input = $('#' + targetId);
+                const $icon = $(this).find('i');
+
+             
+                if ($input.attr('type') === 'password') {
+                    $input.attr('type', 'text');
+                    $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+                    return; 
+                }
+
+                
+                $input.attr('type', 'password');
+                $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+            });
+        });
+    </script>
 </body>
 </html>

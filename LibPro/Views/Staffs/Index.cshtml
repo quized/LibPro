@@ -1,116 +1,132 @@
 ﻿@model IEnumerable<LibPro.Models.Staff>
 
 @{
-    ViewData["Title"] = "館員列表";
+    ViewData["Title"] = "館員管理";
     Layout = "_AdminLayout";
 }
 
-<h1 class="text-center fw-bold">@ViewData["Title"]</h1>
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <a asp-action="Create" class="btn btn-primary">新增館員</a>
-
-    <div class="btn-group shadow-sm" role="group">
-        <a asp-action="Index" asp-route-isresignde="false"
-           class="btn btn-outline-success fw-bold" data-status="false">
-            在職館員
-        </a>
-        <a asp-action="Index" asp-route-isresignde="true"
-           class="btn btn-outline-secondary fw-bold" data-status="true">
-            已離職館員
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark mb-0">
+            <i class="bi bi-person-vcard-fill me-2 text-primary"></i>@ViewData["Title"]
+        </h3>
+        <a asp-action="Create" class="btn btn-primary fw-bold shadow-sm">
+            <i class="bi bi-person-plus-fill me-1"></i> 新增館員
         </a>
     </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-bold text-muted"><i class="bi bi-list-ul me-1"></i> 館員名單</h6>
+            <div class="btn-group shadow-sm" role="group">
+                <a asp-action="Index" asp-route-isresignde="false"
+                   class="btn btn-outline-success fw-bold px-4" data-status="false">
+                    <i class="bi bi-person-check me-1"></i> 在職館員
+                </a>
+                <a asp-action="Index" asp-route-isresignde="true"
+                   class="btn btn-outline-secondary fw-bold px-4" data-status="true">
+                    <i class="bi bi-person-dash me-1"></i> 已離職館員
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-nowrap">
+                    <thead class="table-light text-secondary">
+                        <tr>
+                            <th class="ps-4 py-3">@Html.DisplayNameFor(model => model.Name)</th>
+                            <th class="py-3">@Html.DisplayNameFor(model => model.Gender)</th>
+                            <th class="py-3">@Html.DisplayNameFor(model => model.Email)</th>
+                            <th class="py-3">@Html.DisplayNameFor(model => model.Phone)</th>
+                            <th class="py-3">@Html.DisplayNameFor(model => model.City)</th>
+                            <th class="py-3">@Html.DisplayNameFor(model => model.Department)</th>
+                            <th class="text-end py-3 pe-4">
+                                <div class="d-inline-block text-center" style="min-width: 220px;">操作選項</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-info-circle text-warning fs-4 d-block mb-2"></i>
+                                    目前沒有符合條件的館員資料
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">@Html.DisplayFor(modelItem => item.Name)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Gender)</td>
+                                    <td class="text-muted small">@Html.DisplayFor(modelItem => item.Email)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Phone)</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">@Html.DisplayFor(modelItem => item.City.CityName)</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning bg-opacity-10 text-dark border border-warning-subtle px-2 py-1">
+                                            @Html.DisplayFor(modelItem => item.Department.DeptName)
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex justify-content-end align-items-center gap-2">
+
+                                            <a asp-action="Edit" asp-route-id="@item.StaffID" class="btn btn-sm btn-outline-primary" title="編輯">
+                                                <i class="bi bi-pencil-square"></i> 編輯
+                                            </a>
+                                            <a asp-action="Details" asp-route-id="@item.StaffID" class="btn btn-sm btn-outline-info" title="詳細">
+                                                <i class="bi bi-info-square"></i> 詳細
+                                            </a>
+
+                                            <form asp-action="ToggleResignStatus" asp-route-id="@item.StaffID" class="mb-0 resignForm">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="設為離職" onclick="return confirm('確定要將【@(item.Name)】設為離職嗎？')">
+                                                    <i class="bi bi-box-arrow-right"></i> 離職
+                                                </button>
+                                            </form>
+
+                                            <form asp-action="ToggleResignStatus" asp-route-id="@item.StaffID" class="mb-0 restoreForm">
+                                                <button type="submit" class="btn btn-sm btn-outline-success" title="設為復職" onclick="return confirm('確定要讓館員【@(item.Name)】復職嗎？')">
+                                                    <i class="bi bi-arrow-return-left"></i> 復職
+                                                </button>
+                                            </form>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-           
-            <th>
-                @Html.DisplayNameFor(model => model.Gender)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Phone)
-            </th>
-          
-            <th>
-                @Html.DisplayNameFor(model => model.City)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Department)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-        
-            <td>
-                @Html.DisplayFor(modelItem => item.Gender)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Phone)
-            </td>
-            
-           
-            <td>
-                @Html.DisplayFor(modelItem => item.City.CityName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Department.DeptName)
-            </td>
-            <td class=" text-end">
-                    <a asp-action="Edit" asp-route-id="@item.StaffID" class="btn btn-outline-primary">編輯</a>
-                    <a asp-action="Details" asp-route-id="@item.StaffID" class="btn btn-outline-info">詳細</a>
-                    <form asp-action="ToggleResignStatus" asp-route-id="@item.StaffID" class="d-inline ">
-                        <input type="submit" class="btn btn-outline-danger resign " value="離職" onclick="return confirm('確定要將@(item.Name)設為離職嗎？')" />
-                    </form>
-                    <form asp-action="ToggleResignStatus" asp-route-id="@item.StaffID" class="d-inline ">
-                        <input type="submit" class="btn btn-outline-success restore" value="復職" onclick="return confirm('確定要讓館員 【@(item.Name)】 復職嗎？')" />
-                    </form>
-                   
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-
+           
             const urlParams = new URLSearchParams(window.location.search);
-
             const currentStatus = urlParams.get('isresignde') || 'false';
 
-
-
-
+         
             if (currentStatus === 'false') {
-                $('a[data-status="false"]').removeClass('btn-outline-success').addClass('btn-success');
-                $('.resign').show
-                $('.restore').hide()
+                $('a[data-status="false"]').removeClass('btn-outline-success').addClass('btn-success text-white');
+                $('.resignForm').show();
+                $('.restoreForm').hide();
+                return;
             }
-            else{
-                $('a[data-status="true"]').removeClass('btn-outline-secondary').addClass('btn-secondary');
-                $('.resign').hide()
-                $('.restore').show()
-            }
+
+          
+            $('a[data-status="true"]').removeClass('btn-outline-secondary').addClass('btn-secondary text-white');
+            $('.resignForm').hide();
+            $('.restoreForm').show();
         });
     </script>
 }

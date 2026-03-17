@@ -91,7 +91,7 @@ namespace LibPro.Controllers
                     
                     if (staffInfo.IsResigned)
                     {
-                        ModelState.AddModelError(string.Empty, "該員工已離職。");
+                        ModelState.AddModelError(string.Empty, "該員工帳號已被註銷。");
                         return View(model);
                     }
 

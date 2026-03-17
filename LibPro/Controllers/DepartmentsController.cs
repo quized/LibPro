@@ -69,13 +69,9 @@ namespace LibPro.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("DeptID,DeptName")] Departments departments)
+        public async Task<IActionResult> Edit([Bind("DeptID,DeptName")] Departments departments)
         {
-            if (id != departments.DeptID)
-            {
-                return NotFound();
-            }
-
+           
             if (ModelState.IsValid)
             {
                 try
