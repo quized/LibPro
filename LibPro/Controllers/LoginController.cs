@@ -21,16 +21,22 @@ namespace LibPro.Controllers
 
         public IActionResult login()
         {
-            if (User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated)
             {
-                if (User.IsInRole("Patron"))
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-                return RedirectToAction("StaffCenter", "Home");
+                return View();
             }
 
-            return View();
+            if (User.IsInRole("Patron"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index", "UserAccounts");
+            }
+
+            return RedirectToAction("StaffCenter", "Home");
         }
 
         [HttpPost]
@@ -52,7 +58,6 @@ namespace LibPro.Controllers
                 return View(model);
             }
 
-            // 呼叫 BCrypt 比對密碼
             bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
             if (!isPasswordCorrect)
             {
@@ -63,29 +68,35 @@ namespace LibPro.Controllers
             user.LastLoginTime = DateTime.Now;
             await _context.SaveChangesAsync();
 
-
             string roleName = "Patron";
+            string realName = user.Account;
+
+
             if (user.UserRole != null)
             {
                 roleName = user.UserRole.RoleName;
             }
-
-            string realName = user.Account;
-
-            // 建立 Claims
+           
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserID),
                 new Claim(ClaimTypes.Role, roleName)
             };
 
-            if(roleName == "Staff")
+            if (roleName == "Staff" || roleName == "Admin")
             {
                 var staffInfo = await _context.Staffs.FirstOrDefaultAsync(s => s.UserID == user.UserID);
                 if (staffInfo != null)
                 {
+                    
+                    if (staffInfo.IsResigned)
+                    {
+                        ModelState.AddModelError(string.Empty, "該員工已離職。");
+                        return View(model);
+                    }
+
                     claims.Add(new Claim("StaffID", staffInfo.StaffID));
-                    realName = staffInfo.Name; 
+                    realName = staffInfo.Name;
                 }
             }
 
@@ -99,16 +110,22 @@ namespace LibPro.Controllers
                 }
             }
 
-                claims.Add(new Claim(ClaimTypes.Name, realName));
+            claims.Add(new Claim(ClaimTypes.Name, realName));
 
             var claimsIdentity = new ClaimsIdentity(claims, "ManagerLogin");
             await HttpContext.SignInAsync("ManagerLogin", new ClaimsPrincipal(claimsIdentity));
 
-            // 智慧分流
-            string action = "Index";
-            if (roleName == "Admin" || roleName == "Staff")
-                action = "StaffCenter";
-            return RedirectToAction(action, "Home");
+            if (roleName == "Patron")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (roleName == "Admin")
+            {
+                return RedirectToAction("Index", "UserAccounts");
+            }
+
+            return RedirectToAction("StaffCenter", "Home");
         }
 
         public async Task<IActionResult> Logout()
