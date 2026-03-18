@@ -111,20 +111,22 @@
                                             <div class="form-group mb-3">
                                                 <label class="form-label fw-bold text-muted">新密碼</label>
                                                 <div class="input-group">
-                                                    <input type="password" id="NewPassword-@item.UserID" name="NewPassword" class="form-control" minlength="8" placeholder="請輸入新密碼 (至少 8 碼)" />
-                                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="NewPassword-@item.UserID">
-                                                        <i class="bi bi-eye"></i>
-                                                    </button>
+                                                    <input type="password" id="NewPassword-@item.UserID" name="NewPassword" class="form-control border-end-0" minlength="8" placeholder="請輸入新密碼 (至少 8 碼)" />
+
+                                                    <span class="input-group-text bg-white border-start-0 toggle-password" style="cursor: pointer;" data-target="NewPassword-@item.UserID">
+                                                        <i class="bi bi-eye text-muted"></i>
+                                                    </span>
                                                 </div>
                                             </div>
 
                                             <div class="form-group mb-2">
                                                 <label class="form-label fw-bold text-muted">確認新密碼</label>
                                                 <div class="input-group">
-                                                    <input type="password" id="ConfirmPassword-@item.UserID" name="ConfirmPassword" class="form-control" placeholder="請再次輸入新密碼" />
-                                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="ConfirmPassword-@item.UserID">
-                                                        <i class="bi bi-eye"></i>
-                                                    </button>
+                                                    <input type="password" id="ConfirmPassword-@item.UserID" name="ConfirmPassword" class="form-control border-end-0" placeholder="請再次輸入新密碼" />
+
+                                                    <span class="input-group-text bg-white border-start-0 toggle-password" style="cursor: pointer;" data-target="ConfirmPassword-@item.UserID">
+                                                        <i class="bi bi-eye text-muted"></i>
+                                                    </span>
                                                 </div>
                                             </div>
 

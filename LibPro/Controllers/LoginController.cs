@@ -76,7 +76,7 @@ namespace LibPro.Controllers
             {
                 roleName = user.UserRole.RoleName;
             }
-           
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserID),
@@ -88,7 +88,7 @@ namespace LibPro.Controllers
                 var staffInfo = await _context.Staffs.FirstOrDefaultAsync(s => s.UserID == user.UserID);
                 if (staffInfo != null)
                 {
-                    
+
                     if (staffInfo.IsResigned)
                     {
                         ModelState.AddModelError(string.Empty, "該員工帳號已被註銷。");
@@ -133,6 +133,50 @@ namespace LibPro.Controllers
             await HttpContext.SignOutAsync("ManagerLogin");
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> ChangePasswordAPI(string oldPassword, string newPassword, string confirmPassword)
+        {
+
+            if (newPassword != confirmPassword)
+            {
+                return Json(new { success = false, message = "兩次輸入的新密碼不一致！" });
+            }
+
+            if (newPassword.Length < 8)
+            {
+                return Json(new { success = false, message = "新密碼長度不能小於 8 個字元！" });
+            }
+
+            var currentUserId = User.Identity!.Name;
+            var account = await _context.UserAccounts.FindAsync(currentUserId);
+
+            if (account == null)
+            {
+                return Json(new { success = false, message = "系統錯誤，找不到該帳號狀態！" });
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(oldPassword, account.Password))
+            {
+                return Json(new { success = false, message = "原密碼輸入錯誤，請確認！" });
+            }
+            //加密並更新新密碼
+            account.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            try
+            {
+                _context.Update(account);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "密碼修改成功！系統將在 3 秒後自動登出，請使用新密碼重新登入。" });
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "資料庫更新失敗，請聯繫系統管理員。" });
+            }
+        }
+
     }
 }
-    
+
