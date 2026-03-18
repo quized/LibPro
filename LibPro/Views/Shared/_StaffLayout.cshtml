@@ -96,10 +96,19 @@
             </li>
         </ul>
 
-        <hr class="text-white-50">
+        <hr class="text-white-50 my-3">
 
-        <div class="px-3 py-2">
-            <a asp-controller="Login" asp-action="Logout" class="text-white text-decoration-none small">
+        <div class="px-3 pb-2">
+            <div class="d-flex align-items-center text-warning fw-bold mb-3">
+                <i class="bi bi-person-circle fs-5 me-2"></i>
+                <span class="small">@User.Identity?.Name</span>
+            </div>
+
+            <a href="#" class="text-white text-decoration-none small d-block mb-3" data-bs-toggle="modal" data-bs-target="#globalChangePwdModal">
+                <i class="bi bi-key me-2"></i> 修改密碼
+            </a>
+
+            <a asp-controller="Login" asp-action="Logout" class="text-white text-decoration-none small d-block">
                 <i class="bi bi-box-arrow-left me-2"></i> 登出系統
             </a>
         </div>
@@ -127,6 +136,8 @@
             </div>
         </footer>
     </div>
+
+    <partial name="_ChangePasswordModal" />
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>

@@ -139,6 +139,10 @@ namespace LibPro.Controllers
         [Authorize]
         public async Task<IActionResult> ChangePasswordAPI(string oldPassword, string newPassword, string confirmPassword)
         {
+            if(oldPassword == newPassword)
+            {
+                return Json(new { success = false, message = "新密碼不可與舊密碼相同！" });
+            }    
 
             if (newPassword != confirmPassword)
             {
@@ -150,18 +154,34 @@ namespace LibPro.Controllers
                 return Json(new { success = false, message = "新密碼長度不能小於 8 個字元！" });
             }
 
-            var currentUserId = User.Identity!.Name;
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                currentUserId = User.Identity.Name;
+            }
+
+    
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Json(new { success = false, message = "無法驗證您的登入狀態，請重新登入後再試！" });
+            }
+
+           
             var account = await _context.UserAccounts.FindAsync(currentUserId);
 
+   
             if (account == null)
             {
-                return Json(new { success = false, message = "系統錯誤，找不到該帳號狀態！" });
+                return Json(new { success = false, message = $"系統錯誤，找不到帳號代碼：{currentUserId}！" });
             }
 
             if (!BCrypt.Net.BCrypt.Verify(oldPassword, account.Password))
             {
                 return Json(new { success = false, message = "原密碼輸入錯誤，請確認！" });
             }
+
             //加密並更新新密碼
             account.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
 
@@ -169,7 +189,7 @@ namespace LibPro.Controllers
             {
                 _context.Update(account);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "密碼修改成功！系統將在 3 秒後自動登出，請使用新密碼重新登入。" });
+                return Json(new { success = true, message = "密碼修改成功！" });
             }
             catch (Exception)
             {

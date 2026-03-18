@@ -15,7 +15,7 @@ namespace LibPro.ViewComponents
             var announcements = _context.Announcements
                 .Where(a => a.IsVisible == true)
                 .OrderByDescending(a => a.CreatedDate)
-                .Take(10) 
+                .Take(6) 
                 .ToList();
             return View(announcements);
         }
