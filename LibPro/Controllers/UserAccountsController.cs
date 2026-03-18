@@ -20,14 +20,47 @@ namespace LibPro.Controllers
             _context = context;
         }
 
-        // GET: UserAccounts
-        public async Task<IActionResult> Index()
+    
+        public async Task<IActionResult> Index(string searchString, int? userTypeFilter)
         {
-            var accounts = await _context.UserAccounts.Include(u => u.UserRole).ToListAsync();
+           
+            ViewData["CurrentSearch"] = searchString;
+
+            
+            var roles = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "1", Text = "管理員" },
+                new SelectListItem { Value = "2", Text = "一般館員" },
+                new SelectListItem { Value = "3", Text = "讀者" }
+            };
+            ViewBag.UserTypeFilter = new SelectList(roles, "Value", "Text", userTypeFilter);
+
+    
+            var accountsQuery = _context.UserAccounts.Include(u => u.UserRole).Include(u => u.Staffs).Include(u => u.Patrons).AsQueryable();
+
+      
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                accountsQuery = accountsQuery.Where(u =>
+                        u.Account.Contains(searchString) ||
+                        u.UserID.Contains(searchString) ||                        
+                        u.Staffs!.Any(s => s.Name.Contains(searchString)) ||
+                        u.Patrons!.Any(p => p.Name.Contains(searchString))
+                        );
+            }
+
+            if (userTypeFilter.HasValue)
+            {
+                accountsQuery = accountsQuery.Where(u => u.UserType == userTypeFilter.Value);
+            }
+
+            accountsQuery = accountsQuery.OrderBy(u => u.UserType).ThenBy(u => u.UserID);
+
+            var accounts = await accountsQuery.ToListAsync();
             return View(accounts);
         }
 
-      
+
 
         // POST: UserAccounts/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.

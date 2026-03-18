@@ -86,7 +86,7 @@
         });
 
 
-            //智慧對焦：一開始游標停在借閱證號
+            //智慧對焦
             $patronInput.focus();
 
             //攔截讀者輸入框的 Enter 鍵
@@ -95,16 +95,16 @@
                 if (e.key === "Enter" || e.which === 13) {
                     e.preventDefault(); // 阻止表單提早送出
 
-                    // $.trim 去掉空白，確保不是只輸入空白鍵
+                    // 去掉空白
                     if ($.trim($patronInput.val()) !== "") {
-                        $itemInput.focus(); // 游標平滑跳轉到書籍輸入框！
+                        $itemInput.focus(); // 游標平滑跳轉到書籍輸入框
                     }
                 }
             });
 
-            // 3. 攔截表單的 submit 事件，改用 jQuery AJAX 傳送
+            
             $form.on("submit", function (e) {
-                // 最重要的一行：阻止網頁閃爍跟重新整理！
+                // 阻止網頁閃爍跟重新整理！
                 e.preventDefault();
 
                 // 清空之前的錯誤訊息
@@ -115,20 +115,20 @@
                     return;
                 }
 
-                // 收集表單資料 (this 代表目前觸發 submit 的表單)
+                // 收集表單資料 
                 const formData = new FormData(this);
 
-                // 使用 jQuery 的 AJAX 發送背景請求
+          
                 $.ajax({
-                    url: $form.attr('action'), // 去抓 <form action="..."> 的網址
+                    url: $form.attr('action'),
                     type: 'POST',
                     data: formData,
-                    processData: false, // 必填：告訴 jQuery 不要把 FormData 轉成字串
-                    contentType: false, // 必填：告訴 jQuery 不要覆蓋 FormData 預設的 Content-Type
+                    processData: false, // 告訴 jQuery 不要把 FormData 轉成字串
+                    contentType: false, // 告訴 jQuery 不要覆蓋 FormData 預設的 Content-Type
 
                     success: function (result) {
             if (result.success) {
-                // 存檔成功！
+                // 存檔成功
                 $emptyRow.hide();
                 const newRow = `
                     <tr>
@@ -139,7 +139,7 @@
                 `;
                 $scannedList.prepend(newRow);
                 $itemInput.val("").focus();
-                return; // 成功就直接結束
+                return; 
             }
 
             // 失敗才會執行這裡
