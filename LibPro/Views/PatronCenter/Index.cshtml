@@ -39,7 +39,7 @@
                         <i class="bi bi-telephone text-primary me-2"></i>聯絡電話
                     </label>
                     <span class="fs-6 text-dark fw-medium">
-                        @(string.IsNullOrEmpty(Model.Phone) ? "尚未設定" : Html.DisplayFor(model => model.Phone))
+                        @Html.DisplayFor(model => model.Phone)
                     </span>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                         <i class="bi bi-envelope text-primary me-2"></i>電子信箱
                     </label>
                     <span class="fs-6 text-dark fw-medium">
-                        @(string.IsNullOrEmpty(Model.Email) ? "尚未設定" : Html.DisplayFor(model => model.Email))
+                       @Html.DisplayFor(model => model.Email)
                     </span>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                         <i class="bi bi-house-door text-primary me-2"></i>通訊地址
                     </label>
                     <span class="fs-6 text-dark fw-medium">
-                        @(string.IsNullOrEmpty(Model.Address) ? "尚未設定" : Html.DisplayFor(model => model.Address))
+                        @Html.DisplayFor(model => model.City.CityName)@Html.DisplayFor(model => model.Address)
                     </span>
                 </div>
             </div>
@@ -72,7 +72,7 @@
             <div>
                 <h6 class="fw-bold text-primary mb-1">需要更新個人資料嗎？</h6>
                 <p class="text-primary text-opacity-75 small mb-0">
-                    為保障您的借閱權益與帳號安全，若上述聯絡資訊有異動，請攜帶身分證件至本館一樓綜合服務櫃檯由館員為您辦理變更。
+                    為保障您的借閱權益與帳號安全，若上述聯絡資訊有異動，請攜帶身分證件至本館一樓綜合服務櫃檯由櫃檯人員為您辦理變更。
                 </p>
             </div>
         </div>

@@ -30,6 +30,7 @@ namespace LibPro.Controllers
 
            
             var patron = await _context.Patrons
+                .Include(p => p.City)
                 .FirstOrDefaultAsync(p => p.PatronID == patronId);
 
             if (patron == null)
@@ -109,15 +110,15 @@ namespace LibPro.Controllers
 
             return RedirectToAction(nameof(Reserves));
 
-        }
-
-     
-
+        }                
 
         public IActionResult Loans()
         {
             return View();
         }
+
+    
+
     }
 }
     
