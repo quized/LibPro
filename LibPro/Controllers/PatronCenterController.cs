@@ -17,7 +17,7 @@ namespace LibPro.Controllers
             _context = context;
         }
 
-      
+
         public async Task<IActionResult> Index()
         {
 
@@ -28,7 +28,7 @@ namespace LibPro.Controllers
                 return RedirectToAction("Logout", "Login");
             }
 
-           
+
             var patron = await _context.Patrons
                 .Include(p => p.City)
                 .FirstOrDefaultAsync(p => p.PatronID == patronId);
@@ -39,13 +39,13 @@ namespace LibPro.Controllers
                 return RedirectToAction("Logout", "Login");
             }
 
-            
+
             return View(patron);
         }
 
         public async Task<IActionResult> Reserves()
         {
-           
+
             var patronId = User.FindFirstValue("PatronID");
 
             if (string.IsNullOrEmpty(patronId))
@@ -53,13 +53,13 @@ namespace LibPro.Controllers
                 return RedirectToAction("Logout", "Login");
             }
 
-           
+
             var myReserves = await _context.Reserves
                 .Include(r => r.BookItem)
-                    .ThenInclude(bi => bi.Biblio)     
-                .Include(r => r.ReserveStatus)      
-                .Where(r => r.PatronID == patronId)  
-                .OrderByDescending(r => r.ResDate)   
+                    .ThenInclude(bi => bi.Biblio)
+                .Include(r => r.ReserveStatus)
+                .Where(r => r.PatronID == patronId)
+                .OrderByDescending(r => r.ResDate)
                 .ToListAsync();
 
             return View(myReserves);
@@ -102,24 +102,137 @@ namespace LibPro.Controllers
 
 
 
-            reserve.ResStatus = 4;         
+            reserve.ResStatus = 4;
             reserve.BookItem.ItmStatus = 1;
             await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "預約已成功取消，實體書已重新開放借閱！";
+            TempData["SuccessMessage"] = "預約已成功取消，實體書已重新開放借閱！";
 
             return RedirectToAction(nameof(Reserves));
 
-        }                
+        }
 
         public IActionResult Loans()
         {
             return View();
         }
 
-    
+
+        [HttpGet]
+        public async Task<IActionResult> GetNotifications()
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+             
+                currentUserId = User.Identity.Name;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Json(new { count = 0, items = new List<object>() });
+                }
+            }
+
+            var notifications = new List<object>();
+            var today = DateTime.Now.Date;
+
+
+            var unpaidFines = await _context.Fines
+                .Include(f => f.Loan)
+                .Include(f => f.FineType)
+                .Where(f => f.Loan != null && f.Loan.PatronID == currentUserId && f.ISPaid == false)
+                .ToListAsync();
+
+            decimal totalFine = 0;
+
+            foreach (var fine in unpaidFines)
+            {
+                if (fine.Loan != null && fine.FineType != null)
+                {
+                    DateTime endDate = today;
+                    if (fine.Loan.ReturnDate.HasValue)
+                    {
+                        endDate = fine.Loan.ReturnDate.Value.Date;
+                    }
+
+                    var dueDate = fine.Loan.DueDate.Date;
+                    var overdueDays = (endDate - dueDate).Days;
+
+                    if (overdueDays > 0)
+                    {
+                        totalFine += overdueDays * fine.FineType.UnitPrice;
+                    }
+                }
+            }
+
+            if (totalFine > 0)
+            {
+                notifications.Add(new
+                {
+                    type = "danger",
+                    icon = "bi-cash-coin",
+                    title = "未繳罰金提醒",
+                    message = $"您目前有 {totalFine:0} 元的未繳罰金，請至櫃檯繳納以恢復完整借閱權限。"
+                });
+            }
+
+
+            var loans = await _context.Loans
+                .Include(l => l.BookItem)
+                .ThenInclude(bi => bi.Biblio)
+                .Where(l => l.PatronID == currentUserId && l.ReturnDate == null)
+                .ToListAsync();
+
+            foreach (var loan in loans)
+            {
+                if (loan.DueDate.Date < today)
+                {
+                    notifications.Add(new
+                    {
+                        type = "danger",
+                        icon = "bi-exclamation-octagon-fill",
+                        title = "圖書已逾期！",
+                        message = $"《{loan.BookItem.Biblio.BTitle}》已於 {loan.DueDate:yyyy-MM-dd} 到期，請盡速歸還！"
+                    });
+                    continue;
+                }
+
+                if (loan.DueDate.Date <= today.AddDays(3))
+                {
+                    notifications.Add(new
+                    {
+                        type = "warning",
+                        icon = "bi-clock-history",
+                        title = "即將到期",
+                        message = $"《{loan.BookItem.Biblio.BTitle}》將於 {loan.DueDate:yyyy-MM-dd} 到期。"
+                    });
+                    continue;
+                }
+            }
+
+            var arrivedReserves = await _context.Reserves
+                .Include(r => r.BookItem)
+                    .ThenInclude(bi => bi.Biblio)
+                .Where(r => r.PatronID == currentUserId && r.ResStatus == 2)
+                .ToListAsync();
+
+            foreach (var res in arrivedReserves)
+            {
+                notifications.Add(new
+                {
+                    type = "success",
+                    icon = "bi-bag-check-fill",
+                    title = "預約書已到館",
+                    message = $"您預約的《{res.BookItem.Biblio.BTitle}》已可取書，保留期限至 {res.ExpiryDate:yyyy-MM-dd}。"
+                });
+            }
+
+
+            return Json(new { count = notifications.Count, items = notifications });
+        }
 
     }
 }
-    
+
 

@@ -4,79 +4,106 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - 借閱人中心</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/LibPro.styles.css" asp-append-version="true" />
 
-    <style>
-
-        /* 確保滿版高度與背景色 */
+    <style>     
         .patron-body {
             height: 100%;
-            background-color: #f8f9fa;
+            background-color: #f4f6f9; 
+            overflow-x: hidden;
         }
 
-        /* 左側選單固定樣式 */
+
         .patron-sidebar {
             width: 280px;
             min-height: 100vh;
             position: sticky;
             top: 0;
             background-color: #ffffff;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.03); 
             z-index: 1000;
         }
 
-        /* 右側主內容區塊 */
+       
         .patron-main-content {
             flex-grow: 1;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* 美化選單按鈕 */
+     
+        .patron-topbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            z-index: 999;
+        }
+
+        
         .patron-nav-link {
-            display: block;
-            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1.25rem;
             text-decoration: none;
             border-radius: 0.5rem;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
             color: #495057;
-            transition: all 0.2s;
+            font-weight: 500;
+            transition: all 0.25s ease;
         }
 
             .patron-nav-link:hover {
-                background-color: #f1f3f5;
+                background-color: #f0f4ff;
                 color: #0d6efd;
+                transform: translateX(4px); 
             }
 
-            /* 當按鈕處於啟動狀態 (Active) 時的樣式 */
             .patron-nav-link.active {
                 background-color: #0d6efd;
                 color: white;
-                box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+                box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
             }
+
+                .patron-nav-link.active:hover {
+                    transform: none;
+                }
+
+     
+        .bell-shake:hover {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @@keyframes shake {
+            10%, 90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%, 80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%, 50%, 70% {
+                transform: translate3d(-2px, 0, 0);
+            }
+
+            40%, 60% {
+                transform: translate3d(2px, 0, 0);
+            }
+        }
     </style>
 </head>
 <body class="patron-body">
 
     @{
-        string currentAction = "";
-        if (ViewContext.RouteData.Values["action"] != null)
-        {
-            currentAction = ViewContext.RouteData.Values["action"].ToString();
-        }
-
+        string currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
 
         string CheckActive(string menuName)
         {
-            if (currentAction == menuName)
-            {
-                return "active";
-            }
-
-            return "";
-
+            return currentAction == menuName ? "active" : "";
         }
     }
 
@@ -85,72 +112,175 @@
         <div class="patron-sidebar d-flex flex-column flex-shrink-0 p-4">
 
             <a asp-controller="Home" asp-action="Index" class="d-flex align-items-center mb-4 link-dark text-decoration-none" title="回前台首頁">
-                <i class="bi bi-book-half fs-3 text-primary me-2"></i>
-                <span class="fs-4 fw-bold text-dark">LibPro <span class="text-primary fs-6">借閱人中心</span></span>
+                <i class="bi bi-book-half fs-2 text-primary me-2"></i>
+                <span class="fs-4 fw-bold text-dark tracking-wide">LibPro <span class="text-primary fs-6 ms-1">借閱人中心</span></span>
             </a>
 
-            <hr class="text-black-50 mb-4">
+            <hr class="text-black-50 mb-4 opacity-25">
 
             <ul class="nav flex-column mb-auto list-unstyled">
                 <li class="nav-item">
-                    <a asp-controller="PatronCenter" asp-action="Index" class="patron-nav-link py-3 fw-medium @CheckActive("Index")">
-                        <i class="bi bi-person-lines-fill me-3 fs-5"></i>
+                    <a asp-controller="PatronCenter" asp-action="Index" class="patron-nav-link @CheckActive("Index")">
+                        <i class="bi bi-person-vcard fs-5 me-3"></i>
                         個人資料
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a asp-controller="PatronCenter" asp-action="Reserves" class="patron-nav-link py-3 fw-medium @CheckActive("Reserves")">
-                        <i class="bi bi-bookmark-fill me-3 fs-5"></i>
+                    <a asp-controller="PatronCenter" asp-action="Reserves" class="patron-nav-link @CheckActive("Reserves")">
+                        <i class="bi bi-journal-bookmark-fill fs-5 me-3"></i>
                         預約紀錄
                     </a>
                 </li>
-
                 <li class="nav-item">
-                    <a href="#" class="patron-nav-link py-3 fw-medium text-secondary" data-bs-toggle="modal" data-bs-target="#globalChangePwdModal">
-                        <i class="bi bi-key  me-3 fs-5"></i>
+                    <a href="#" class="patron-nav-link text-secondary" data-bs-toggle="modal" data-bs-target="#globalChangePwdModal">
+                        <i class="bi bi-key-fill fs-5 me-3"></i>
                         修改密碼
                     </a>
                 </li>
-           
             </ul>
 
-            <div class="mt-auto pt-4 border-top">
-                <p class="text-muted small mb-0 text-center">&copy; 2026 LibPro System</p>
-                <div class="text-center mt-2">
-                    <a asp-controller="Login" asp-action="Logout" class="btn btn-outline-danger btn-sm rounded-pill w-100">
-                        <i class="bi bi-box-arrow-right me-1"></i>登出
+            <div class="mt-auto pt-4 border-top opacity-75">
+                <div class="text-center mb-3">
+                    <a asp-controller="Login" asp-action="Logout" class="btn btn-light text-danger border rounded-pill w-100 fw-bold shadow-sm hover-bg-danger">
+                        <i class="bi bi-box-arrow-right me-2"></i>登出系統
                     </a>
                 </div>
+                <p class="text-muted small mb-0 text-center">&copy; @DateTime.Now.Year LibPro System</p>
             </div>
         </div>
 
-        <div class="patron-main-content p-4 p-md-5">
 
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 rounded-4" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 rounded-4" role="alert">
-                    <i class="bi bi-x-circle-fill me-2"></i> @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
+        <div class="patron-main-content">
 
-            <main role="main">
+            <header class="patron-topbar d-flex justify-content-between align-items-center p-3 px-4 px-md-5">
+
+                <div class="fw-bold text-secondary">
+                    <i class="bi bi-house-door-fill me-1"></i> / 借閱人中心 / <span class="text-primary">@ViewData["Title"]</span>
+                </div>
+
+                <div class="d-flex align-items-center">
+
+                    <div class="dropdown me-4">
+                        <a class="nav-link position-relative bell-shake" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell-fill fs-4 text-secondary"></i>
+                            <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light d-none" style="font-size: 0.65rem;">
+                                0
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2" aria-labelledby="notificationDropdown" id="notificationList" style="width: 320px; max-height: 400px; overflow-y: auto;">
+                            <li><h6 class="dropdown-header fw-bold bg-light py-2 text-dark"><i class="bi bi-info-circle-fill me-2 text-primary"></i>系統提醒</h6></li>
+                            <li id="noNotificationMsg"><span class="dropdown-item text-muted small py-4 text-center">🎉 目前沒有任何新提醒</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex align-items-center border-start ps-3">
+                        <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center me-2 shadow-sm" style="width: 36px; height: 36px;">
+                            <i class="bi bi-person-fill fs-5"></i>
+                        </div>
+                        <span class="fw-bold text-dark">@User.Identity?.Name</span>
+                    </div>
+
+                </div>
+            </header>
+
+            <main role="main" class="flex-grow-1 p-4 p-md-5">
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 rounded-3 mb-4" role="alert">
+                        <i class="bi bi-check-circle-fill me-2 fs-5 align-text-top"></i>
+                        <strong>成功！</strong> @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 rounded-3 mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5 align-text-top"></i>
+                        <strong>錯誤！</strong> @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
                 @RenderBody()
+
             </main>
         </div>
     </div>
 
+    <div class="modal fade" id="loginNotificationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg overflow-hidden">
+                <div class="modal-header bg-warning border-0 p-4">
+                    <h5 class="modal-title fw-bold text-dark"><i class="bi bi-bell-fill me-2"></i>重要通知</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="list-group list-group-flush" id="modalNotificationList">
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 p-3 d-flex justify-content-center">
+                    <button type="button" class="btn btn-secondary px-5 fw-bold rounded-pill" data-bs-dismiss="modal">我知道了</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_ChangePasswordModal" />
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <partial name="_ChangePasswordModal" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/PatronCenter/GetNotifications')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notificationBadge');
+                    const list = document.getElementById('notificationList');
+                    const modalList = document.getElementById('modalNotificationList');
+                    if (data.count <= 0) return;
+
+                    badge.innerText = data.count > 9 ? '9+' : data.count;
+                    badge.classList.remove('d-none');
+
+                    const emptyMsg = document.getElementById('noNotificationMsg');
+                    if (emptyMsg) emptyMsg.remove();
+
+  
+                    let html = '';
+                    data.items.forEach(item => {
+                        html += `
+                            <a href="#" class="list-group-item list-group-item-action border-bottom border-0 py-3 px-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="bi ${item.icon} fs-2 text-${item.type}"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-1 fw-bold text-${item.type}">${item.title}</h6>
+                                        <div class="small text-secondary" style="white-space: normal; line-height: 1.5;">${item.message}</div>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    });
+
+                
+                    list.innerHTML += html;
+                    if (modalList) modalList.innerHTML = html;
+
+                   
+                    const isJustLoggedIn = '@TempData["JustLoggedIn"]' !== '';
+                    if (isJustLoggedIn) {
+                        const notifModal = new bootstrap.Modal(document.getElementById('loginNotificationModal'));
+                        notifModal.show();
+                    }
+                })
+                .catch(err => console.error('無法載入系統通知', err));
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

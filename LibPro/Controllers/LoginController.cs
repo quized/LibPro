@@ -110,13 +110,20 @@ namespace LibPro.Controllers
                 }
             }
 
+
             claims.Add(new Claim(ClaimTypes.Name, realName));
 
             var claimsIdentity = new ClaimsIdentity(claims, "ManagerLogin");
+            
+
             await HttpContext.SignInAsync("ManagerLogin", new ClaimsPrincipal(claimsIdentity));
 
+            
             if (roleName == "Patron")
             {
+                
+                TempData["JustLoggedIn"] = true;
+
                 return RedirectToAction("Index", "Home");
             }
 
