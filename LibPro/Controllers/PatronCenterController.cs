@@ -139,30 +139,41 @@ namespace LibPro.Controllers
 
 
             var unpaidFines = await _context.Fines
-                .Include(f => f.Loan)
-                .Include(f => f.FineType)
-                .Where(f => f.Loan != null && f.Loan.PatronID == currentUserId && f.ISPaid == false)
-                .ToListAsync();
+              .Include(f => f.Loan)
+              .Include(f => f.FineType)
+              .Where(f => f.Loan != null && f.Loan.PatronID == currentUserId && f.ISPaid == false)
+              .ToListAsync();
 
             decimal totalFine = 0;
 
             foreach (var fine in unpaidFines)
             {
-                if (fine.Loan != null && fine.FineType != null)
+                if (fine.Loan == null || fine.FineType == null)
                 {
-                    DateTime endDate = today;
-                    if (fine.Loan.ReturnDate.HasValue)
-                    {
-                        endDate = fine.Loan.ReturnDate.Value.Date;
-                    }
+                    continue;
+                }
 
-                    var dueDate = fine.Loan.DueDate.Date;
-                    var overdueDays = (endDate - dueDate).Days;
+              
+                if (fine.FineType.FTName != "逾期")
+                {
+                    totalFine += fine.FineType.UnitPrice;
+                    continue;
+                }
 
-                    if (overdueDays > 0)
-                    {
-                        totalFine += overdueDays * fine.FineType.UnitPrice;
-                    }
+                
+                DateTime endDate = today;
+
+                if (fine.Loan.ReturnDate.HasValue)
+                {
+                    endDate = fine.Loan.ReturnDate.Value.Date;
+                }
+
+                var dueDate = fine.Loan.DueDate.Date;
+                var overdueDays = (endDate - dueDate).Days;
+
+                if (overdueDays > 0)
+                {
+                    totalFine += overdueDays * fine.FineType.UnitPrice;
                 }
             }
 
