@@ -118,31 +118,26 @@ namespace LibPro.Controllers
         }
 
 
-        [HttpGet]
+
         public async Task<IActionResult> GetNotifications()
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+          
+            var currentPatronId = User.FindFirstValue("PatronID");
 
-            if (string.IsNullOrEmpty(currentUserId))
+    
+            if (string.IsNullOrEmpty(currentPatronId))
             {
-             
-                currentUserId = User.Identity.Name;
-
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return Json(new { count = 0, items = new List<object>() });
-                }
+                return Json(new { count = 0, items = new List<object>() });
             }
 
             var notifications = new List<object>();
             var today = DateTime.Now.Date;
 
-
             var unpaidFines = await _context.Fines
-              .Include(f => f.Loan)
-              .Include(f => f.FineType)
-              .Where(f => f.Loan != null && f.Loan.PatronID == currentUserId && f.ISPaid == false)
-              .ToListAsync();
+                .Include(f => f.Loan)
+                .Include(f => f.FineType)
+                .Where(f => f.Loan != null && f.Loan.PatronID == currentPatronId && f.ISPaid == false)
+                .ToListAsync();
 
             decimal totalFine = 0;
 
@@ -153,14 +148,12 @@ namespace LibPro.Controllers
                     continue;
                 }
 
-              
                 if (fine.FineType.FTName != "逾期")
                 {
                     totalFine += fine.FineType.UnitPrice;
                     continue;
                 }
 
-                
                 DateTime endDate = today;
 
                 if (fine.Loan.ReturnDate.HasValue)
@@ -189,10 +182,11 @@ namespace LibPro.Controllers
             }
 
 
+         
             var loans = await _context.Loans
                 .Include(l => l.BookItem)
                 .ThenInclude(bi => bi.Biblio)
-                .Where(l => l.PatronID == currentUserId && l.ReturnDate == null)
+                .Where(l => l.PatronID == currentPatronId && l.ReturnDate == null)
                 .ToListAsync();
 
             foreach (var loan in loans)
@@ -203,7 +197,7 @@ namespace LibPro.Controllers
                     {
                         type = "danger",
                         icon = "bi-exclamation-octagon-fill",
-                        title = "圖書已逾期！",
+                        title = "圖書已逾期！",                      
                         message = $"《{loan.BookItem.Biblio.BTitle}》已於 {loan.DueDate:yyyy-MM-dd} 到期，請盡速歸還！"
                     });
                     continue;
@@ -222,10 +216,12 @@ namespace LibPro.Controllers
                 }
             }
 
+          
             var arrivedReserves = await _context.Reserves
                 .Include(r => r.BookItem)
                     .ThenInclude(bi => bi.Biblio)
-                .Where(r => r.PatronID == currentUserId && r.ResStatus == 2)
+               
+                .Where(r => r.PatronID == currentPatronId && r.ResStatus == 2)
                 .ToListAsync();
 
             foreach (var res in arrivedReserves)
@@ -238,7 +234,6 @@ namespace LibPro.Controllers
                     message = $"您預約的《{res.BookItem.Biblio.BTitle}》已可取書，保留期限至 {res.ExpiryDate:yyyy-MM-dd}。"
                 });
             }
-
 
             return Json(new { count = notifications.Count, items = notifications });
         }
