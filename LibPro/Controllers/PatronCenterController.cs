@@ -1,4 +1,5 @@
 ﻿using LibPro.Models;
+using LibPro.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -237,6 +238,80 @@ namespace LibPro.Controllers
 
             return Json(new { count = notifications.Count, items = notifications });
         }
+
+        public async Task<IActionResult> Fines()
+        {
+            var currentPatronId = User.FindFirstValue("PatronID");
+            if (string.IsNullOrEmpty(currentPatronId))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            var today = DateTime.Now.Date;
+
+            var finesData = await _context.Fines
+                .Include(f => f.Loan)
+                    .ThenInclude(l => l.BookItem)
+                        .ThenInclude(bi => bi.Biblio)
+                .Include(f => f.FineType)
+                .Where(f => f.Loan != null && f.Loan.PatronID == currentPatronId)
+                .OrderBy(f => f.ISPaid)
+                .ThenByDescending(f => f.CreatedDate)
+                .ToListAsync();
+
+            
+            var model = new List<PatronFineViewModel>();
+
+            foreach (var fine in finesData)
+            {
+                
+                var info = new PatronFineViewModel
+                {
+                    FineID = fine.FineID,
+                    CreatedDate = fine.CreatedDate,
+                    BookTitle = fine.Loan.BookItem.Biblio.BTitle,
+                    FineTypeName = fine.FineType.FTName,
+                    IsPaid = fine.ISPaid,
+                    OverdueDays = 0,
+                    Amount = 0
+                };
+
+                if (fine.FineType != null)
+                {
+                   
+                    if (fine.FineType.FTName != "逾期")
+                    {
+                        info.Amount = fine.FineType.UnitPrice;
+                    }
+
+                  
+                    if (fine.FineType.FTName == "逾期")
+                    {
+                        DateTime endDate = today;
+
+                        if (fine.Loan.ReturnDate != null)
+                        {
+                            endDate = fine.Loan.ReturnDate.Value.Date;
+                        }
+
+                        var dueDate = fine.Loan.DueDate.Date;
+                        var overdueDays = (endDate - dueDate).Days;
+
+                        if (overdueDays > 0)
+                        {
+                            info.OverdueDays = overdueDays;
+                            info.Amount = overdueDays * fine.FineType.UnitPrice;
+                        }
+                    }
+                }
+
+                model.Add(info);
+            }
+            ViewBag.TotalUnpaid = model.Where(m => !m.IsPaid).Sum(m => m.Amount);
+
+            return View(model);
+        }
+
 
     }
 }

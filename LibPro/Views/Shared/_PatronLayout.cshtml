@@ -132,6 +132,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a asp-controller="PatronCenter" asp-action="Fines" class="patron-nav-link @CheckActive("Fines")">
+                        <i class="bi bi-cash-coin fs-5 me-3"></i>
+                        罰金紀錄
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="patron-nav-link text-secondary" data-bs-toggle="modal" data-bs-target="#globalChangePwdModal">
                         <i class="bi bi-key-fill fs-5 me-3"></i>
                         修改密碼
