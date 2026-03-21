@@ -1,0 +1,76 @@
+﻿@model IEnumerable<LibPro.ViewModels.PatronLoanViewModel>
+
+@{
+    ViewData["Title"] = "目前借閱";
+}
+
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+        <h4 class="fw-bold text-dark mb-0">
+            <i class="bi bi-book-half text-primary me-2"></i>我的借閱清單
+        </h4>
+    </div>
+    <div class="card-body p-4">
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-inbox text-secondary opacity-50" style="font-size: 5rem;"></i>
+                <h5 class="fw-bold mt-3 text-secondary">您目前沒有借閱任何書籍</h5>
+                <p class="text-muted">去圖書館逛逛，發掘新知識吧！</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center">
+                    <thead class="table-light text-muted small">
+                        <tr>
+                            <th class="text-start rounded-start ps-3">書名</th>
+                            <th>借閱日期</th>
+                            <th>應還日期</th>
+                            <th>續借狀態</th>
+                            <th class="rounded-end">操作選項</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-start ps-3">
+                                    <div class="fw-bold text-dark">@item.BookTitle</div>
+                                    <div class="small text-muted">@item.Author</div>
+                                </td>
+                                <td class="text-muted font-monospace">@item.LoanDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <span class="fw-bold font-monospace @(item.DueDate.Date < DateTime.Now.Date ? "text-danger" : "text-dark")">
+                                        @item.DueDate.ToString("yyyy-MM-dd")
+                                    </span>
+                                </td>
+                                <td class="text-muted">
+                                    @item.RenewalCount / 1 次
+                                </td>
+                                <td>
+                                    @if (item.CanRenew)
+                                    {
+                                        <form asp-action="RenewLoan" method="post" class="d-inline">
+                                            <input type="hidden" name="loanId" value="@item.LoanID" />
+                                            <button type="submit" class="btn btn-sm @item.ButtonClass rounded-pill px-3 fw-bold shadow-sm" onclick="return confirm('確定要續借這本書嗎？到期日將為您順延 14 天。');">
+                                                <i class="bi bi-arrow-clockwise me-1"></i>@item.RenewMessage
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-sm @item.ButtonClass rounded-pill px-3 fw-bold" disabled>
+                                            @item.RenewMessage
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

@@ -312,7 +312,79 @@ namespace LibPro.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> MyLoans()
+        {
+            var currentPatronId = User.FindFirstValue("PatronID");
+            if (string.IsNullOrEmpty(currentPatronId))
+            {
+                return RedirectToAction("Login", "Login");
+            }
 
+            var today = DateTime.Now.Date;
+
+           
+            var activeLoans = await _context.Loans
+                .Include(l => l.BookItem)
+                    .ThenInclude(bi => bi.Biblio)
+                .Where(l => l.PatronID == currentPatronId && l.ReturnDate == null)
+                .OrderBy(l => l.DueDate) 
+                .ToListAsync();
+
+           
+            var activeReserves = await _context.Reserves
+                .Where(r => r.ResStatus == 1 || r.ResStatus == 2)
+                .ToListAsync();
+
+            var model = new List<PatronLoanViewModel>();
+
+            foreach (var loan in activeLoans)
+            {
+                var info = new PatronLoanViewModel
+                {
+                    LoanID = loan.LoanID,
+                    BookTitle = loan.BookItem.Biblio.BTitle,
+                    Author = loan.BookItem.Biblio.Author,
+                    LoanDate = loan.LoanDate,
+                    DueDate = loan.DueDate,
+                    RenewalCount = loan.RenewalCount,
+
+                    
+                    CanRenew = true,
+                    RenewMessage = "我要續借",
+                    ButtonClass = "btn-outline-primary"
+                };
+
+                
+
+              
+                if (activeReserves.Any(r => r.BookItem.ItemID == loan.BookItem.ItemID))
+                {
+                    info.CanRenew = false;
+                    info.RenewMessage = "有人預約";
+                    info.ButtonClass = "btn-warning disabled opacity-75 text-dark fw-bold";
+                }
+
+               
+                if (loan.RenewalCount >= 1)
+                {
+                    info.CanRenew = false;
+                    info.RenewMessage = "已達上限";
+                    info.ButtonClass = "btn-secondary disabled opacity-75";
+                }
+
+                
+                if (loan.DueDate.Date < today)
+                {
+                    info.CanRenew = false;
+                    info.RenewMessage = "已逾期";
+                    info.ButtonClass = "btn-danger disabled opacity-75";
+                }
+
+                model.Add(info);
+            }
+
+            return View(model);
+        }
     }
 }
 
