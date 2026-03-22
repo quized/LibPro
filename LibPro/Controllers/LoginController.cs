@@ -19,7 +19,7 @@ namespace LibPro.Controllers
         }
 
 
-        public IActionResult login(string returnUrl)
+        public IActionResult login(string? returnUrl)
         {
             
             ViewData["ReturnUrl"] = returnUrl;
@@ -44,7 +44,7 @@ namespace LibPro.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl)
         {
             
             if (!ModelState.IsValid)
@@ -90,8 +90,7 @@ namespace LibPro.Controllers
                 new Claim(ClaimTypes.NameIdentifier, user.UserID),
                 new Claim(ClaimTypes.Role, roleName)
             };
-
-           
+                       
            
             if (roleName == "Staff" || roleName == "Admin")
             {
