@@ -93,12 +93,32 @@
                                     <span class="fw-medium">我的帳戶</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userDropdown">
-                                    <li>
-                                        <a class="dropdown-item py-2" asp-controller="PatronCenter" asp-action="Index">
-                                            <i class="bi bi-person-badge text-muted me-2"></i>借閱人中心
-                                        </a>
-                                    </li>
-                                    
+
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item py-2 fw-bold text-danger" asp-controller="UserAccounts" asp-action="Index">
+                                                <i class="bi bi-shield-lock-fill me-2"></i>系統管理後台
+                                            </a>
+                                        </li>
+                                    }
+                                    else if (User.IsInRole("Staff"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item py-2 fw-bold text-primary" asp-controller="Home" asp-action="StaffCenter">
+                                                <i class="bi bi-speedometer2 me-2"></i>館員中心
+                                            </a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li>
+                                            <a class="dropdown-item py-2" asp-controller="PatronCenter" asp-action="Index">
+                                                <i class="bi bi-person-badge text-muted me-2"></i>借閱人中心
+                                            </a>
+                                        </li>
+                                    }
+
                                     <li>
                                         <a href="#" class="dropdown-item py-2 text-dark" data-bs-toggle="modal" data-bs-target="#globalChangePwdModal">
                                             <i class="bi bi-key text-muted me-2"></i>修改密碼

@@ -19,8 +19,11 @@ namespace LibPro.Controllers
         }
 
 
-        public IActionResult login()
+        public IActionResult login(string returnUrl)
         {
+            
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (!User.Identity.IsAuthenticated)
             {
                 return View();
@@ -41,13 +44,15 @@ namespace LibPro.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
+        
             var user = await _context.UserAccounts
                                      .Include(u => u.UserRole)
                                      .FirstOrDefaultAsync(u => u.Account == model.Account);
@@ -58,19 +63,22 @@ namespace LibPro.Controllers
                 return View(model);
             }
 
+           
             bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
+
             if (!isPasswordCorrect)
             {
                 ModelState.AddModelError(string.Empty, "帳號或密碼錯誤，請重新登入。");
                 return View(model);
             }
 
+          
             user.LastLoginTime = DateTime.Now;
             await _context.SaveChangesAsync();
 
+           
             string roleName = "Patron";
             string realName = user.Account;
-
 
             if (user.UserRole != null)
             {
@@ -83,12 +91,14 @@ namespace LibPro.Controllers
                 new Claim(ClaimTypes.Role, roleName)
             };
 
+           
+           
             if (roleName == "Staff" || roleName == "Admin")
             {
                 var staffInfo = await _context.Staffs.FirstOrDefaultAsync(s => s.UserID == user.UserID);
+
                 if (staffInfo != null)
                 {
-
                     if (staffInfo.IsResigned)
                     {
                         ModelState.AddModelError(string.Empty, "該員工帳號已被註銷。");
@@ -100,9 +110,11 @@ namespace LibPro.Controllers
                 }
             }
 
+           
             if (roleName == "Patron")
             {
                 var patronsInfo = await _context.Patrons.FirstOrDefaultAsync(s => s.UserID == user.UserID);
+
                 if (patronsInfo != null)
                 {
                     claims.Add(new Claim("PatronID", patronsInfo.PatronID));
@@ -110,29 +122,37 @@ namespace LibPro.Controllers
                 }
             }
 
-
             claims.Add(new Claim(ClaimTypes.Name, realName));
 
+           
             var claimsIdentity = new ClaimsIdentity(claims, "ManagerLogin");
-            
-
             await HttpContext.SignInAsync("ManagerLogin", new ClaimsPrincipal(claimsIdentity));
 
             
             if (roleName == "Patron")
             {
-                
                 TempData["JustLoggedIn"] = true;
-
-                return RedirectToAction("Index", "Home");
             }
 
+           
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            
             if (roleName == "Admin")
             {
                 return RedirectToAction("Index", "UserAccounts");
             }
 
-            return RedirectToAction("StaffCenter", "Home");
+            if (roleName == "Staff")
+            {
+                return RedirectToAction("StaffCenter", "Home");
+            }
+
+            
+            return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> Logout()
