@@ -125,6 +125,13 @@
                         個人資料
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a asp-controller="PatronCenter" asp-action="MyLoans" class="patron-nav-link @CheckActive("MyLoans")">
+                        <i class="bi bi-book-half fs-5 me-3"></i>
+                        目前借閱
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a asp-controller="PatronCenter" asp-action="Reserves" class="patron-nav-link @CheckActive("Reserves")">
                         <i class="bi bi-journal-bookmark-fill fs-5 me-3"></i>

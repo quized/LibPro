@@ -354,17 +354,26 @@ namespace LibPro.Controllers
                     ButtonClass = "btn-outline-primary"
                 };
 
-                
+
+
 
               
-                if (activeReserves.Any(r => r.BookItem.ItemID == loan.BookItem.ItemID))
+                if ((loan.DueDate.Date - today).Days > 3)
+                {
+                    info.CanRenew = false;
+                    info.RenewMessage = "尚未開放";
+                    info.ButtonClass = "btn-outline-secondary disabled opacity-50";
+                }
+
+
+                if (activeReserves.Any(r => r.ItemID == loan.ItemID))
                 {
                     info.CanRenew = false;
                     info.RenewMessage = "有人預約";
                     info.ButtonClass = "btn-warning disabled opacity-75 text-dark fw-bold";
                 }
 
-               
+
                 if (loan.RenewalCount >= 1)
                 {
                     info.CanRenew = false;
@@ -384,6 +393,65 @@ namespace LibPro.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RenewLoan(string loanId)
+        {
+            var currentPatronId = User.FindFirstValue("PatronID");
+            if (string.IsNullOrEmpty(currentPatronId))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+          
+            var loan = await _context.Loans
+                .Include(l => l.BookItem)
+                    .ThenInclude(bi => bi.Biblio)
+                .FirstOrDefaultAsync(l => l.LoanID == loanId && l.PatronID == currentPatronId && l.ReturnDate == null);
+
+            if (loan == null)
+            {
+                TempData["ErrorMessage"] = "找不到該借閱紀錄，或已歸還。";
+                return RedirectToAction(nameof(MyLoans));
+            }
+
+
+            var today = DateTime.Now.Date;
+
+            
+            if ((loan.DueDate.Date - today).Days > 3)
+            {
+                TempData["ErrorMessage"] = "系統規定：圖書需於【到期日前 3 天內】方可辦理續借手續！";
+                return RedirectToAction(nameof(MyLoans));
+            }
+
+            if (loan.DueDate.Date < today)
+            {
+                TempData["ErrorMessage"] = "該圖書已逾期，無法續借！";
+                return RedirectToAction(nameof(MyLoans));
+            }
+
+            bool isReserved = await _context.Reserves.AnyAsync(r => r.BookItem!.ItemID == loan.ItemID && (r.ResStatus == 1 || r.ResStatus == 2));
+
+            if (isReserved)
+            {
+                TempData["ErrorMessage"] = "該圖書目前有其他讀者預約，無法續借！";
+                return RedirectToAction(nameof(MyLoans));
+            }
+
+
+            loan.DueDate = loan.DueDate.AddDays(14);
+            loan.RenewalCount += 1;
+
+            _context.Update(loan);
+            await _context.SaveChangesAsync();
+
+           
+            string bookTitle = loan.BookItem.Biblio.BTitle;
+
+            TempData["SuccessMessage"] = $"《{bookTitle}》續借成功！新到期日為：{loan.DueDate:yyyy-MM-dd}";
+            return RedirectToAction(nameof(MyLoans));
         }
     }
 }
