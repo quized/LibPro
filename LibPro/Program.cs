@@ -13,7 +13,6 @@ builder.Services.AddDbContext<LibproContext>(options =>
 builder.Services.AddScoped<AnnService>();
 
 
-
 builder.Services.AddAuthentication("ManagerLogin").AddCookie("ManagerLogin", options =>
 {
     options.LoginPath = "/Login/Login";

@@ -69,17 +69,23 @@ namespace LibPro.Controllers
                     return RedirectToAction("Logout", "Login");
                 }
 
-                bool result = await _annService.GetAnnCreate(announcements, currentStaffID);
-
-                if (result)
+                
+                try
                 {
-                    return RedirectToAction(nameof(Index));
+                    bool result = await _annService.GetAnnCreate(announcements, currentStaffID);
+                    if (result)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
-
-
+                catch (Exception ex)
+                {
+                   
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
             }
 
-            ModelState.AddModelError("", "公告建立失敗，請聯絡管理員。");
+            
             return View(announcements);
         }
 
@@ -111,24 +117,29 @@ namespace LibPro.Controllers
             ModelState.Remove("CreatedDate");
             ModelState.Remove("Creator");
 
-
             if (ModelState.IsValid)
             {
                 try
                 {
                     bool editResult = await _annService.GetAnnEdit(id, announcements);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_annService.AnnouncementsExists(announcements.AnnID))
+
+                   
+                    if (!editResult)
                     {
                         return NotFound();
                     }
-                        throw;
-                    
+
+                  
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                catch (DbUpdateConcurrencyException)
+                {
+                    
+                    ModelState.AddModelError(string.Empty, "這筆資料剛好被其他人修改了，請重新整理後再試一次。");
+                }
             }
+
+            
             return View(announcements);
         }
 
