@@ -1,4 +1,5 @@
 ﻿using LibPro.Models;
+using LibPro.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,21 +15,18 @@ namespace LibPro.Controllers
     [Authorize(Roles = "Staff")]
     public class AnnouncementsController : Controller
     {
-        private readonly LibproContext _context;
+        private readonly AnnService _annService;
 
-        public AnnouncementsController(LibproContext context)
+        public AnnouncementsController(AnnService annService)
         {
-            _context = context;
+            _annService = annService;
         }
 
 
         public async Task<IActionResult> Index()
         {
-            // 直接撈出所有資料，並依日期排序
-            var announcements = await _context.Announcements
-                .Include(a => a.Staff)
-                .OrderByDescending(a => a.CreatedDate)
-                .ToListAsync();
+            var announcements = await _annService.GetAnnIndex();
+
 
             return View(announcements);
         }
@@ -36,14 +34,9 @@ namespace LibPro.Controllers
         // GET: Announcements/Details/5
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var announcements = await _context.Announcements
-                .Include(a => a.Staff)
-                .FirstOrDefaultAsync(m => m.AnnID == id);
+            var announcements = await _annService.GetAnnDetails(id);
+
             if (announcements == null)
             {
                 return NotFound();
@@ -58,9 +51,7 @@ namespace LibPro.Controllers
             return View();
         }
 
-        // POST: Announcements/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Announcements announcements)
@@ -73,46 +64,31 @@ namespace LibPro.Controllers
             if (ModelState.IsValid)
             {
                 var currentStaffID = User.FindFirstValue("StaffID");
-
                 if (string.IsNullOrEmpty(currentStaffID))
                 {
                     return RedirectToAction("Logout", "Login");
                 }
 
-              
+                bool result = await _annService.GetAnnCreate(announcements, currentStaffID);
 
-
-                var annIDResult = await _context.Database.SqlQuery<string>($"exec GetAnnID").ToListAsync();
-                var newAnnID = annIDResult.FirstOrDefault();
-
-                if (string.IsNullOrWhiteSpace(newAnnID))
+                if (result)
                 {
-                    ModelState.AddModelError("", "產生 公告編號 失敗，請聯絡管理員。");
-                    return View(announcements);
+                    return RedirectToAction(nameof(Index));
                 }
 
-                announcements.AnnID = newAnnID;
-                announcements.CreatedDate = DateTime.Now;
-                announcements.IsVisible = true;
-                announcements.Creator = currentStaffID;
 
-                _context.Add(announcements);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
             }
-           
+
+            ModelState.AddModelError("", "公告建立失敗，請聯絡管理員。");
             return View(announcements);
         }
 
         // GET: Announcements/Edit/5
         public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        {           
 
-            var announcements = await _context.Announcements.FindAsync(id);
+            var announcements = await _annService.GetAnnEditView(id);
+          
             if (announcements == null)
             {
                 return NotFound();
@@ -140,29 +116,16 @@ namespace LibPro.Controllers
             {
                 try
                 {
-                    var existingAnn = await _context.Announcements.FindAsync(id);
-                    if (existingAnn == null)
-                    {
-                        return NotFound();
-                    }
-
-                    existingAnn.Title = announcements.Title;
-                    existingAnn.Content = announcements.Content;
-                    existingAnn.IsVisible = announcements.IsVisible;
-
-                    await _context.SaveChangesAsync();
-
+                    bool editResult = await _annService.GetAnnEdit(id, announcements);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AnnouncementsExists(announcements.AnnID))
+                    if (!_annService.AnnouncementsExists(announcements.AnnID))
                     {
                         return NotFound();
                     }
-                    else
-                    {
                         throw;
-                    }
+                    
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -181,21 +144,16 @@ namespace LibPro.Controllers
                 return NotFound();
             }
 
-            var announcements = await _context.Announcements.FindAsync(id);
-            if (announcements != null)
-            {
+            bool isDeleted = await _annService.GetAnnDelete(id);
 
-                announcements.IsVisible = false;
-                _context.Announcements.Update(announcements);
+            if (!isDeleted)
+            {
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AnnouncementsExists(string id)
-        {
-            return _context.Announcements.Any(e => e.AnnID == id);
-        }
+        
     }
 }

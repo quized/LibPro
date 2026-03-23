@@ -1,4 +1,5 @@
 using LibPro.Models;
+using LibPro.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,10 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<LibproContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LibProContext")));
+
+builder.Services.AddScoped<AnnService>();
+
+
 
 builder.Services.AddAuthentication("ManagerLogin").AddCookie("ManagerLogin", options =>
 {
