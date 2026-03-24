@@ -19,13 +19,15 @@ namespace LibPro.Controllers
             _context = context;
         }
 
-        public async  Task<IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
+            
             var topBooks = await _context.Biblios
-                .Where(b => b.isDeleted == 0) 
-                .OrderByDescending(b => b.BibID)
+                .Where(b => b.isDeleted == 0)
+                .OrderByDescending(b => b.BookItems.SelectMany(bi => bi.Loans).Count())
                 .Take(5)
                 .ToListAsync();
+
             return View(topBooks);
         }
 
