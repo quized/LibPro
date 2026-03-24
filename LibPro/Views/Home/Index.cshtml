@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "首頁";
     Layout = "_HomeLayout";
+    int index = 0;
 }
 
 <div class="position-relative w-100" style="margin-top: -1rem; margin-bottom: 3rem;">
@@ -61,19 +62,33 @@
                 </div>
 
                 <div class="carousel-inner bg-light border rounded-3 overflow-hidden">
+                   
                     @foreach (var item in Model)
                     {
-                        var a = item == Model.First() ? "active" : "";
+                        
+                        var activeClass = (index == 0) ? "active" : "";
 
-                        <div class="carousel-item @a">
+                        <div class="carousel-item @activeClass">
+
                             <div class="d-flex justify-content-center align-items-center" style="height: 400px; background-color: #f8f9fa;">
-                                <img src="~/ImgPath/@item.ImgPath" class="d-block" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="@item.BTitle">
+
+                                @if (string.IsNullOrEmpty(item.ImgPath))
+                                {
+                                    <img src="~/ImgPath/bookcover.jpg" class="d-block" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="@item.BTitle">
+                                }
+                                else
+                                {
+                                    <img src="~/ImgPath/@item.ImgPath" class="d-block" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="@item.BTitle">
+                                }
+
                             </div>
 
                             <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3 mb-2 px-3 py-1 mx-auto" style="width: fit-content;">
                                 <h5 class="mb-0">@item.BTitle</h5>
                             </div>
+
                         </div>
+                        index++;
                     }
                 </div>
 
