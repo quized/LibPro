@@ -6,10 +6,25 @@
 
 <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
     <h2 class="m-0 fw-bold text-dark">罰金列表</h2>
-    <a asp-action="Create" class="btn btn-warning shadow-sm px-4 fw-bold">
+    <button type="button" class="btn btn-warning shadow-sm px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#createFineModal">
         <i class="bi bi-plus-lg me-1"></i> 手動開立罰單
-    </a>
+    </button>
 </div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <div class="card shadow-sm border-0 mb-4 bg-light">
     <div class="card-body">
@@ -118,6 +133,38 @@
                     }
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createFineModal" tabindex="-1" aria-labelledby="createFineModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Create" method="post">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title fw-bold text-dark" id="createFineModalLabel"><i class="bi bi-plus-lg me-1"></i> 手動開立罰單</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label class="control-label fw-bold mb-1">罰款項目</label>
+                        <select name="FTID" class="form-select" asp-items="ViewBag.FTID" required>
+                            <option value="">-- 請選擇罰款類型 --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="control-label fw-bold mb-1">關聯借閱紀錄</label>
+                        <select name="LoanID" class="form-select" asp-items="ViewBag.LoanID">
+                            <option value="">-- 無關聯借閱 (如補發借閱證) --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg"></i> 確認開立</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -87,32 +87,32 @@ namespace LibPro.Controllers
 
 
                 var bookItem = await _context.BookItems.FindAsync(loans.ItemID);
-                Reserves targetReserve = null; 
+                Reserves targetReserve = null;
 
-               
+
                 if (bookItem == null || (bookItem.ItmStatus != 1 && bookItem.ItmStatus != 3))
                 {
                     return Json(new { success = false, message = "此書籍不在架上，或已被借出。" });
                 }
 
-               
+
                 if (bookItem.ItmStatus == 3)
                 {
                     targetReserve = await _context.Reserves.FirstOrDefaultAsync(r =>
                         r.ItemID == bookItem.ItemID && r.PatronID == loans.PatronID && r.ResStatus == 2);
 
-                   
+
                     if (targetReserve == null)
                     {
                         return Json(new { success = false, message = "此書籍為其他讀者預約保留中，不可借閱。" });
                     }
                 }
 
-               
+
 
 
                 bool hasBorrowedSameBook = await _context.Loans
-                 .Include(l => l.BookItem) 
+                 .Include(l => l.BookItem)
                  .AnyAsync(l => l.PatronID == loans.PatronID && l.ReturnDate == null && l.BookItem.BibID == bookItem.BibID);
 
                 if (hasBorrowedSameBook)
@@ -137,13 +137,24 @@ namespace LibPro.Controllers
                 decimal totalOwed = 0;
                 foreach (var fine in unpaidFines)
                 {
+                    DateTime endDate = DateTime.Now;
 
-                    int overdueDays = (DateTime.Now.Date - fine.Loan.DueDate.Date).Days;
-                    if (overdueDays < 0) overdueDays = 0;
+                    if(fine.Loan.ReturnDate != null)
+                    {
+                        endDate = fine.Loan.ReturnDate.Value;
+                    }
+
+                    if (fine.FTID == 1)
+                    {
+                        int overdueDays = (endDate - fine.Loan.DueDate).Days;
+                        totalOwed += overdueDays * fine.FineType.UnitPrice;
+                    }
+                    else
+                    {
+                        totalOwed += fine.FineType.UnitPrice;
+                    }
 
 
-                    decimal fineAmount = fine.FineType.UnitPrice * overdueDays;
-                    totalOwed += fineAmount;
                 }
 
 
@@ -169,12 +180,12 @@ namespace LibPro.Controllers
                 loans.RenewalCount = 0;
 
 
-             
+
                 _context.Loans.Add(loans);
                 bookItem.ItmStatus = 2;
                 _context.BookItems.Update(bookItem);
 
-                
+
                 if (targetReserve != null)
                 {
                     targetReserve.ResStatus = 3;
@@ -280,34 +291,34 @@ namespace LibPro.Controllers
 
             var topReserve = await _context.Reserves
                   .Where(r => r.BookItem.BibID == bookItem.BibID && r.ResStatus == 1)
-                  .OrderBy(r => r.ResDate) 
+                  .OrderBy(r => r.ResDate)
                   .FirstOrDefaultAsync();
 
             bool isReservedNow = false;
             string reserveMessage = "";
 
-            
+
             bookItem.ItmStatus = 1;
 
-          
+
             if (topReserve != null)
             {
-               
+
                 bookItem.ItmStatus = 3;
 
-            
-                topReserve.ResStatus = 2; 
-                topReserve.ItemID = bookItem.ItemID; 
-                topReserve.ExpiryDate = today.AddDays(7); 
+
+                topReserve.ResStatus = 2;
+                topReserve.ItemID = bookItem.ItemID;
+                topReserve.ExpiryDate = today.AddDays(7);
 
                 _context.Reserves.Update(topReserve);
                 isReservedNow = true;
                 reserveMessage = $"此書已為預約者 (證號:{topReserve.PatronID}) 保留，請移至預約保留區！";
             }
 
-           
+
             _context.BookItems.Update(bookItem);
-            
+
 
             try
             {

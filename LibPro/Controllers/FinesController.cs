@@ -24,19 +24,16 @@ namespace LibPro.Controllers
 
         public async Task<IActionResult> Index(string searchString, string status)
         {
-
             var finesQuery = _context.Fines
                 .Include(f => f.FineType)
                 .Include(f => f.Loan)
                     .ThenInclude(l => l.Patron)
                 .AsQueryable();
 
-
             if (!string.IsNullOrEmpty(searchString))
             {
                 finesQuery = finesQuery.Where(f => f.Loan.PatronID.Contains(searchString) || f.Loan.Patron.Name.Contains(searchString));
             }
-
 
             if (status == "unpaid")
             {
@@ -47,12 +44,10 @@ namespace LibPro.Controllers
                 finesQuery = finesQuery.Where(f => f.ISPaid);
             }
 
-
             var finesData = await finesQuery
                 .OrderBy(f => f.ISPaid)
                 .ThenByDescending(f => f.CreatedDate)
                 .ToListAsync();
-
 
             var viewModelList = new List<FineViewModel>();
 
@@ -64,14 +59,12 @@ namespace LibPro.Controllers
                 int overdueDays = 0;
                 decimal amount = 0;
 
-               
                 if (f.FineType != null)
                 {
                     ftName = f.FineType.FTName;
                     amount = f.FineType.UnitPrice;
                 }
 
-             
                 if (f.Loan != null)
                 {
                     pId = f.Loan.PatronID;
@@ -79,7 +72,6 @@ namespace LibPro.Controllers
                         pName = f.Loan.Patron.Name;
                 }
 
-                
                 if (f.FTID == 1 && f.Loan != null && f.FineType != null)
                 {
                     overdueDays = (f.CreatedDate.Date - f.Loan.DueDate.Date).Days;
@@ -101,10 +93,33 @@ namespace LibPro.Controllers
                 });
             }
 
-
             ViewBag.CurrentFilter = searchString;
             ViewBag.CurrentStatus = status;
 
+            
+          
+            ViewData["FTID"] = new SelectList(_context.FineTypes.Where(ft => ft.FTID != 1), "FTID", "FTName");
+
+            var loansFromDb = await _context.Loans.Include(l => l.Patron).ToListAsync();
+            var loanOptions = loansFromDb.Select(l =>
+            {
+              
+                string text = $"未知讀者 (單號: {l.LoanID})";
+
+              
+                if (l.Patron != null)
+                {
+                    text = $"{l.Patron.Name} (單號: {l.LoanID})";
+                }
+
+                return new
+                {
+                    LoanID = l.LoanID,
+                    DisplayText = text
+                };
+            }).ToList();
+
+            ViewData["LoanID"] = new SelectList(loanOptions, "LoanID", "DisplayText");
 
             return View(viewModelList);
         }
@@ -143,19 +158,13 @@ namespace LibPro.Controllers
 
 
 
-        public IActionResult Create()
-        {
-            ViewData["FTID"] = new SelectList(_context.FineTypes, "FTID", "FTName");
-            ViewData["LoanID"] = new SelectList(_context.Loans, "LoanID", "LoanID");
-            return View();
-        }
+
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Fines fines)
         {
-           
             ModelState.Remove("CreatedDate");
             ModelState.Remove("ISPaid");
             ModelState.Remove("FineID");
@@ -164,24 +173,18 @@ namespace LibPro.Controllers
             {
                 if (fines.LoanID != null)
                 {
-
                     bool isDuplicate = await _context.Fines
                         .AnyAsync(f => f.LoanID == fines.LoanID && f.FTID == fines.FTID);
 
                     if (isDuplicate)
                     {
-                        
-                        ModelState.AddModelError("", "這筆借閱紀錄已經開立過「相同類型」的罰單了！");
-
-                     
-                        ViewData["FTID"] = new SelectList(_context.FineTypes, "FTID", "FTName", fines.FTID);
-                        ViewData["LoanID"] = new SelectList(_context.Loans, "LoanID", "LoanID", fines.LoanID);
-                        return View(fines);
+                       
+                        TempData["ErrorMessage"] = "這筆借閱紀錄已經開立過「相同類型」的罰單了！";
+                        return RedirectToAction(nameof(Index));
                     }
                 }
 
                 fines.CreatedDate = DateTime.Now;
-
                 fines.ISPaid = false;
 
                 var FineIDResult = await _context.Database.SqlQuery<string>($"exec GetFineID").ToListAsync();
@@ -189,21 +192,21 @@ namespace LibPro.Controllers
 
                 if (string.IsNullOrWhiteSpace(FineID))
                 {
-                    ModelState.AddModelError("", "產生 罰金編號 失敗，請聯絡管理員。");
-                    ViewData["FTID"] = new SelectList(_context.FineTypes, "FTID", "FTName");
-                    ViewData["LoanID"] = new SelectList(_context.Loans, "LoanID", "LoanID", fines.LoanID);
-                    return View(fines);
+                    TempData["ErrorMessage"] = "產生罰金編號失敗，請聯絡管理員。";
+                    return RedirectToAction(nameof(Index));
                 }
 
                 fines.FineID = FineID;
                 _context.Add(fines);
                 await _context.SaveChangesAsync();
+
+                
+                TempData["SuccessMessage"] = "成功手動開立罰單！";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FTID"] = new SelectList(_context.FineTypes, "FTID", "FTName");
-            ViewData["LoanID"] = new SelectList(_context.Loans, "LoanID", "LoanID", fines.LoanID);
-            return View(fines);
-        }
 
+            TempData["ErrorMessage"] = "資料格式錯誤，無法開立罰單。";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
